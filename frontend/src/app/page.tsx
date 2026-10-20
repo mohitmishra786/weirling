@@ -378,22 +378,22 @@ function LandingSections() {
           panel showing which signals put each one there. It learns from what you open,
           finish, skip and rate. You can see and edit what it has learned.
         </p>
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
+        <div className="mt-10 grid gap-6 md:grid-cols-2 [&>*]:min-w-0">
           <Image
             src="/landing/example-digest.png"
             alt="A Weirling digest: ranked articles with AI summaries and scores"
             width={1280}
             height={800}
-            sizes="(min-width: 768px) 480px, 100vw"
-            className="rounded-2xl border border-white/10"
+            sizes="(min-width: 768px) 488px, 92vw"
+            className="h-auto w-full rounded-2xl border border-white/10"
           />
           <Image
             src="/landing/example-why.png"
             alt="The Why this? panel: the share of each reading signal behind an item's rank"
             width={1280}
             height={800}
-            sizes="(min-width: 768px) 480px, 100vw"
-            className="rounded-2xl border border-white/10"
+            sizes="(min-width: 768px) 488px, 92vw"
+            className="h-auto w-full rounded-2xl border border-white/10"
           />
         </div>
       </section>
@@ -467,12 +467,18 @@ function LandingSections() {
       <footer className="border-t border-white/10">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-8 text-sm text-white/60">
           <Logo />
-          <nav aria-label="Footer" className="flex flex-wrap gap-5">
-            <a href="/how-it-works" className="hover:text-white">How it works</a>
-            <a href="/vs/feedly" className="hover:text-white">Compare</a>
-            <a href="/privacy" className="hover:text-white">Privacy</a>
-            <a href="/terms" className="hover:text-white">Terms</a>
-            <a href="https://github.com/mohitmishra786/weirling" className="hover:text-white">GitHub</a>
+          <nav aria-label="Footer" className="flex flex-wrap gap-x-3 gap-y-1">
+            {[
+              ["/how-it-works", "How it works"],
+              ["/vs/feedly", "Compare"],
+              ["/privacy", "Privacy"],
+              ["/terms", "Terms"],
+              ["https://github.com/mohitmishra786/weirling", "GitHub"],
+            ].map(([href, label]) => (
+              <a key={href} href={href} className="inline-block px-2 py-2 hover:text-white">
+                {label}
+              </a>
+            ))}
           </nav>
         </div>
       </footer>
