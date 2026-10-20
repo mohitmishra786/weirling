@@ -369,6 +369,13 @@ function LandingSections() {
         </ol>
       </section>
 
+      <section className="mx-auto max-w-5xl px-6 pb-24" aria-labelledby="video-heading">
+        <h2 id="video-heading" className="font-playfair text-4xl italic sm:text-5xl">
+          See it in 40 seconds
+        </h2>
+        <DemoVideo />
+      </section>
+
       <section className="mx-auto max-w-5xl px-6 pb-24" aria-labelledby="example-heading">
         <h2 id="example-heading" className="font-playfair text-4xl italic sm:text-5xl">
           A real digest, with its reasons
@@ -483,6 +490,52 @@ function LandingSections() {
         </div>
       </footer>
     </div>
+  );
+}
+
+// #213: the product in use, narrated, captions burned in (works muted). The
+// poster is a lazy image and the video loads only on click, so the section
+// costs nothing on page load.
+function DemoVideo() {
+  const [playing, setPlaying] = useState(false);
+  if (playing) {
+    return (
+      <video
+        className="mt-8 w-full rounded-2xl border border-white/10"
+        controls
+        autoPlay
+        playsInline
+        width={1920}
+        height={1080}
+        src="/landing/weirling-demo.mp4"
+      >
+        A 40-second tour of Weirling: the digest, the reasons behind each pick, and what it learns.
+      </video>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={() => setPlaying(true)}
+      className="group relative mt-8 block w-full overflow-hidden rounded-2xl border border-white/10"
+      aria-label="Play the 40-second Weirling tour"
+    >
+      <Image
+        src="/landing/weirling-demo.jpg"
+        alt=""
+        width={1280}
+        height={720}
+        sizes="(min-width: 1024px) 976px, 100vw"
+        className="w-full"
+      />
+      <span className="absolute inset-0 flex items-center justify-center">
+        <span className="flex h-20 w-20 items-center justify-center rounded-full bg-[#b45309] shadow-lg shadow-black/40 transition-transform group-hover:scale-105">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </span>
+      </span>
+    </button>
   );
 }
 
