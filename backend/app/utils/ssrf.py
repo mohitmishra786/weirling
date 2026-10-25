@@ -64,9 +64,20 @@ def _blocked_ip_reason(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> str
 
 
 def _default_resolver(host: str) -> list[str]:
-    """Resolve `host` to the set of IP strings it points at (A + AAAA)."""
+    """Resolve `host` to the IP strings it points at (A + AAAA), IPv4 first.
+
+    The fetcher connects to these in order. Many hosts (Railway, plenty of
+    VPS and container networks) have no outbound IPv6, so an AAAA address
+    first meant "All connection attempts failed" for dual-stack sites
+    (Cloudflare, Google, AWS) at random: a set has no stable order."""
     infos = socket.getaddrinfo(host, None, proto=socket.IPPROTO_TCP)
-    return list({info[4][0] for info in infos})
+    return prefer_ipv4(info[4][0] for info in infos)
+
+
+def prefer_ipv4(ips: Iterable[str]) -> list[str]:
+    """Unique IPs in their original order, IPv4 before IPv6."""
+    unique = list(dict.fromkeys(ips))
+    return [ip for ip in unique if ":" not in ip] + [ip for ip in unique if ":" in ip]
 
 
 def _literal_ip(host: str) -> ipaddress.IPv4Address | ipaddress.IPv6Address | None:
@@ -251,13 +262,10 @@ async def safe_fetch(
             ips = validate_public_url(
                 current, resolver=resolver, allow_private_hosts=allow_private_hosts
             )
-            extensions: dict = {}
-            target, hop_headers = current, headers
-            if pin_ip and ips:
-                target, hop_headers, extensions = _pinned_request(current, ips[0], headers)
-            async with client.stream(
-                method, target, headers=hop_headers, content=content, extensions=extensions
-            ) as resp:
+            # Connect to each validated address in turn (IPv4 first): one
+            # unreachable family or address must not fail the whole fetch.
+            candidates = prefer_ipv4(ips) if pin_ip and ips else [None]
+            async with _open_first(client, method, current, candidates, headers, content) as resp:
                 if resp.is_redirect and resp.headers.get("location"):
                     saw_redirect = True
                     if resp.status_code != 301:
@@ -285,6 +293,39 @@ async def safe_fetch(
         raise UnsafeURLError(f"too many redirects fetching {url!r}")
     finally:
         await client.aclose()
+
+
+class _open_first:
+    """Async context manager: stream `url` through the first candidate IP that
+    accepts the connection. Only connection failures move on to the next IP;
+    any HTTP response, even an error status, is final."""
+
+    def __init__(self, client, method, url, candidates, headers, content):
+        self._args = (client, method, url, candidates, headers, content)
+        self._cm = None
+
+    async def __aenter__(self):
+        client, method, url, candidates, headers, content = self._args
+        last_error: Exception | None = None
+        for ip in candidates:
+            target, hop_headers, extensions = url, headers, {}
+            if ip is not None:
+                target, hop_headers, extensions = _pinned_request(url, ip, headers)
+            cm = client.stream(
+                method, target, headers=hop_headers, content=content, extensions=extensions
+            )
+            try:
+                resp = await cm.__aenter__()
+            except (httpx.ConnectError, httpx.ConnectTimeout) as e:
+                last_error = e
+                continue
+            self._cm = cm
+            return resp
+        assert last_error is not None
+        raise last_error
+
+    async def __aexit__(self, *exc):
+        return await self._cm.__aexit__(*exc)
 
 
 async def safe_get(

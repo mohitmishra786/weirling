@@ -262,6 +262,58 @@
     outline-offset: 2px;
     border-radius: 4px;
   }
+
+  /* Native form controls match .input everywhere, so no page falls back to
+     the browser's look. :where() keeps specificity at zero: any utility or
+     component class on the element still wins. */
+  :where(
+      select,
+      textarea,
+      input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"],
+          [type="submit"], [type="button"], [type="reset"], [type="hidden"], [type="image"])
+    ) {
+    background-color: var(--bg-elevated);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+    border-radius: 0.5rem;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  :where(select, textarea, input):focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.25);
+  }
+  :where(textarea, input)::placeholder {
+    color: var(--text-tertiary);
+  }
+  :where(select, textarea, input):disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  /* One chevron for every select instead of the OS stepper arrows. */
+  :where(select:not([multiple])) {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23b5b5b0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.875rem center;
+    background-size: 1rem;
+    cursor: pointer;
+  }
+  :where(select) option {
+    background-color: var(--bg-elevated);
+    color: var(--text);
+  }
+  :where(input[type="checkbox"], input[type="radio"]) {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
 }
 
 @layer components {
@@ -337,7 +389,60 @@
     color: var(--text-tertiary);
   }
 
+  /* ---- Selectable option cards (starter packs, plans, choices) ----
+     Use aria-pressed / aria-checked for the selected state so styling and
+     accessibility can't drift apart. */
+  .choice {
+    @apply rounded-xl p-4 text-left;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text);
+    transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+  }
+  .choice:hover:not(:disabled) {
+    border-color: var(--border-strong);
+  }
+  .choice:is([aria-pressed="true"], [aria-checked="true"]) {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .choice:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  /* ---- Selected / status states ----
+     One tinted look per meaning, readable on the dark surfaces (the light
+     -50/-100 Tailwind shades turned white-on-cream in dark mode). */
+  .state-positive {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.45);
+    color: #6ee7b7;
+  }
+  .state-negative {
+    background: rgba(244, 63, 94, 0.12);
+    border-color: rgba(244, 63, 94, 0.45);
+    color: #fda4af;
+  }
+  .state-warning {
+    background: rgba(245, 158, 11, 0.12);
+    border-color: rgba(245, 158, 11, 0.45);
+    color: #fcd34d;
+  }
+  .state-accent {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--color-prism-300);
+  }
+
   /* ---- Chips / badges ---- */
+  .badge-accent {
+    @apply inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide;
+    background: var(--accent-soft);
+    color: var(--color-prism-300);
+    border: 1px solid rgba(180, 83, 9, 0.45);
+  }
   .chip {
     @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium;
   }

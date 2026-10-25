@@ -365,6 +365,12 @@ export const api = {
         `/sources/starter-packs/${id}/subscribe`,
         { method: 'POST' },
       ),
+    /** Several packs in one request and one transaction (packs share feeds). */
+    subscribePacks: (ids: string[]) =>
+      request<{ status: string; packs: string[]; subscribed: number }>(
+        '/sources/starter-packs/subscribe',
+        { method: 'POST', body: JSON.stringify({ pack_ids: ids }) },
+      ),
     /** One-click repair of a dead/failing feed (#212). */
     fix: (id: string) =>
       request<{ status: 'fixed' | 'no_new_feed'; feed_url: string | null; suggestion?: string }>(

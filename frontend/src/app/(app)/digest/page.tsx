@@ -88,7 +88,14 @@ export default function DigestPage() {
   }
 
   if (needsOnboarding) {
-    return <OnboardingWizard />;
+    return (
+      <OnboardingWizard
+        onDone={() => {
+          setNeedsOnboarding(false);
+          void loadDigest();
+        }}
+      />
+    );
   }
 
   // First run (#102): a brand-new user's sources are still being fetched and

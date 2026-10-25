@@ -24,7 +24,9 @@ const STEPS = [
 ] as const;
 type StepName = (typeof STEPS)[number];
 
-export function OnboardingWizard() {
+/** `onDone` lets the page that hosts the wizard (/digest) leave onboarding:
+ *  navigating to the URL it is already on changes nothing. */
+export function OnboardingWizard({ onDone }: { onDone?: () => void } = {}) {
   const router = useRouter();
   const [step, setStep] = useState(0);
   const current: StepName = STEPS[step];
@@ -101,13 +103,19 @@ export function OnboardingWizard() {
     setError("");
     try {
       // 1. Submit interest text and sample ratings to the onboarding endpoint
-      await api.onboarding.complete({
-        interest_text: interestText,
-        // Real headlines are rated in the "Rate Headlines" step (#149).
-        sample_ratings: [],
-        source_opml: null,
-        confirmed_topics: topics.length > 0 ? topics : undefined,
-      });
+      try {
+        await api.onboarding.complete({
+          interest_text: interestText,
+          // Real headlines are rated in the "Rate Headlines" step (#149).
+          sample_ratings: [],
+          source_opml: null,
+          confirmed_topics: topics.length > 0 ? topics : undefined,
+        });
+      } catch (err: unknown) {
+        // Already saved (a second click, or a retry after a slow first try):
+        // carry on with the rest instead of showing an error.
+        if (!(err instanceof Error && /already completed/i.test(err.message))) throw err;
+      }
 
       // 2. Add sources and creator via their APIs
       for (const url of sources) {
@@ -127,7 +135,8 @@ export function OnboardingWizard() {
       // are in (#102). The digest page shows live progress until it exists.
       await api.onboarding.startFirstDigest().catch(() => {});
 
-      router.replace("/digest");
+      if (onDone) onDone();
+      else router.replace("/digest");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Setup failed");
     } finally {
@@ -135,25 +144,23 @@ export function OnboardingWizard() {
     }
   };
 
+  const skipLabel =
+    (current === "Starter Packs" && packIds.length === 0) ||
+    (current === "Add Sources" && sources.length === 0 && importedCount === 0) ||
+    (current === "Add Creators" && !creatorInput);
+
   return (
-    <div style={{ maxWidth: 600, margin: "40px auto", padding: "0 16px" }}>
-      <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: 4 }}>
-          Welcome to Weirling
-        </h1>
-        <p style={{ color: "var(--text-tertiary)" }}>
+    <div className="mx-auto my-10 max-w-2xl px-4">
+      <div className="mb-8">
+        <h1 className="mb-1 text-3xl italic">Welcome to Weirling</h1>
+        <p className="text-[var(--text-tertiary)]">
           Step {step + 1} of {STEPS.length}: {STEPS[step]}
         </p>
-        <div style={{ display: "flex", gap: 4, marginTop: 12 }}>
+        <div className="mt-3 flex gap-1" aria-hidden="true">
           {STEPS.map((_, i) => (
             <div
               key={i}
-              style={{
-                height: 4,
-                flex: 1,
-                borderRadius: 2,
-                background: i <= step ? "#b45309" : "#3a3a3a",
-              }}
+              className={`h-1 flex-1 rounded-full ${i <= step ? "bg-[var(--accent)]" : "bg-[var(--border-strong)]"}`}
             />
           ))}
         </div>
@@ -165,55 +172,44 @@ export function OnboardingWizard() {
 
       {current === "Confirm Topics" && (
         <div>
-          <p style={{ color: "var(--text-tertiary)", marginBottom: 16 }}>
+          <p className="mb-4 text-[var(--text-tertiary)]">
             We expanded your interests into these topics. They seed your first
             digest: remove any that are wrong and add what&apos;s missing.
           </p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
+          <div className="mb-4 flex flex-wrap gap-2">
             {topics.map((t) => (
               <span
                 key={t}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  padding: "6px 12px",
-                  borderRadius: 16,
-                  background: "rgba(37,99,235,0.12)",
-                  color: "#f8a94a",
-                  fontSize: 14,
-                }}
+                className="chip border border-[var(--accent)]/50 bg-[var(--accent-soft)] text-sm text-prism-300"
               >
                 {t}
                 <button
+                  type="button"
                   onClick={() => setTopics((prev) => prev.filter((x) => x !== t))}
                   aria-label={`Remove topic ${t}`}
-                  style={{ background: "none", border: "none", color: "#f8a94a", cursor: "pointer", padding: 0, display: "inline-flex", alignItems: "center" }}
+                  className="inline-flex items-center rounded-full text-prism-300 hover:text-prism-200"
                 >
-                  <X style={{ width: 14, height: 14 }} aria-hidden="true" />
+                  <X className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>
               </span>
             ))}
             {topics.length === 0 && (
-              <p style={{ fontSize: 14 }}>
+              <p className="text-sm text-[var(--text-secondary)]">
                 No topics extracted. Add a few yourself below.
               </p>
             )}
           </div>
-          <div style={{ display: "flex", gap: 8 }}>
+          <div className="flex gap-2">
             <input
               type="text"
+              className="input flex-1"
               value={topicInput}
               onChange={(e) => setTopicInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addTopic()}
               placeholder="Add a topic…"
               aria-label="Add a topic"
-              style={{ flex: 1, padding: "8px 12px", border: "1px solid var(--border-strong)", borderRadius: 6 }}
             />
-            <button
-              onClick={addTopic}
-              style={{ padding: "8px 16px", background: "#b45309", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer" }}
-            >
+            <button type="button" className="btn-primary" onClick={addTopic}>
               Add
             </button>
           </div>
@@ -222,9 +218,10 @@ export function OnboardingWizard() {
 
       {current === "Starter Packs" && (
         <div>
-          <p style={{ color: "var(--text-tertiary)", marginBottom: 16 }}>
+          <p className="mb-4 text-[var(--text-tertiary)]">
             Pick a few starter packs to follow. The ones matching your topics are
-            pre-selected. <strong>Optional</strong>: you can add more from Sources later.
+            pre-selected. <strong className="text-[var(--text-secondary)]">Optional</strong>: you can
+            add more from Sources later.
           </p>
           <StarterPackPicker topics={topics} selected={packIds} onChange={setPackIds} />
         </div>
@@ -234,31 +231,30 @@ export function OnboardingWizard() {
 
       {current === "Add Sources" && (
         <div>
-          <p style={{ color: "var(--text-tertiary)", marginBottom: 16 }}>
+          <p className="mb-4 text-[var(--text-tertiary)]">
             Coming from another reader? Import your feeds and saved articles in
-            one go. <strong>Optional</strong>: you can also add sites one by one below.
+            one go. <strong className="text-[var(--text-secondary)]">Optional</strong>: you can also
+            add sites one by one below.
           </p>
-          <div style={{ marginBottom: 20 }}>
+          <div className="mb-5">
             <ImportPanel onImported={(feeds, saved) => setImportedCount((n) => n + feeds + saved)} />
           </div>
-          <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+          <div className="mb-3 flex gap-2">
             <input
               type="url"
+              className="input flex-1"
               value={sourceUrl}
               onChange={(e) => setSourceUrl(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && addSource()}
               placeholder="https://example.com/blog"
-              style={{ flex: 1, padding: "8px 12px", border: "1px solid var(--border-strong)", borderRadius: 6 }}
+              aria-label="Site or feed URL"
             />
-            <button
-              onClick={addSource}
-              style={{ padding: "8px 16px", background: "#b45309", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer" }}
-            >
+            <button type="button" className="btn-primary" onClick={addSource}>
               Add
             </button>
           </div>
           {sources.map((s) => (
-            <div key={s} style={{ padding: "6px 12px", background: "var(--bg-sunken)", borderRadius: 6, marginBottom: 6, fontSize: 14 }}>
+            <div key={s} className="mb-1.5 rounded-lg bg-[var(--bg-sunken)] px-3 py-1.5 text-sm">
               {s}
             </div>
           ))}
@@ -267,9 +263,9 @@ export function OnboardingWizard() {
 
       {current === "Newsletters" && (
         <div>
-          <p style={{ color: "var(--text-tertiary)", marginBottom: 16 }}>
-            Newsletters go in your digest too. <strong>Optional</strong>: the address is
-            also in Preferences.
+          <p className="mb-4 text-[var(--text-tertiary)]">
+            Newsletters go in your digest too. <strong className="text-[var(--text-secondary)]">Optional</strong>:
+            the address is also in Preferences.
           </p>
           <NewsletterAddressCard />
         </div>
@@ -277,62 +273,68 @@ export function OnboardingWizard() {
 
       {current === "Add Creators" && (
         <div>
-          <p style={{ color: "var(--text-tertiary)", marginBottom: 16 }}>
-            Add creators you follow (name or URL). <strong>Optional</strong>:
+          <p className="mb-4 text-[var(--text-tertiary)]">
+            Add creators you follow (name or URL). <strong className="text-[var(--text-secondary)]">Optional</strong>:
             skip and add later from the Creators page.
           </p>
           <input
             type="text"
+            className="input"
             value={creatorInput}
             onChange={(e) => setCreatorInput(e.target.value)}
             placeholder="https://simonwillison.substack.com or Simon Willison"
-            style={{ width: "100%", padding: "8px 12px", border: "1px solid var(--border-strong)", borderRadius: 6 }}
+            aria-label="Creator name or URL"
           />
         </div>
       )}
 
       {current === "Digest Preferences" && (
-        <div>
-          <label style={{ display: "block", fontWeight: 500, marginBottom: 8 }}>Digest frequency</label>
-          <select
-            value={digestFreq}
-            onChange={(e) => setDigestFreq(e.target.value as typeof digestFreq)}
-            disabled={!emailOn}
-            style={{ width: "100%", padding: "8px 12px", border: "1px solid var(--border-strong)", borderRadius: 6 }}
-          >
-            <option value="daily">Daily</option>
-            <option value="twice_daily">Twice daily</option>
-            <option value="weekly">Weekly</option>
-          </select>
+        <div className="space-y-5">
+          <div>
+            <label className="mb-2 block font-medium" htmlFor="digest-frequency">
+              Digest frequency
+            </label>
+            <select
+              id="digest-frequency"
+              className="input"
+              value={digestFreq}
+              onChange={(e) => setDigestFreq(e.target.value as typeof digestFreq)}
+              disabled={!emailOn}
+            >
+              <option value="daily">Daily</option>
+              <option value="twice_daily">Twice daily</option>
+              <option value="weekly">Weekly</option>
+            </select>
+          </div>
 
-          <label style={{ display: "block", fontWeight: 500, margin: "16px 0 8px" }} htmlFor="digest-time">
-            Delivery time
-          </label>
-          <input
-            id="digest-time"
-            type="time"
-            value={digestTime}
-            onChange={(e) => setDigestTime(e.target.value)}
-            style={{ padding: "8px 12px", border: "1px solid var(--border-strong)", borderRadius: 6 }}
-          />
-          <p style={{ fontSize: 13, color: "var(--text-tertiary)", marginTop: 4 }}>
-            Your time zone: {timezone}
-          </p>
+          <div>
+            <label className="mb-2 block font-medium" htmlFor="digest-time">
+              Delivery time
+            </label>
+            <input
+              id="digest-time"
+              type="time"
+              className="input w-auto"
+              value={digestTime}
+              onChange={(e) => setDigestTime(e.target.value)}
+            />
+            <p className="mt-1.5 text-sm text-[var(--text-tertiary)]">Your time zone: {timezone}</p>
+          </div>
 
-          <label style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 16, fontSize: 14 }}>
+          <label className="flex items-center gap-2.5 text-sm">
             <input type="checkbox" checked={emailOn} onChange={(e) => setEmailOn(e.target.checked)} />
             Email me the digest (otherwise read it in the app)
           </label>
 
           {installer.available && !installed && (
-            <div style={{ marginTop: 20, padding: 12, border: "1px solid var(--border)", borderRadius: 8 }}>
-              <p style={{ fontSize: 14, marginBottom: 8 }}>
+            <div className="card p-4">
+              <p className="mb-3 text-sm">
                 Add Weirling to your home screen to open your digest in one tap.
               </p>
               <button
                 type="button"
+                className="btn-secondary"
                 onClick={async () => setInstalled(await installer.install())}
-                style={{ padding: "6px 14px", border: "1px solid var(--border-strong)", borderRadius: 6 }}
               >
                 Add to home screen
               </button>
@@ -341,63 +343,45 @@ export function OnboardingWizard() {
         </div>
       )}
 
-      {error && <p style={{ color: "#ef4444", marginTop: 16 }}>{error}</p>}
+      {error && (
+        <p role="alert" className="mt-4 text-sm text-red-400">
+          {error}
+        </p>
+      )}
 
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 32 }}>
+      <div className="mt-8 flex justify-between">
         <button
+          type="button"
+          className="btn-secondary disabled:cursor-not-allowed disabled:opacity-40"
           onClick={back}
-          disabled={step === 0}
-          style={{
-            padding: "10px 20px",
-            border: "1px solid var(--border-strong)",
-            borderRadius: 6,
-            background: "var(--bg-elevated)",
-            cursor: step === 0 ? "not-allowed" : "pointer",
-            opacity: step === 0 ? 0.4 : 1,
-          }}
+          disabled={step === 0 || loading || subscribing}
         >
           Back
         </button>
         {step < STEPS.length - 1 ? (
           <button
+            type="button"
+            className="btn-primary disabled:cursor-wait disabled:opacity-70"
             onClick={step === 0 ? expandAndContinue : next}
             disabled={expanding || subscribing}
-            style={{
-              padding: "10px 20px",
-              background: "#b45309",
-              color: "#fff",
-              border: "none",
-              borderRadius: 6,
-              cursor: expanding ? "not-allowed" : "pointer",
-              opacity: expanding ? 0.7 : 1,
-            }}
           >
             {expanding
               ? "Finding your topics…"
               : subscribing
                 ? "Subscribing…"
                 : /* Optional steps read as "Skip" when nothing was chosen */
-                  (current === "Starter Packs" && packIds.length === 0) ||
-                    (current === "Add Sources" && sources.length === 0 && importedCount === 0) ||
-                    (current === "Add Creators" && !creatorInput)
+                  skipLabel
                   ? "Skip for now"
                   : "Continue"}
           </button>
         ) : (
           <button
+            type="button"
+            className="btn-primary disabled:cursor-wait disabled:opacity-70"
             onClick={finish}
             disabled={loading}
-            style={{
-              padding: "10px 20px",
-              background: "#059669",
-              color: "#fff",
-              border: "none",
-              borderRadius: 6,
-              cursor: loading ? "not-allowed" : "pointer",
-              opacity: loading ? 0.7 : 1,
-            }}
           >
-            {loading ? "Setting up..." : "Start Weirling"}
+            {loading ? "Setting up your digest…" : "Start Weirling"}
           </button>
         )}
       </div>

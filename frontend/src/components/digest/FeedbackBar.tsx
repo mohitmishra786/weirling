@@ -73,7 +73,7 @@ export function FeedbackBar({ contentItemId, topics, onFeedback }: FeedbackBarPr
         aria-label="Helpful"
         className={`flex h-8 w-8 items-center justify-center rounded-md border text-sm transition-colors ${
           rated === 1
-            ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+            ? "state-positive"
             : "border-stone-200 text-stone-600 hover:bg-stone-50 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800"
         }`}
       >
@@ -85,7 +85,7 @@ export function FeedbackBar({ contentItemId, topics, onFeedback }: FeedbackBarPr
         aria-label="Not helpful"
         className={`flex h-8 w-8 items-center justify-center rounded-md border text-sm transition-colors ${
           rated === -1
-            ? "border-rose-200 bg-rose-50 text-rose-700"
+            ? "state-negative"
             : "border-stone-200 text-stone-600 hover:bg-stone-50 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800"
         }`}
       >
@@ -97,7 +97,7 @@ export function FeedbackBar({ contentItemId, topics, onFeedback }: FeedbackBarPr
         aria-label="Save for later"
         className={`flex h-8 items-center gap-1 rounded-md border px-2.5 text-xs font-medium transition-colors ${
           saved
-            ? "border-prism-200 bg-prism-50 text-prism-700"
+            ? "state-accent"
             : "border-stone-200 text-stone-600 hover:bg-stone-50 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800"
         }`}
       >
@@ -118,7 +118,7 @@ export function FeedbackBar({ contentItemId, topics, onFeedback }: FeedbackBarPr
             title={`More like this (${topTopic})`}
             className={`flex h-8 items-center gap-1 rounded-md border px-2.5 text-xs font-medium transition-colors ${
               quickAdjusted === "boost"
-                ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+                ? "state-positive"
                 : "border-stone-200 text-stone-600 hover:bg-stone-50 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800"
             }`}
           >
@@ -129,7 +129,7 @@ export function FeedbackBar({ contentItemId, topics, onFeedback }: FeedbackBarPr
             title={`Less like this (${topTopic})`}
             className={`flex h-8 items-center gap-1 rounded-md border px-2.5 text-xs font-medium transition-colors ${
               quickAdjusted === "suppress"
-                ? "border-rose-200 bg-rose-50 text-rose-700"
+                ? "state-negative"
                 : "border-stone-200 text-stone-600 hover:bg-stone-50 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800"
             }`}
           >

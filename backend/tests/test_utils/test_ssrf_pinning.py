@@ -125,3 +125,65 @@ def test_sidecar_network_policy(monkeypatch, deployment, flag, expected):
     monkeypatch.setattr(get_settings(), "deployment_mode", deployment)
     monkeypatch.setattr(get_settings(), "sidecar_allow_private_http", flag)
     assert _network_policy("http://NAS.home:8080/v1/feeds") == expected
+
+
+def test_ipv4_addresses_come_first_and_order_is_stable():
+    from app.utils.ssrf import prefer_ipv4
+
+    ips = ["2606:4700::6810:84e5", "104.16.132.229", "2606:4700::6810:85e5", "104.16.133.229"]
+    assert prefer_ipv4(ips) == [
+        "104.16.132.229",
+        "104.16.133.229",
+        "2606:4700::6810:84e5",
+        "2606:4700::6810:85e5",
+    ]
+    assert prefer_ipv4(["1.1.1.1", "1.1.1.1"]) == ["1.1.1.1"]
+
+
+class _Unreachable(httpx.AsyncBaseTransport):
+    """Refuses connections to some IPs, the way a host without IPv6 does."""
+
+    def __init__(self, dead: set[str]):
+        self.dead = dead
+        self.tried: list[str] = []
+
+    async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+        self.tried.append(request.url.host)
+        if request.url.host in self.dead:
+            raise httpx.ConnectError("All connection attempts failed", request=request)
+        return httpx.Response(200, text="ok")
+
+
+@pytest.mark.asyncio
+async def test_connects_over_ipv4_when_the_host_also_has_ipv6():
+    transport = _Unreachable(dead={"2606:4700::6810:84e5"})
+    resp = await safe_fetch(
+        "https://blog.example.com/feed",
+        resolver=lambda h: ["2606:4700::6810:84e5", PUBLIC],
+        transport=transport,
+        pin_ip=True,
+    )
+    assert resp.status_code == 200
+    assert transport.tried == [PUBLIC]
+
+
+@pytest.mark.asyncio
+async def test_falls_back_to_the_next_validated_ip_and_fails_only_when_all_do():
+    transport = _Unreachable(dead={PUBLIC})
+    resp = await safe_fetch(
+        "https://blog.example.com/feed",
+        resolver=lambda h: [PUBLIC, "8.8.8.8"],
+        transport=transport,
+        pin_ip=True,
+    )
+    assert resp.status_code == 200
+    assert transport.tried == [PUBLIC, "8.8.8.8"]
+
+    everything_down = _Unreachable(dead={PUBLIC, "8.8.8.8"})
+    with pytest.raises(httpx.ConnectError):
+        await safe_fetch(
+            "https://blog.example.com/feed",
+            resolver=lambda h: [PUBLIC, "8.8.8.8"],
+            transport=everything_down,
+            pin_ip=True,
+        )

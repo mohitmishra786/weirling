@@ -82,8 +82,8 @@ export function SourceList({ sources, onUpdated, onDeleted }: SourceListProps) {
                     }
                     className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${
                       s.health === "degraded" || s.health === "platform_outage"
-                        ? "bg-amber-100 text-amber-700"
-                        : "bg-rose-100 text-rose-700"
+                        ? "state-warning border"
+                        : "state-negative border"
                     }`}
                   >
                     {s.health === "degraded"
