@@ -46,7 +46,11 @@ async def process_onboarding(
         if not topics:
             topics = _fallback_topic_extract(interest_text)
 
-    # 2. Embed topics and create initial nodes
+    # 2. Embed topics and create initial nodes. Pack-name interests added while
+    #    the reader picked packs earlier in this flow stand in for topics they
+    #    hadn't confirmed yet; with confirmed topics they only add noise.
+    if confirmed_topics:
+        await _drop_pack_name_interests(user.id, topics, session)
     topic_embeddings = await embedding_service.encode_batch_cached(topics)
     for label, emb in zip(topics, topic_embeddings, strict=False):
         node = await graph_manager.get_or_create_node(
@@ -55,6 +59,8 @@ async def process_onboarding(
             topic_embedding=emb,
             session=session,
         )
+        # The reader's own wording wins over a pack title matched by case.
+        node.topic_label = label
         # Start above neutral — confirmed interest from onboarding
         node.weight = 0.6
         await session.flush()
@@ -97,6 +103,31 @@ async def process_onboarding(
         f"Onboarding complete for user {user.id}: {len(topics)} topics, "
         f"{seeded} starter sources seeded"
     )
+
+
+async def _drop_pack_name_interests(
+    user_id: uuid.UUID, topics: list[str], session: AsyncSession
+) -> None:
+    """Remove interests named after a starter pack that are still at their
+    seed weight and aren't one of the reader's own topics."""
+    from sqlalchemy import delete, func
+
+    from app.models.interest_graph import InterestNode
+    from app.services.cold_start.starter_packs import list_starter_packs
+
+    pack_titles = {p.title.strip().lower() for p in list_starter_packs()}
+    keep = {t.strip().lower() for t in topics}
+    drop = sorted(pack_titles - keep)
+    if not drop:
+        return
+    await session.execute(
+        delete(InterestNode).where(
+            InterestNode.user_id == user_id,
+            func.lower(InterestNode.topic_label).in_(drop),
+            InterestNode.weight <= 0.4,
+        )
+    )
+    await session.flush()
 
 
 def _fallback_topic_extract(text: str) -> list[str]:

@@ -524,15 +524,37 @@ async def get_emerging_topics(
     """Topics with a burst of distinct-source coverage in the last 72 h vs
     the trailing 28-day baseline (UX-10). Powers the "Emerging" card.
 
-    Public items only; per topic: distinct sources in the recent window
-    compared with the four trailing 7-day windows (z >= 2).
+    The reader's own feeds only; per topic: distinct sources in the recent
+    window compared with the four trailing 7-day windows (z >= 2). Empty
+    until those feeds have BASELINE_DAYS of history.
     """
 
     from sqlalchemy import func
 
-    from app.services.digest.emerging import detect_emerging
+    from app.services.digest.emerging import BASELINE_DAYS, detect_emerging
+    from app.services.feed_identity import (
+        equivalent_source_ids,
+        from_user_feeds,
+        user_feed_ids,
+    )
 
     now = datetime.now(UTC)
+
+    # The reader's own feeds only: other readers' sources made "agent" topics
+    # "emerge" for someone who follows kernel blogs.
+    source_ids = await equivalent_source_ids(session, current_user.id)
+    feed_ids = await user_feed_ids(session, current_user.id)
+    if not source_ids and not feed_ids:
+        return []
+    mine = from_user_feeds(source_ids, feed_ids)
+
+    # A burst needs a baseline: with less history than that, every topic is
+    # "new this month" and the card would list noise.
+    oldest = (
+        await session.execute(select(func.min(ContentItem.fetched_at)).where(mine))
+    ).scalar_one_or_none()
+    if oldest is None or now - oldest < timedelta(days=BASELINE_DAYS):
+        return []
 
     def distinct_sources_per_topic(start, end):
         topic = func.jsonb_array_elements_text(ContentItem.topic_clusters).label("topic")
@@ -543,7 +565,7 @@ async def get_emerging_topics(
                 ContentItem.fetched_at >= start,
                 ContentItem.fetched_at < end,
                 ContentItem.source_id.isnot(None),
-                ContentItem.owner_user_id.is_(None),
+                mine,
             )
             .group_by(topic)
         )

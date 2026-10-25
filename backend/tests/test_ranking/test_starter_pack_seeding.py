@@ -75,3 +75,56 @@ async def test_pack_list_marks_suggestions_and_subscriptions(client):
     suggested = {p["id"] for p in packs if p["suggested"]}
     assert {"programming-languages", "databases-data"} <= suggested
     assert all(p["subscribed"] == 0 for p in packs)
+
+
+@pytest.mark.asyncio
+async def test_confirmed_topics_replace_pack_name_interests(db_session):
+    """Packs picked mid-onboarding add "Hardware & Electronics"-style topics;
+    saving the reader's confirmed topics removes them (and a case variant of
+    a confirmed topic is one interest, not two)."""
+    from app.api.sources import _seed_pack_interest
+    from app.models.interest_graph import InterestNode
+    from app.services.cold_start.onboarding import process_onboarding
+
+    user = User(email=f"sp{uuid.uuid4().hex[:6]}@example.com", hashed_password="x")
+    db_session.add(user)
+    await db_session.flush()
+    for title in ("Hardware & Electronics", "Systems Programming"):
+        await _seed_pack_interest(db_session, user.id, title)
+
+    await process_onboarding(
+        user,
+        "kernels and compilers",
+        [],
+        None,
+        db_session,
+        confirmed_topics=["Systems programming", "Compilers", "Linux"],
+    )
+    labels = sorted(
+        (
+            await db_session.execute(
+                select(InterestNode.topic_label).where(InterestNode.user_id == user.id)
+            )
+        ).scalars()
+    )
+    assert labels == ["Compilers", "Linux", "Systems programming"]
+
+
+@pytest.mark.asyncio
+async def test_a_pack_adds_no_topic_for_a_reader_with_interests(db_session):
+    from app.api.sources import _seed_pack_interest
+    from app.models.interest_graph import InterestNode
+
+    user = User(email=f"sp{uuid.uuid4().hex[:6]}@example.com", hashed_password="x")
+    db_session.add(user)
+    await db_session.flush()
+    for label in ("Rust", "Linux", "Compilers"):
+        db_session.add(InterestNode(user_id=user.id, topic_label=label, weight=0.6))
+    await db_session.flush()
+    await _seed_pack_interest(db_session, user.id, "Hardware & Electronics")
+    count = len(
+        (
+            await db_session.execute(select(InterestNode.id).where(InterestNode.user_id == user.id))
+        ).all()
+    )
+    assert count == 3

@@ -11,6 +11,8 @@ from dataclasses import dataclass
 
 EMERGING_Z_THRESHOLD = 2.0
 EMERGING_MIN_SOURCES = 2
+# History a reader's feeds need before anything can count as emerging.
+BASELINE_DAYS = 14
 
 
 @dataclass(frozen=True)

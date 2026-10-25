@@ -45,6 +45,10 @@ async def _enforce_capacity(session: AsyncSession, user: User, urls: list[str]) 
     enforce_source_limit(user, count, adding=adding)
 
 
+# A pack becomes an interest only for readers with fewer topics than this.
+PACK_INTEREST_MAX_EXISTING = 3
+
+
 async def _seed_pack_interest(session: AsyncSession, user_id, title: str) -> None:
     """A subscribed pack is a stated interest: give the ranker an embedded
     topic for it so day-0 scores aren't flat (#135). Never lowers an
@@ -54,6 +58,18 @@ async def _seed_pack_interest(session: AsyncSession, user_id, title: str) -> Non
 
     label = title.strip()
     if not label:
+        return
+    from app.models.interest_graph import InterestNode
+
+    # Someone who already described their interests doesn't need a broad
+    # "Hardware & Electronics" topic on top: it pulls in everything the pack
+    # carries. Onboarding removes these once the confirmed topics are saved.
+    have = (
+        await session.execute(
+            select(func.count()).select_from(InterestNode).where(InterestNode.user_id == user_id)
+        )
+    ).scalar_one()
+    if have >= PACK_INTEREST_MAX_EXISTING:
         return
     try:
         embedding = (await get_embedding_service().encode_batch_cached([label]))[0]

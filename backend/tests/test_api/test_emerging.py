@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import uuid
 from datetime import UTC, datetime, timedelta
 
 import pytest
@@ -101,7 +102,8 @@ async def test_emerging_endpoint_finds_a_burst(
 async def test_emerging_endpoint_with_no_baseline_rows(
     client: AsyncClient, test_user_data: dict, db_session
 ):
-    """A brand-new instance (no 28-day history) still detects a burst."""
+    """A topic with no baseline rows of its own still emerges once the
+    reader's feeds have history (a burst into a silent topic)."""
     resp = await client.post("/api/v1/auth/register", json=test_user_data)
     headers = {"Authorization": f"Bearer {resp.json()['access_token']}"}
     user = (
@@ -122,9 +124,64 @@ async def test_emerging_endpoint_with_no_baseline_rows(
                 fetched_at=now - timedelta(hours=i + 1),
             )
         )
+    # History from 20 days ago on another topic: the feeds are not brand new.
+    db_session.add(
+        ContentItem(
+            source_id=src.id,
+            url="https://fresh-0.example/old",
+            title="old",
+            topic_clusters=["databases"],
+            fetched_at=now - timedelta(days=20),
+        )
+    )
     await db_session.commit()
 
     result = await client.get("/api/v1/digest/emerging", headers=headers)
     assert result.status_code == 200
     topics = [row["topic"] for row in result.json()]
     assert "wasm" in topics
+
+
+@pytest.mark.asyncio
+async def test_emerging_needs_history_and_ignores_other_readers_feeds(
+    client: AsyncClient, test_user_data: dict, db_session
+):
+    """Brand-new feeds show nothing; another reader's burst never shows."""
+    resp = await client.post("/api/v1/auth/register", json=test_user_data)
+    headers = {"Authorization": f"Bearer {resp.json()['access_token']}"}
+    user = (
+        await db_session.execute(select(User).where(User.email == test_user_data["email"]))
+    ).scalar_one()
+    other = User(email=f"other-{uuid.uuid4().hex[:6]}@example.com", hashed_password="x")
+    db_session.add(other)
+    await db_session.flush()
+    now = datetime.now(UTC)
+    mine = Source(user_id=user.id, url="https://mine.example/feed")
+    db_session.add(mine)
+    await db_session.flush()
+    db_session.add(
+        ContentItem(
+            source_id=mine.id,
+            url="https://mine.example/1",
+            title="m",
+            topic_clusters=["rust"],
+            fetched_at=now - timedelta(hours=2),
+        )
+    )
+    for i in range(3):
+        src = Source(user_id=other.id, url=f"https://theirs-{i}.example/feed")
+        db_session.add(src)
+        await db_session.flush()
+        db_session.add(
+            ContentItem(
+                source_id=src.id,
+                url=f"https://theirs-{i}.example/a",
+                title="t",
+                topic_clusters=["agents"],
+                fetched_at=now - timedelta(hours=i + 1),
+            )
+        )
+    await db_session.commit()
+    result = await client.get("/api/v1/digest/emerging", headers=headers)
+    assert result.status_code == 200
+    assert result.json() == []

@@ -25,13 +25,18 @@ class InterestGraphManager:
         topic_embedding: list[float] | None,
         session: AsyncSession,
     ) -> InterestNode:
+        # Case-insensitive: "Systems Programming" (a pack) and "Systems
+        # programming" (a confirmed topic) are one interest, not two.
         result = await session.execute(
-            select(InterestNode).where(
+            select(InterestNode)
+            .where(
                 InterestNode.user_id == user_id,
-                InterestNode.topic_label == topic_label,
+                func.lower(InterestNode.topic_label) == topic_label.strip().lower(),
             )
+            .order_by(InterestNode.weight.desc())
+            .limit(1)
         )
-        node = result.scalar_one_or_none()
+        node = result.scalars().first()
         if node is not None:
             return node
 
