@@ -138,6 +138,30 @@ def test_multi_interest_user_is_not_averaged_down():
     assert near_cooking.why_topics == "matches your interest in cooking"
 
 
+def test_every_interest_counts_not_just_the_top_three():
+    """Fourteen equal interests (an onboarding with confirmed topics): a post
+    matching the tenth must score above one matching none (was flat: only
+    the first three medoids were compared)."""
+    vectors = [unit(*([0.0] * i + [1.0])) for i in range(14)]
+    interests = build_interests([(v, 0.6, f"topic-{i}") for i, v in enumerate(vectors)])
+    st = state(interests=interests)
+    on_topic, off_topic = score_candidates(
+        st, [item(unit(*([0.0] * 9 + [1.0]))), item(unit(*([0.0] * 20 + [1.0])))]
+    )
+    assert on_topic.features["semantic"] > 0.95
+    assert off_topic.features["semantic"] < 0.05
+    assert on_topic.why_topics == "matches your interest in topic-9"
+
+
+def test_a_cluster_matches_each_of_its_topics_not_only_its_medoid():
+    near = [unit(1.0, 0.3), unit(1.0, 0.0), unit(1.0, -0.3)]  # one cluster
+    interests = build_interests([(v, 0.6, f"t{i}") for i, v in enumerate(near)])
+    assert len(interests) == 1
+    edge = score_candidates(state(interests=interests), [item(unit(1.0, -0.3))])[0]
+    assert edge.features["semantic"] > 0.99
+    assert edge.why_topics == "matches your interest in t2"
+
+
 def test_bridge_scores_the_intersection_of_connected_topics():
     a, b = unit(1), unit(0, 1)
     interests = [Interest(a, 1.0, "compilers"), Interest(b, 1.0, "language design")]

@@ -54,11 +54,16 @@ class HistoryRow:
 
 @dataclass
 class Interest:
-    """A user interest cluster medoid."""
+    """A user interest cluster: its medoid, plus every topic in it."""
 
     vector: np.ndarray
     importance: float
     label: str
+    # The cluster's own topic vectors and labels. Semantic scoring compares an
+    # item with each of them: a cluster of "Rust", "Linux" and "Schedulers"
+    # must match a Rust post as well as its medoid does. Empty: the medoid only.
+    members: np.ndarray | None = None
+    member_labels: list[str] = field(default_factory=list)
 
 
 @dataclass

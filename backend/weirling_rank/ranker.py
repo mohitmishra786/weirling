@@ -122,7 +122,15 @@ def build_interests(
             total_imp = float(sum(candidates[i][1] for i in group))
             labels = [candidates[i][2] for i in group if candidates[i][2]]
             label = max(set(labels), key=labels.count) if labels else ""
-            interests.append(Interest(vector=matrix[best_idx], importance=total_imp, label=label))
+            interests.append(
+                Interest(
+                    vector=matrix[best_idx],
+                    importance=total_imp,
+                    label=label,
+                    members=sub,
+                    member_labels=[candidates[i][2] for i in group],
+                )
+            )
     interests.sort(key=lambda it: it.importance, reverse=True)
     return interests
 
@@ -247,8 +255,25 @@ def score_candidates(
     suggested = [r for r in hist if r.was_suggested and r.opened_at is not None]
     sugg_success = sum(1 for r in suggested if _is_success(r))
 
-    interest_matrix = np.stack([it.vector for it in state.interests]) if state.interests else None
-    interest_imp = np.array([it.importance for it in state.interests]) if state.interests else None
+    # One row per interest topic (every cluster member), each weighted by the
+    # square root of its cluster's share of the strongest cluster: a minor
+    # interest still counts, just less. Comparing with only the top three
+    # medoids made every item score alike when a reader had many equal
+    # interests (a Rust post never met the "Rust" interest).
+    interest_rows: list[np.ndarray] = []
+    interest_row_w: list[float] = []
+    interest_row_label: list[str] = []
+    top_imp = max((it.importance for it in state.interests), default=0.0)
+    for it in state.interests:
+        weight = math.sqrt(max(it.importance, 0.0) / top_imp) if top_imp > 0 else 1.0
+        rows = it.members if it.members is not None and len(it.members) else it.vector[None, :]
+        names = it.member_labels if len(it.member_labels) == len(rows) else [it.label] * len(rows)
+        for row, name in zip(rows, names, strict=True):
+            interest_rows.append(np.asarray(row))
+            interest_row_w.append(weight)
+            interest_row_label.append(name or it.label)
+    interest_matrix = np.stack(interest_rows) if interest_rows else None
+    interest_imp = np.array(interest_row_w) if interest_rows else None
     bridge_matrix = np.stack([b[0] for b in state.bridges]) if state.bridges else None
 
     cand_matrix_rows = [i for i, v in enumerate(vecs) if v is not None and v.shape[0] == dim]
@@ -281,12 +306,11 @@ def score_candidates(
             and interest_imp is not None
             and interest_matrix.shape[1] == v.shape[0]
         ):
-            top = min(3, len(state.interests))
-            cos = np.clip(interest_matrix[:top] @ v, 0.0, 1.0)
-            weighted = cos * (interest_imp[:top] / max(interest_imp[:top].max(), 1e-8))
+            cos = np.clip(interest_matrix @ v, 0.0, 1.0)
+            weighted = cos * interest_imp
             best = int(np.argmax(weighted))
             score = float(weighted[best])
-            label = state.interests[best].label
+            label = interest_row_label[best]
             if bridge_matrix is not None and bridge_matrix.shape[1] == v.shape[0]:
                 bcos = np.clip(bridge_matrix @ v, 0.0, 1.0)
                 bbest = int(np.argmax(bcos))
