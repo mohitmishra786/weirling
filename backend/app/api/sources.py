@@ -4,6 +4,7 @@ import uuid
 from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, File, HTTPException, Response, UploadFile, status
+from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -67,11 +68,20 @@ async def _seed_pack_interest(session: AsyncSession, user_id, title: str) -> Non
     await session.flush()
 
 
-def _fetch_new_sources_soon(user_id) -> None:
-    """Fetch a user's sources now instead of waiting for the next beat (#102)."""
+def _fetch_new_sources_soon(user_id, session: AsyncSession) -> None:
+    """Fetch a user's sources now instead of waiting for the next beat (#102).
+
+    Queued only once the request's transaction commits: queued earlier, the
+    worker could read the sources table before the new rows were visible and
+    skip them. Nothing is queued if the transaction rolls back."""
+    from sqlalchemy import event
+
     from app.workers.tasks.ingest_feeds import ingest_user_sources
 
-    ingest_user_sources.delay(str(user_id))
+    def _queue(_sync_session) -> None:
+        ingest_user_sources.delay(str(user_id))
+
+    event.listen(session.sync_session, "after_commit", _queue, once=True)
 
 
 @router.get("/starter-packs")
@@ -110,6 +120,69 @@ async def list_packs(
     ]
 
 
+async def _subscribe_packs(session: AsyncSession, user: User, packs: list) -> int:
+    """Add every feed of `packs` the user doesn't follow yet, in one
+    transaction (packs share feeds, so parallel requests would race on the
+    same URL). Returns how many sources were created."""
+    from sqlalchemy import text
+
+    # One subscribe at a time per user, so two requests can't both treat a
+    # feed as new or pass the capacity check with a stale count. Released at
+    # commit or rollback.
+    await session.execute(
+        text("SELECT pg_advisory_xact_lock(hashtextextended(:key, 0))"),
+        {"key": f"subscribe-packs:{user.id}"},
+    )
+    existing_urls = {
+        row[0]
+        for row in (await session.execute(select(Source.url).where(Source.user_id == user.id)))
+    }
+    new_urls = sorted({f["url"] for p in packs for f in p.feeds} - existing_urls)
+    await _enforce_capacity(session, user, new_urls)
+
+    created = 0
+    for pack in packs:
+        for feed in pack.feeds:
+            if feed["url"] in existing_urls:
+                continue
+            session.add(
+                Source(
+                    user_id=user.id,
+                    url=feed["url"],
+                    name=feed["name"],
+                    feed_url=feed["feed_url"],
+                    source_type="rss",
+                    # Seeded pack sources start slightly below default trust so
+                    # the ranking engine earns its keep (same rule as onboarding).
+                    trust_weight=0.45,
+                )
+            )
+            existing_urls.add(feed["url"])
+            created += 1
+    await session.flush()
+    for pack in packs:
+        await _seed_pack_interest(session, user.id, pack.title)
+    if created:
+        from app.services.product_metrics import track
+
+        await track(session, user.id, "source_added", count=created, via="starter_pack")
+        _fetch_new_sources_soon(user.id, session)
+    return created
+
+
+def _find_packs(ids: list[str]) -> list:
+    from app.services.cold_start.starter_packs import list_starter_packs
+
+    by_id = {p.id: p for p in list_starter_packs()}
+    unknown = [i for i in ids if i not in by_id]
+    if unknown:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Unknown starter pack: {', '.join(unknown)}",
+        )
+    return [by_id[i] for i in dict.fromkeys(ids)]
+
+
 @router.post("/starter-packs/{pack_id}/subscribe", response_model=dict)
 async def subscribe_pack(
     pack_id: str,
@@ -117,51 +190,34 @@ async def subscribe_pack(
     current_user: User = Depends(get_current_user),
 ) -> dict:
     """One-click subscribe to a starter pack. Idempotent per feed URL."""
-    from app.services.cold_start.starter_packs import list_starter_packs
-
-    pack = next((p for p in list_starter_packs() if p.id == pack_id), None)
-    if pack is None:
+    try:
+        (pack,) = _find_packs([pack_id])
+    except HTTPException:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Unknown starter pack")
-
-    existing_result = await session.execute(
-        select(Source.url).where(Source.user_id == current_user.id)
-    )
-    existing_urls = {row[0] for row in existing_result.fetchall()}
-
-    new_urls = sorted({f["url"] for f in pack.feeds} - existing_urls)
-    await _enforce_capacity(session, current_user, new_urls)
-
-    created = 0
-    for feed in pack.feeds:
-        if feed["url"] in existing_urls:
-            continue
-        session.add(
-            Source(
-                user_id=current_user.id,
-                url=feed["url"],
-                name=feed["name"],
-                feed_url=feed["feed_url"],
-                source_type="rss",
-                # Seeded pack sources start slightly below default trust so
-                # the ranking engine earns its keep (same rule as onboarding).
-                trust_weight=0.45,
-            )
-        )
-        existing_urls.add(feed["url"])
-        created += 1
-    await session.flush()
-    await _seed_pack_interest(session, current_user.id, pack.title)
-    if created:
-        from app.services.product_metrics import track
-
-        await track(session, current_user.id, "source_added", count=created, via="starter_pack")
-        _fetch_new_sources_soon(current_user.id)
+    created = await _subscribe_packs(session, current_user, [pack])
     return {
         "status": "ok",
         "pack": pack.id,
         "subscribed": created,
         "already_had": len(pack.feeds) - created,
     }
+
+
+class PackSubscribeRequest(BaseModel):
+    pack_ids: list[str] = Field(min_length=1, max_length=30)
+
+
+@router.post("/starter-packs/subscribe", response_model=dict)
+async def subscribe_packs(
+    body: PackSubscribeRequest,
+    session: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    """Subscribe to several starter packs in one request: one transaction,
+    one fetch of the new feeds. Idempotent per feed URL."""
+    packs = _find_packs(body.pack_ids)
+    created = await _subscribe_packs(session, current_user, packs)
+    return {"status": "ok", "packs": [p.id for p in packs], "subscribed": created}
 
 
 @router.get("/discover-suggestions")
@@ -285,7 +341,7 @@ async def add_source(
 
     # Fetch this user's sources now. Never the whole instance: on hosted any
     # user could otherwise trigger a poll of every feed (#169).
-    _fetch_new_sources_soon(current_user.id)
+    _fetch_new_sources_soon(current_user.id, session)
 
     return SourceRead.model_validate(source)
 
@@ -376,7 +432,7 @@ async def import_opml(
             from app.services.product_metrics import track
 
             await track(session, current_user.id, "source_added", count=created, via="opml")
-            _fetch_new_sources_soon(current_user.id)
+            _fetch_new_sources_soon(current_user.id, session)
         return {"created": created}
     except ImportError:
         raise HTTPException(status_code=500, detail="listparser not installed")
@@ -451,7 +507,7 @@ async def import_opml_tagged(
         from app.services.product_metrics import track
 
         await track(session, current_user.id, "source_added", count=plan.created, via="opml")
-        _fetch_new_sources_soon(current_user.id)
+        _fetch_new_sources_soon(current_user.id, session)
     return {
         "created": plan.created,
         "skipped": plan.skipped,
@@ -658,7 +714,7 @@ async def fix_source(
     source.next_poll_at = None
     await session.flush()
     await sync_feeds(session, user_id=current_user.id)
-    _fetch_new_sources_soon(current_user.id)
+    _fetch_new_sources_soon(current_user.id, session)
     return {"status": "fixed", "feed_url": found}
 
 

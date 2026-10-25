@@ -29,6 +29,7 @@ def hosted(monkeypatch):
         "billing_trial_days": 30,
         "hosted_paused_delete_days": 30,
         "hosted_delete_reminder_days": 7,
+        "billing_provider": "lemonsqueezy",
     }
     # entitlements keeps the settings object it imported; an earlier test may
     # have cleared get_settings' cache, so patch both when they differ.
@@ -170,3 +171,22 @@ async def test_paying_stops_the_clock(db_session, hosted):
             "reminded": 0,
             "deleted": 0,
         }
+
+
+@pytest.mark.asyncio
+async def test_nobody_is_deleted_while_billing_is_off(db_session, hosted, monkeypatch):
+    for target in {id(hosted): hosted, id(entitlements.settings): entitlements.settings}.values():
+        monkeypatch.setattr(target, "billing_provider", "")
+    user = User(
+        email=f"b{uuid.uuid4().hex[:6]}@example.com",
+        hashed_password="x",
+        email_verified_at=T0,
+        trial_ends_at=T0,
+    )
+    db_session.add(user)
+    await db_session.commit()
+    from app.workers.tasks.paused_accounts import _run
+
+    result = await _run(T0 + timedelta(days=90))
+    assert result["deleted"] == 0 and result.get("skipped") == "billing off"
+    assert await db_session.get(User, user.id) is not None

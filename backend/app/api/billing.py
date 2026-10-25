@@ -37,8 +37,9 @@ async def billing_state(
     from app.services import entitlements
 
     plan = billing.effective_plan(user)
+    enabled = billing.billing_enabled()
     trial_days_left = None
-    if plan == "trial" and user.trial_ends_at is not None:
+    if plan == "trial" and enabled and user.trial_ends_at is not None:
         ends = (
             user.trial_ends_at
             if user.trial_ends_at.tzinfo
@@ -47,11 +48,12 @@ async def billing_state(
         trial_days_left = max(0, (ends - datetime.now(UTC)).days)
     return {
         "plan": plan,
-        "billing_enabled": billing.billing_enabled(),
+        "billing_enabled": enabled,
         # Shown before checkout so the reader knows it will apply (#250).
         "academic_discount": bool(billing.academic_discount_for(user)),
         "status": user.billing_status,
-        "trial_ends_at": user.trial_ends_at,
+        # No end date while billing is off: the trial doesn't run out then.
+        "trial_ends_at": user.trial_ends_at if enabled else None,
         "trial_days_left": trial_days_left,
         "plan_expires_at": user.plan_expires_at,
         "can_manage": bool(

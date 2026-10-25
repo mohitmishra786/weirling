@@ -27,6 +27,8 @@ def hosted(monkeypatch):
         "email_verification": "off",
         "billing_trial_days": 30,
         "hosted_pro_max_poll_minutes": 60,
+        # Trials only end, and Pro only differs from the trial, with billing on.
+        "billing_provider": "lemonsqueezy",
     }
     # entitlements keeps the settings object it imported; patch both if they differ.
     s = get_settings()

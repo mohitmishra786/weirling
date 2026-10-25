@@ -33,6 +33,8 @@ def hosted_billing(monkeypatch):
         "billing_team_price_ids": "222",
         "billing_checkout_monthly": "https://shop.example/checkout/buy/abc",
         "billing_trial_days": 30,
+        # The trial only runs out once there is a way to pay.
+        "billing_provider": "lemonsqueezy",
     }.items():
         monkeypatch.setattr(s, key, value)
     return s
@@ -412,3 +414,33 @@ async def test_event_for_an_unknown_account_is_recorded_not_applied(
         {"event_id": "evt_tx", "event_type": "transaction.completed", "data": {}}
     ).encode()
     assert (await _post_paddle(client, other)).json()["status"] == "ignored"
+
+
+def test_without_billing_the_trial_never_runs_out(hosted_billing, monkeypatch):
+    """A hosted beta before BILLING_PROVIDER is set: nobody can pay, so nobody
+    is paused, emailed about a trial ending, or deleted."""
+    monkeypatch.setattr(hosted_billing, "billing_provider", "")
+    now = datetime.now(UTC)
+    u = User(email="x@example.com", hashed_password="x", tier="free")
+    billing.start_trial(u, now=now)
+    assert billing.effective_plan(u, now=now + timedelta(days=400)) == "trial"
+    u.tier, u.plan_expires_at = "pro", None  # a granted plan still wins
+    assert billing.effective_plan(u, now=now) == "pro"
+
+
+@pytest.mark.asyncio
+async def test_billing_state_has_no_trial_end_without_billing(client, hosted_billing, monkeypatch):
+    monkeypatch.setattr(hosted_billing, "billing_provider", "")
+    resp = await client.post(
+        "/api/v1/auth/register",
+        json={
+            "email": f"beta{uuid.uuid4().hex[:6]}@example.com",
+            "password": "TestPass123!",
+            "accept_terms": True,
+        },
+    )
+    headers = {"Authorization": f"Bearer {resp.json()['access_token']}"}
+    state = (await client.get("/api/v1/billing", headers=headers)).json()
+    assert state["plan"] == "trial"
+    assert state["billing_enabled"] is False
+    assert state["trial_ends_at"] is None and state["trial_days_left"] is None

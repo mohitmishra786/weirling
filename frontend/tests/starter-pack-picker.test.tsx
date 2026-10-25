@@ -13,7 +13,7 @@ const packs: StarterPack[] = [
 const api = vi.hoisted(() => ({
   sources: {
     starterPacks: vi.fn(),
-    subscribePack: vi.fn(() => Promise.resolve({ status: "ok", subscribed: 12, already_had: 0 })),
+    subscribePacks: vi.fn(() => Promise.resolve({ status: "ok", packs: ["a", "b"], subscribed: 24 })),
   },
 }));
 vi.mock("../src/lib/api", () => ({ api }));
@@ -47,8 +47,15 @@ describe("StarterPackPicker (#152)", () => {
     expect(screen.getByText("Already following")).toBeInTheDocument();
   });
 
-  it("subscribePacks adds up the new feeds", async () => {
+  it("subscribePacks sends every pack in one request", async () => {
     expect(await subscribePacks(["a", "b"])).toBe(24);
-    expect(api.sources.subscribePack).toHaveBeenCalledTimes(2);
+    expect(api.sources.subscribePacks).toHaveBeenCalledTimes(1);
+    expect(api.sources.subscribePacks).toHaveBeenCalledWith(["a", "b"]);
+    expect(await subscribePacks([])).toBe(0);
+  });
+
+  it("subscribePacks lets a failure reach the caller", async () => {
+    api.sources.subscribePacks.mockRejectedValueOnce(new Error("Unknown starter pack: x"));
+    await expect(subscribePacks(["x"])).rejects.toThrow("Unknown starter pack");
   });
 });

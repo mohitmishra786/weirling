@@ -63,6 +63,57 @@ def active_embedder() -> dict:
     }
 
 
+def container_cpus() -> int:
+    """CPUs this process may actually use: the smaller of the cgroup quota
+    (Docker, Railway, Kubernetes limits) and the affinity mask. os.cpu_count()
+    reports the host's cores, far more than a 2-vCPU container gets."""
+    import contextlib
+    import math
+    import os
+
+    limits: list[int] = []
+    try:
+        with open("/sys/fs/cgroup/cpu.max") as f:
+            quota, period = f.read().split()[:2]
+        if quota != "max":
+            limits.append(math.ceil(int(quota) / int(period)))
+    except (OSError, ValueError):
+        pass
+    with contextlib.suppress(AttributeError, OSError):  # no affinity API on macOS
+        limits.append(len(os.sched_getaffinity(0)))
+    if not limits:
+        limits.append(os.cpu_count() or 1)
+    return max(1, min(limits))
+
+
+def _positive_int(value: str | None) -> int | None:
+    try:
+        number = int(value or "")
+    except ValueError:
+        return None
+    return number if number > 0 else None
+
+
+def limit_torch_threads() -> int | None:
+    """Cap PyTorch's thread pool at the container's CPUs. Left at the host core
+    count, its threads fight over a 2-vCPU quota and one article took 30-40 s
+    to embed on Railway instead of 0.06 s. A positive TORCH_NUM_THREADS or
+    OMP_NUM_THREADS still wins (0 or junk is ignored: PyTorch rejects 0)."""
+    import os
+
+    try:
+        import torch
+    except ImportError:
+        return None
+    threads = (
+        _positive_int(os.environ.get("TORCH_NUM_THREADS"))
+        or _positive_int(os.environ.get("OMP_NUM_THREADS"))
+        or container_cpus()
+    )
+    torch.set_num_threads(threads)
+    return threads
+
+
 class EmbeddingService:
     def __init__(self, model_name: str, device: str = "cpu") -> None:
         try:
@@ -87,7 +138,8 @@ class EmbeddingService:
             self.dimension = spec.dim
             return
 
-        logger.info(f"Loading embedding model: {model_name} on {device}")
+        threads = limit_torch_threads()
+        logger.info(f"Loading embedding model: {model_name} on {device} ({threads} threads)")
         self.model = SentenceTransformer(model_name, device=device)
         self.model_name = model_name
         self.dimension = 384

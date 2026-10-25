@@ -33,6 +33,20 @@ export const SUBPROCESSORS: Subprocessor[] = [
       "Transactional/user-requested email only: no cold or bulk marketing. Include a working unsubscribe (implemented) and, for bulk sending, a physical address and SPF/DKIM/DMARC on a sending subdomain.",
   },
   {
+    service: "Railway",
+    usedFor: "Hosting the API, workers, database and cache (hosted)",
+    dataSent: "All account and reading data stored by the service",
+    location: "United States",
+    termsNotes: "Infrastructure provider: processes data only to run the service.",
+  },
+  {
+    service: "Vercel",
+    usedFor: "Serving the web app (hosted)",
+    dataSent: "Request metadata (IP address, pages requested)",
+    location: "United States",
+    termsNotes: "No Vercel Analytics or Speed Insights: no third-party analytics run in the browser.",
+  },
+  {
     service: "Lemon Squeezy / Paddle",
     usedFor: "Merchant of record & subscription billing (hosted)",
     dataSent: "Customer email, country, billing token",

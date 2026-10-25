@@ -8,30 +8,23 @@ interface InterestInputProps {
 export function InterestInput({ value, onChange }: InterestInputProps) {
   return (
     <div>
-      <label style={{ display: "block", fontWeight: 600, marginBottom: 8 }}>
+      <label htmlFor="interest-text" className="mb-2 block font-semibold">
         Describe what you read and care about
       </label>
       <textarea
+        id="interest-text"
+        className="input resize-y text-[0.95rem] leading-relaxed"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={5}
         placeholder="I work in ML infrastructure, care about distributed training, follow the Kubernetes ecosystem closely, and read about the economics of AI."
-        style={{
-          width: "100%",
-          padding: "12px",
-          border: "1px solid var(--border-strong)",
-          borderRadius: 8,
-          fontSize: "0.95rem",
-          lineHeight: 1.6,
-          resize: "vertical",
-        }}
       />
-      <p style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 4 }}>
+      <p className="mt-1.5 text-xs text-[var(--text-tertiary)]">
         Be specific. The more detail you provide, the better your first digest will be.
       </p>
-      <p style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 12 }}>
+      <p className="mt-3 text-xs text-[var(--text-tertiary)]">
         Weirling learns from what you read. See{" "}
-        <a href="/privacy" target="_blank" rel="noopener" style={{ textDecoration: "underline" }}>
+        <a href="/privacy" target="_blank" rel="noopener" className="underline hover:text-[var(--text)]">
           exactly what it records and why
         </a>
         .

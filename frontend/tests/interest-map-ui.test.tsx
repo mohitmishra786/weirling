@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -53,8 +53,8 @@ describe("Interest map (#179)", () => {
     render(<InterestMap />);
     expect(await screen.findByRole("img", { name: /Map of 3 interests/ })).toBeInTheDocument();
     expect(api.preferences.interestGraph).toHaveBeenCalledWith(300);
-    expect(document.querySelectorAll("svg g").length).toBe(3);
-    expect(document.querySelectorAll("svg line").length).toBe(1);
+    // Drawn on a canvas; the list beside it names every topic.
+    expect(within(await screen.findByRole("list")).getAllByRole("button")).toHaveLength(3);
   });
 
   it("offers boost, mute, remove, rename and merge for a topic", async () => {
@@ -83,24 +83,6 @@ describe("Interest map (#179)", () => {
     await userEvent.click(within(panel).getByRole("button", { name: "Merge" }));
     expect(api.feedback.mergeInterests).toHaveBeenCalledWith("rust", "compilers");
     expect(api.preferences.interestGraph.mock.calls.length).toBeGreaterThan(3); // reloads after edits
-  });
-
-  it("merges by dragging one topic onto another", async () => {
-    render(<InterestMap />);
-    const svg = (await screen.findByRole("img")) as unknown as SVGSVGElement;
-    // 1 screen px = 1 map unit.
-    svg.getBoundingClientRect = () => ({ left: 0, top: 0, width: 1000, height: 700, right: 1000, bottom: 700, x: 0, y: 0, toJSON: () => ({}) });
-    const groups = document.querySelectorAll("svg g");
-    const at = (g: Element) => {
-      const m = /translate\(([-\d.]+),([-\d.]+)\)/.exec(g.getAttribute("transform")!)!;
-      return { x: Number(m[1]), y: Number(m[2]) };
-    };
-    const target = at(groups[0]); // compilers
-    fireEvent.pointerDown(groups[1], { pointerId: 1 }); // rust
-    fireEvent.pointerMove(svg, { clientX: target.x, clientY: target.y, pointerId: 1 });
-    fireEvent.pointerUp(svg, { clientX: target.x, clientY: target.y, pointerId: 1 });
-    expect(window.confirm).toHaveBeenCalledWith("Merge “rust” into “compilers”?");
-    await vi.waitFor(() => expect(api.feedback.mergeInterests).toHaveBeenCalledWith("rust", "compilers"));
   });
 
   it("highlights recent and muted topics", () => {

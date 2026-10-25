@@ -57,14 +57,14 @@ const ICONS: Record<string, LucideIcon> = {
   "filings-markets": FileSpreadsheet,
 };
 
-/** Subscribe to the selected packs; returns how many new feeds were added. */
+/** Subscribe to the selected packs; returns how many new feeds were added.
+ *  One request for all of them: one at a time made five packs a minute-long
+ *  wait, and parallel requests would race on feeds the packs share. Throws on
+ *  failure so the caller can keep the selection and say what went wrong. */
 export async function subscribePacks(ids: string[]): Promise<number> {
-  let added = 0;
-  for (const id of ids) {
-    const result = await api.sources.subscribePack(id).catch(() => null);
-    added += result?.subscribed ?? 0;
-  }
-  return added;
+  if (ids.length === 0) return 0;
+  const result = await api.sources.subscribePacks(ids);
+  return result.subscribed;
 }
 
 export function packSummary(packs: StarterPack[], selected: string[]): string {
@@ -127,23 +127,22 @@ export function StarterPackPicker({
               aria-pressed={on}
               disabled={following}
               onClick={() => toggle(p.id)}
-              className={`rounded-lg border p-3 text-left transition-colors ${
-                on ? "border-prism-600 bg-prism-50 ring-1 ring-prism-600" : "border-stone-200 hover:border-stone-400"
-              } ${following ? "opacity-60" : ""}`}
+              className="choice"
             >
               <div className="flex items-center gap-2 font-medium">
                 {(() => {
                   const Icon = ICONS[p.id] ?? BookOpen;
-                  return <Icon className="h-4 w-4 shrink-0 text-stone-600 dark:text-stone-300" aria-hidden="true" />;
+                  return <Icon
+                      className={`h-4 w-4 shrink-0 ${on ? "text-prism-300" : "text-stone-400"}`}
+                      aria-hidden="true"
+                    />;
                 })()}
                 {p.title}
                 {p.suggested && !following && (
-                  <span className="ml-auto rounded bg-amber-50 px-1.5 text-[10px] font-semibold uppercase text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
-                    For you
-                  </span>
+                  <span className="badge-accent ml-auto shrink-0">For you</span>
                 )}
               </div>
-              <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
+              <p className="mt-1 text-xs text-stone-400">
                 {following
                   ? "Already following"
                   : `${p.feed_count} sources · ${p.feeds.slice(0, 3).map((f) => f.name).join(", ")}`}
@@ -152,7 +151,7 @@ export function StarterPackPicker({
           );
         })}
       </div>
-      <div className="sticky bottom-0 mt-4 flex items-center justify-between border-t border-stone-200 bg-white/95 py-3 text-sm backdrop-blur dark:bg-stone-950/95 dark:border-white/10">
+      <div className="sticky bottom-0 mt-4 flex items-center justify-between border-t border-[var(--border)] bg-[var(--bg)]/95 py-3 text-sm text-[var(--text-secondary)] backdrop-blur">
         <span>{packSummary(packs, selected)}</span>
         {footer}
       </div>

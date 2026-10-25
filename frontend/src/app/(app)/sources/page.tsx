@@ -15,10 +15,15 @@ export default function SourcesPage() {
 
   const subscribeSelected = async () => {
     setPackNote("Subscribing…");
-    const added = await subscribePacks(packIds);
-    setPackNote(`Added ${added} new source${added === 1 ? "" : "s"}.`);
-    setPackIds([]);
-    setSources(await api.sources.list());
+    try {
+      const added = await subscribePacks(packIds);
+      setPackNote(`Added ${added} new source${added === 1 ? "" : "s"}.`);
+      setPackIds([]);
+      setSources(await api.sources.list());
+    } catch (err: unknown) {
+      // Keep the selection so the user can retry.
+      setPackNote(`Couldn't follow those packs${err instanceof Error && err.message ? `: ${err.message}` : ""}.`);
+    }
   };
 
   useEffect(() => {

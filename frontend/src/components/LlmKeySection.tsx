@@ -3,22 +3,7 @@ import { useEffect, useState } from "react";
 import { api } from "../lib/api";
 import type { LLMKeyState } from "../lib/types";
 
-const BUTTON = {
-  padding: "8px 16px",
-  border: "1px solid var(--border-strong)",
-  borderRadius: 6,
-  background: "var(--bg-elevated)",
-  cursor: "pointer",
-} as const;
 
-const INPUT = {
-  padding: "8px 10px",
-  border: "1px solid var(--border-strong)",
-  borderRadius: 6,
-  background: "var(--bg-elevated)",
-  width: "100%",
-  maxWidth: 420,
-} as const;
 
 // Your own LLM key on hosted (#255). Renders nothing on self-hosted instances.
 export function LlmKeySection() {
@@ -78,7 +63,7 @@ export function LlmKeySection() {
             Key ending in <code>{state.last4 || "····"}</code> at {state.base_url}
             {state.model ? ` (${state.model})` : ""}
           </span>
-          <button style={BUTTON} onClick={remove} disabled={busy}>
+          <button className="btn-secondary disabled:cursor-not-allowed disabled:opacity-50" onClick={remove} disabled={busy}>
             Remove key
           </button>
         </div>
@@ -86,7 +71,7 @@ export function LlmKeySection() {
         <div style={{ display: "grid", gap: 10 }}>
           <label style={{ fontSize: 14 }}>
             Provider
-            <select style={{ ...INPUT, display: "block", marginTop: 4 }} value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)}>
+            <select className="input mt-1 block" value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)}>
               {(state.allowed_base_urls ?? []).map((u) => (
                 <option key={u} value={u}>
                   {u}
@@ -97,7 +82,7 @@ export function LlmKeySection() {
           <label style={{ fontSize: 14 }}>
             API key
             <input
-              style={{ ...INPUT, display: "block", marginTop: 4 }}
+              className="input mt-1 block"
               type="password"
               autoComplete="off"
               value={apiKey}
@@ -107,14 +92,14 @@ export function LlmKeySection() {
           <label style={{ fontSize: 14 }}>
             Model (optional)
             <input
-              style={{ ...INPUT, display: "block", marginTop: 4 }}
+              className="input mt-1 block"
               placeholder="the instance's summary model"
               value={model}
               onChange={(e) => setModel(e.target.value)}
             />
           </label>
           <div>
-            <button style={BUTTON} onClick={save} disabled={busy || apiKey.trim().length < 8}>
+            <button className="btn-secondary disabled:cursor-not-allowed disabled:opacity-50" onClick={save} disabled={busy || apiKey.trim().length < 8}>
               {busy ? "Checking…" : "Check and save"}
             </button>
           </div>

@@ -49,8 +49,11 @@ async def require_owner_or_metrics_token(
     from app.api.auth import get_current_user
     from app.services import instance_health as health
 
+    auth = request.headers.get("authorization", "")
+    bearer = auth[7:].strip() if auth.lower().startswith("bearer ") else None
     try:
-        user = await get_current_user(request=request, token=None, session=session)
+        # A bearer token (API, MCP) or, when absent, the browser's session cookie.
+        user = await get_current_user(request=request, token=bearer, session=session)
         if await health.is_instance_owner(session, user):
             return
     except HTTPException:
@@ -81,7 +84,10 @@ async def llm_status(
     key exists at all.
     """
     s = get_settings()
-    has_primary_key = bool(s.groq_api_key or s.openai_api_key)
+    # LLM_API_KEY (or the deprecated GROQ_API_KEY it absorbs) or the OpenAI
+    # fallback. Checking groq_api_key alone said "no key" on every install
+    # configured the current way.
+    has_primary_key = bool(s.llm_configured or s.openai_api_key)
     from app.utils.embeddings import active_embedder
 
     embedder = active_embedder()
@@ -266,25 +272,48 @@ async def recompute_scores(session: AsyncSession = Depends(get_db)) -> dict:
     return {"ranker_version": RANKER_VERSION, "items": len(ids)}
 
 
-@router.get("/ingestion", dependencies=[Depends(require_metrics_token)])
+@router.get("/ingestion", dependencies=[Depends(require_owner_or_metrics_token)])
 async def ingestion_metrics(session: AsyncSession = Depends(get_db)) -> dict:
-    """Fetch success, extraction method mix, and ingest-to-score lag."""
+    """Fetch success, extraction method mix, and ingest-to-score lag. The
+    instance owner can read it from the app (Ingestion page) or an operator
+    with the metrics token. Reads only the columns the report needs: loading
+    every item with its full text grew without bound."""
+    from types import SimpleNamespace
+
+    from sqlalchemy import func
+
     from app.models.content import ContentItem
     from app.models.source import Source
     from app.services.ingestion.observe import ingestion_report
     from app.services.ingestion.retention import storage_stats
 
-    sources = list((await session.execute(select(Source))).scalars())
-    items = list((await session.execute(select(ContentItem))).scalars())
+    sources = [
+        SimpleNamespace(is_active=active, feed_status=feed_status)
+        for active, feed_status in (
+            await session.execute(select(Source.is_active, Source.feed_status))
+        ).all()
+    ]
+    rows = (
+        await session.execute(
+            select(
+                ContentItem.id,
+                ContentItem.source_id,
+                ContentItem.extraction_method,
+                ContentItem.fetched_at,
+                ContentItem.scored_at,
+                func.coalesce(func.length(ContentItem.full_text), 0),
+            )
+        )
+    ).all()
+    items = [
+        SimpleNamespace(extraction_method=method, fetched_at=fetched, scored_at=scored)
+        for _id, _source, method, fetched, scored, _length in rows
+    ]
     report = ingestion_report(sources, items)
     report["storage"] = storage_stats(
         [
-            {
-                "id": item.id,
-                "source_id": item.source_id,
-                "text_length": len(item.full_text or ""),
-            }
-            for item in items
+            {"id": item_id, "source_id": source_id, "text_length": length}
+            for item_id, source_id, _m, _f, _s, length in rows
         ]
     )
     return report

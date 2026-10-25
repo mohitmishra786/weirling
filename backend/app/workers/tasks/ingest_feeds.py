@@ -182,6 +182,14 @@ def _pro_followed(now: datetime):
 
     if not entitlements.is_hosted():
         return None
+    from app.services.billing import billing_enabled
+
+    if not billing_enabled():
+        # Same rule as effective_plan: with billing off every account is on
+        # the trial, which gets Pro's priority fetching.
+        return exists().where(
+            Source.feed_id == Feed.id, Source.is_active.is_(True), Source.user_id == User.id
+        )
     plan_active = or_(User.plan_expires_at.is_(None), User.plan_expires_at > now)
     paid_pro = and_(
         User.tier.in_([t for t in PAID_TIERS if t in entitlements.PRO_PLANS]), plan_active

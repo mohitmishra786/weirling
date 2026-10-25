@@ -1,6 +1,6 @@
 site_name: Weirling
 site_description: A personal reading digest that explains itself. Self-hosted or hosted, MIT.
-site_url: https://weirling.com
+site_url: https://mohitmishra786.github.io/weirling/
 repo_url: https://github.com/mohitmishra786/weirling
 repo_name: mohitmishra786/weirling
 edit_uri: edit/main/docs/
@@ -36,6 +36,7 @@ nav:
   - Home: index.md
   - Self-hosting:
       - Install & run: DEPLOYMENT.md
+      - Configuration: CONFIGURATION.md
       - Upgrading: UPGRADING.md
       - Ranking sidecar: sidecar.md
   - Hosted service: HOSTING.md
@@ -55,8 +56,10 @@ nav:
       - Replay evaluation: eval/replay-protocol.md
       - Embedding models: eval/embedding-models.md
   - Project:
+      - Development: DEVELOPMENT.md
       - Roadmap: milestones.md
       - Release notes:
+          - v0.3.3: releases/v0.3.3.md
           - v0.3.2: releases/v0.3.2.md
           - v0.3.1: releases/v0.3.1.md
           - v0.3.0: releases/v0.3.0.md

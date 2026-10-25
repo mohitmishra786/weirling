@@ -4,13 +4,6 @@ import { GraduationCap } from "lucide-react";
 import { api } from "../lib/api";
 import type { BillingState, PlanOffer, PlanQuota } from "../lib/types";
 
-const BUTTON = {
-  padding: "8px 16px",
-  border: "1px solid var(--border-strong)",
-  borderRadius: 6,
-  background: "var(--bg-elevated)",
-  cursor: "pointer",
-} as const;
 
 function day(iso: string | null): string {
   return iso ? new Date(iso).toLocaleDateString() : "";
@@ -19,6 +12,9 @@ function day(iso: string | null): string {
 function describe(state: BillingState): string {
   switch (state.plan) {
     case "trial":
+      // Billing off (hosted beta): nothing runs out, so don't count down.
+      if (!state.billing_enabled || !state.trial_ends_at)
+        return "Early access: everything is included while Weirling is in beta. No payment needed.";
       return `Free trial: ${state.trial_days_left ?? 0} days left (until ${day(state.trial_ends_at)}).`;
     case "reader":
     case "pro":
@@ -84,7 +80,7 @@ function PlanPicker({
             <div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {p.intervals.map((i) => (
-                  <button key={i} style={BUTTON} onClick={() => onBuy(p.plan, i)}>
+                  <button key={i} className="btn-secondary disabled:cursor-not-allowed disabled:opacity-50" onClick={() => onBuy(p.plan, i)}>
                     {p.name} {i === "month" ? "monthly" : "yearly"}
                   </button>
                 ))}
@@ -186,7 +182,7 @@ export function PlanSection() {
               state.support_email ? (
                 <a
                   href={`mailto:${state.support_email}?subject=Manage%20subscription`}
-                  style={{ ...BUTTON, textDecoration: "none", display: "inline-block", color: "inherit" }}
+                  className="btn-secondary no-underline"
                 >
                   Email to change or cancel
                 </a>
@@ -194,7 +190,7 @@ export function PlanSection() {
                 <p style={{ fontSize: 14 }}>To change or cancel, contact the operator of this service.</p>
               )
             ) : (
-              <button style={BUTTON} onClick={() => go(api.billing.portal())}>
+              <button className="btn-secondary disabled:cursor-not-allowed disabled:opacity-50" onClick={() => go(api.billing.portal())}>
                 Manage billing
               </button>
             ))}

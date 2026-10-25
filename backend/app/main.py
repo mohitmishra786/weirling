@@ -110,6 +110,21 @@ def create_app() -> FastAPI:
     )
 
     @app.middleware("http")
+    async def _security_headers(request, call_next):
+        # The API serves JSON, never pages: forbid sniffing and framing on
+        # every response, and pin HTTPS outside development (the web app's
+        # own headers come from the frontend). setdefault keeps any header a
+        # route set on purpose.
+        response = await call_next(request)
+        headers = response.headers
+        headers.setdefault("X-Content-Type-Options", "nosniff")
+        headers.setdefault("X-Frame-Options", "DENY")
+        headers.setdefault("Referrer-Policy", "no-referrer")
+        if settings.app_env != "development":
+            headers.setdefault("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
+        return response
+
+    @app.middleware("http")
     async def _prometheus_http(request, call_next):
         # Route template, not the raw path, so IDs don't explode cardinality (#170).
         import time as _time

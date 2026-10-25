@@ -144,6 +144,10 @@ def effective_plan(user: User, *, now: datetime | None = None) -> str:
     expires = _aware(user.plan_expires_at)
     if user.tier in PAID_TIERS and (expires is None or expires > now):
         return user.tier
+    if not billing_enabled():
+        # No way to pay yet (a hosted beta before BILLING_PROVIDER is set):
+        # nobody's trial runs out, so nobody is paused, emailed or deleted.
+        return "trial"
     trial = _aware(user.trial_ends_at)
     if trial is not None and trial > now:
         return "trial"

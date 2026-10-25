@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -19,7 +19,7 @@ const api = vi.hoisted(() => ({
         { id: "systems-programming", title: "Systems Programming", feed_count: 12, feeds: [], suggested: true, subscribed: 0 },
       ]),
     ),
-    subscribePack: vi.fn(() => Promise.resolve({ status: "ok", subscribed: 12, already_had: 0 })),
+    subscribePacks: vi.fn(() => Promise.resolve({ status: "ok", packs: ["systems-programming"], subscribed: 12 })),
     importFeeds: vi.fn(),
     importSaved: vi.fn(),
     importJob: vi.fn(),
@@ -63,7 +63,7 @@ describe("OnboardingWizard", () => {
     await next(); // -> Starter Packs
     expect(await screen.findByRole("button", { name: /Systems Programming/ })).toHaveAttribute("aria-pressed", "true");
     await next();
-    expect(api.sources.subscribePack).toHaveBeenCalledWith("systems-programming");
+    expect(api.sources.subscribePacks).toHaveBeenCalledWith(["systems-programming"]);
     expect(await screen.findByText(/Coming from another reader/)).toBeInTheDocument();
   });
 
@@ -89,5 +89,48 @@ describe("OnboardingWizard", () => {
       expect.objectContaining({ digest_frequency: "in_app_only", digest_time_morning: "06:30:00" }),
     );
     expect(replace).toHaveBeenCalledWith("/digest");
+  });
+
+  it("keeps the selected packs and stays put when subscribing fails", async () => {
+    api.sources.subscribePacks.mockRejectedValueOnce(new Error("Service unavailable"));
+    render(<OnboardingWizard />);
+    await userEvent.type(screen.getByRole("textbox"), "rust");
+    await next(); // Confirm Topics
+    await screen.findByText("Rust");
+    await next(); // Starter Packs
+    const pack = await screen.findByRole("button", { name: /Systems Programming/ });
+    await next(); // tries to subscribe, fails
+    expect(await screen.findByRole("alert")).toHaveTextContent("Couldn't follow those packs");
+    expect(screen.getByText(/: Starter Packs$/)).toBeInTheDocument();
+    expect(pack).toHaveAttribute("aria-pressed", "true");
+  });
+
+  async function walkToEnd() {
+    await userEvent.type(screen.getByRole("textbox"), "rust");
+    await next(); // Confirm Topics
+    await screen.findByText("Rust");
+    for (let i = 0; i < 6; i++) await next();
+    await screen.findByText(/: Digest Preferences$/);
+  }
+
+  it("hands back to the page that hosts it instead of navigating to itself", async () => {
+    replace.mockClear();
+    const onDone = vi.fn();
+    render(<OnboardingWizard onDone={onDone} />);
+    await walkToEnd();
+    await userEvent.click(screen.getByRole("button", { name: "Start Weirling" }));
+    await waitFor(() => expect(onDone).toHaveBeenCalledTimes(1));
+    expect(replace).not.toHaveBeenCalled();
+  });
+
+  it("finishes when onboarding was already saved by an earlier click", async () => {
+    api.onboarding.complete.mockRejectedValueOnce(new Error("Onboarding already completed"));
+    const onDone = vi.fn();
+    render(<OnboardingWizard onDone={onDone} />);
+    await walkToEnd();
+    await userEvent.click(screen.getByRole("button", { name: "Start Weirling" }));
+    await waitFor(() => expect(onDone).toHaveBeenCalled());
+    expect(api.preferences.update).toHaveBeenCalled();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 });

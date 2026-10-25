@@ -87,7 +87,7 @@ export function ImportPanel({ onImported }: { onImported?: (feeds: number, saved
           if (e.dataTransfer.files.length) void handle(e.dataTransfer.files);
         }}
         className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-6 text-center text-sm ${
-          dragging ? "border-prism-600 bg-prism-50" : "border-stone-300"
+          dragging ? "border-[var(--accent)] bg-[var(--accent-soft)]" : "border-[var(--border-strong)] hover:border-[var(--accent)]"
         }`}
       >
         <span className="font-medium">

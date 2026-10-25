@@ -108,13 +108,23 @@ Weirling can send data to the third-party services below when configured. See
 [THIRD_PARTY_SERVICES.md](THIRD_PARTY_SERVICES.md) for details.
 
 - **Groq** (and optionally OpenAI): article text/titles are sent to generate
-  summaries. Summaries are cached.
+  summaries, and the description of your interests you write during
+  onboarding is sent once to turn it into topics. Summaries are cached. If
+  you add your own LLM key, your requests go to the provider you chose.
 - **Email provider (Resend, on the hosted service):** your email address and
   the content of the emails we send you (digests, sign-in and account
   messages). Replies you send us go to our own mailboxes. Self-hosters use
   their own provider.
+- **Hosting (on the hosted service):** Railway (United States) runs the API,
+  workers, database and cache, so it stores everything above; Vercel (United
+  States) serves the web app and sees request metadata such as IP address and
+  pages visited. Neither may use the data for its own purposes.
 - **Postgres, Redis, Browserless:** run within the operator's own
-  infrastructure.
+  infrastructure (on the hosted service, at Railway).
+
+**Where your data is:** the hosted service stores and processes data in the
+United States. If you are outside it (for example in India or the EU), your
+data is transferred there under these providers' data-processing terms.
 
 Self-hosters may supply their own API keys, in which case those providers'
 terms apply to the operator.

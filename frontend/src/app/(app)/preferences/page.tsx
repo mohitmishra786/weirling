@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, AlertTriangle, Brain, Pencil } from "lucide-react";
 import { api } from "../../../lib/api";
@@ -8,94 +9,28 @@ import { LlmKeySection } from "../../../components/LlmKeySection";
 import { NewsletterAddressCard } from "../../../components/NewsletterAddressCard";
 import { CitationExport } from "../../../components/CitationExport";
 import { PushAlerts } from "../../../components/PushAlerts";
-import type { InterestGraph, InterestGraphEdge, InterestGraphNode, User } from "../../../lib/types";
+import { ForceGraph } from "../../../components/graph/ForceGraph";
+import type { InterestGraph, User } from "../../../lib/types";
 
-// --- Simple force-layout SVG graph ---
-const SVG_W = 600;
-const SVG_H = 360;
-const NODE_R = 18;
-
-function layoutNodes(nodes: InterestGraphNode[]): Map<string, { x: number; y: number }> {
-  const positions = new Map<string, { x: number; y: number }>();
-  const count = Math.min(nodes.length, 24);
-  for (let i = 0; i < count; i++) {
-    const angle = (2 * Math.PI * i) / count;
-    const r = SVG_H / 2 - NODE_R - 10;
-    positions.set(nodes[i].label, {
-      x: SVG_W / 2 + r * Math.cos(angle),
-      y: SVG_H / 2 + r * Math.sin(angle),
-    });
-  }
-  return positions;
+function Section({ title, children, hint }: { title: string; hint?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <section className="card p-5 sm:p-6">
+      <h2 className="text-xl italic">{title}</h2>
+      {hint && <p className="mt-1 text-sm text-[var(--text-tertiary)]">{hint}</p>}
+      <div className="mt-4">{children}</div>
+    </section>
+  );
 }
 
-function InterestGraphSVG({
-  nodes,
-  edges,
-}: {
-  nodes: InterestGraphNode[];
-  edges: InterestGraphEdge[];
-}) {
-  const visible = nodes.slice(0, 24);
-  const labelSet = useMemo(() => new Set(visible.map((n) => n.label)), [visible]);
-  const positions = useMemo(() => layoutNodes(visible), [visible]);
-  const visibleEdges = edges.filter(
-    (e) => labelSet.has(e.from_label) && labelSet.has(e.to_label) && e.weight > 0.1
-  );
-
+function Field({ label, htmlFor, hint, children }: { label: React.ReactNode; htmlFor?: string; hint?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <svg
-      width="100%"
-      viewBox={`0 0 ${SVG_W} ${SVG_H}`}
-      style={{ background: "var(--bg-sunken)", borderRadius: 8, border: "1px solid var(--border)" }}
-    >
-      {visibleEdges.map((edge, i) => {
-        const from = positions.get(edge.from_label);
-        const to = positions.get(edge.to_label);
-        if (!from || !to) return null;
-        return (
-          <line
-            key={i}
-            x1={from.x}
-            y1={from.y}
-            x2={to.x}
-            y2={to.y}
-            stroke="#3a3a3a"
-            strokeWidth={Math.max(0.5, edge.weight * 3)}
-            opacity={0.6}
-          />
-        );
-      })}
-      {visible.map((node) => {
-        const pos = positions.get(node.label);
-        if (!pos) return null;
-        const r = NODE_R * (0.6 + node.weight * 0.6);
-        return (
-          <g key={node.label}>
-            <circle
-              cx={pos.x}
-              cy={pos.y}
-              r={r}
-              fill={`rgba(37,99,235,${0.15 + node.weight * 0.4})`}
-              stroke={node.is_core ? "#b45309" : "#f8a94a"}
-              strokeWidth={node.is_core ? 2 : 1}
-            />
-            <text
-              x={pos.x}
-              y={pos.y}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fontSize={Math.max(8, Math.min(11, 200 / visible.length))}
-              fill="#e7e5e4"
-              fontWeight={node.is_core ? "bold" : "normal"}
-              style={{ pointerEvents: "none" }}
-            >
-              {node.label.length > 12 ? node.label.slice(0, 11) + "…" : node.label}
-            </text>
-          </g>
-        );
-      })}
-    </svg>
+    <div>
+      <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-medium">
+        {label}
+      </label>
+      {children}
+      {hint && <p className="mt-1.5 text-xs text-[var(--text-tertiary)]">{hint}</p>}
+    </div>
   );
 }
 
@@ -117,26 +52,25 @@ function LlmStatus() {
 
   if (!status) return null;
   return (
-    <div style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 12 }} role="status">
-      <p style={{ margin: "4px 0", display: "flex", alignItems: "center", gap: 6 }}>
+    <div className="mt-5 space-y-1.5 rounded-lg bg-[var(--bg-sunken)] px-3 py-2.5 text-xs text-[var(--text-tertiary)]" role="status">
+      <p className="flex items-start gap-2">
         {status.llm_configured ? (
-          <Check style={{ width: 14, height: 14, color: "#16a34a" }} aria-hidden="true" />
+          <Check className="mt-px h-3.5 w-3.5 shrink-0 text-emerald-400" aria-hidden="true" />
         ) : (
-          <AlertTriangle style={{ width: 14, height: 14, color: "#d97706" }} aria-hidden="true" />
+          <AlertTriangle className="mt-px h-3.5 w-3.5 shrink-0 text-amber-400" aria-hidden="true" />
         )}
         <span>
-          Summaries:{" "}
-          {status.llm_configured ? "LLM active" : "extractive fallback (no key)"} ·{" "}
+          Summaries: {status.llm_configured ? "AI summaries on" : "extract summaries (no AI key)"} ·{" "}
           {status.model_primary} · fast: {status.model_fast}
           {status.openai_fallback_enabled ? " · OpenAI fallback on" : ""}
         </span>
       </p>
       {status.embedding_model && (
-        <p style={{ margin: "4px 0", display: "flex", alignItems: "center", gap: 6 }}>
+        <p className="flex items-start gap-2">
           {status.embedding_is_hash ? (
-            <AlertTriangle style={{ width: 14, height: 14, color: "#d97706" }} aria-hidden="true" />
+            <AlertTriangle className="mt-px h-3.5 w-3.5 shrink-0 text-amber-400" aria-hidden="true" />
           ) : (
-            <Brain style={{ width: 14, height: 14, color: "#f08a24" }} aria-hidden="true" />
+            <Brain className="mt-px h-3.5 w-3.5 shrink-0 text-prism-400" aria-hidden="true" />
           )}
           <span>
             Embeddings: {status.embedding_model}
@@ -145,7 +79,7 @@ function LlmStatus() {
         </p>
       )}
       {status.embedding_is_hash && status.embedding_upgrade_hint && (
-        <p style={{ margin: "4px 0", color: "#b45309" }}>{status.embedding_upgrade_hint}</p>
+        <p className="text-amber-300">{status.embedding_upgrade_hint}</p>
       )}
     </div>
   );
@@ -155,6 +89,25 @@ export default function PreferencesPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [graph, setGraph] = useState<InterestGraph | null>(null);
+  const [now] = useState(() => Date.now());
+  const graphNodes = useMemo(
+    () =>
+      (graph?.nodes ?? []).slice(0, 60).map((n) => ({
+        id: n.label,
+        label: n.label,
+        weight: n.weight,
+        core: n.is_core,
+        muted: Boolean(n.suppressed_until && Date.parse(n.suppressed_until) > now),
+      })),
+    [graph, now],
+  );
+  const graphLinks = useMemo(
+    () =>
+      (graph?.edges ?? [])
+        .filter((e) => e.weight > 0.1)
+        .map((e) => ({ source: e.from_label, target: e.to_label, weight: e.weight })),
+    [graph],
+  );
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState("");
@@ -282,189 +235,217 @@ export default function PreferencesPage() {
     setSaving(false);
   };
 
-  if (!user) return <p style={{ color: "var(--text-tertiary)" }}>Loading preferences...</p>;
+  if (!user)
+    return (
+      <div className="space-y-4" aria-busy="true" aria-label="Loading preferences">
+        <div className="skeleton h-10 w-48 rounded-lg" />
+        <div className="skeleton h-80 rounded-xl" />
+      </div>
+    );
 
   return (
-    <div>
-      <h1 style={{ fontSize: "1.4rem", fontWeight: 700, marginBottom: 24 }}>Preferences</h1>
+    <div className="space-y-6">
+      <header>
+        <p className="eyebrow">Your account</p>
+        <h1 className="mt-1 text-3xl italic">Preferences</h1>
+      </header>
 
-      <section style={{ marginBottom: 32 }}>
-        <h2 style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: 16 }}>Digest Settings</h2>
-        <div style={{ display: "grid", gap: 16, maxWidth: 480 }}>
-          <div>
-            <label style={{ display: "block", fontWeight: 500, marginBottom: 4 }}>Frequency</label>
+      <Section title="Digest">
+        <div className="grid max-w-xl gap-5">
+          <Field
+            label="Frequency"
+            htmlFor="frequency-input"
+            hint="Lighter reader? Weekly bundles the best of your week; “email off” stops digest emails while keeping your in-app digest."
+          >
             <select
+              id="frequency-input"
+              className="input"
               value={user.digest_frequency}
               onChange={(e) => setUser({ ...user, digest_frequency: e.target.value })}
-              style={{ width: "100%", padding: "8px 12px", border: "1px solid var(--border-strong)", borderRadius: 6 }}
             >
               <option value="daily">Daily</option>
               <option value="twice_daily">Twice daily</option>
               <option value="weekly">Weekly (we’ll keep it short)</option>
               <option value="in_app_only">Email off (read in-app only)</option>
             </select>
-            <p style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 4 }}>
-              Lighter reader? Weekly bundles the best of your week; “email off”
-              stops digest emails while keeping your in-app digest.
-            </p>
-          </div>
-          <div>
-            <label style={{ display: "block", fontWeight: 500, marginBottom: 4 }}>
-              Max items per digest: {user.digest_max_items}
-            </label>
+          </Field>
+          <Field
+            label={
+              <span className="flex justify-between">
+                <span>Max items per digest</span>
+                <span className="font-mono text-[var(--text-secondary)]">{user.digest_max_items}</span>
+              </span>
+            }
+            htmlFor="max-items-input"
+            hint={
+              user.digest_length_locked
+                ? "Locked to your choice."
+                : "Auto: adapts to how much you actually open. Moving the slider locks it."
+            }
+          >
             <input
+              id="max-items-input"
               type="range"
+              className="w-full"
               min={5}
               max={30}
               value={user.digest_max_items}
               onChange={(e) => setUser({ ...user, digest_max_items: Number(e.target.value) })}
-              style={{ width: "100%" }}
             />
-            <p style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 4 }}>
-              {user.digest_length_locked
-                ? "Locked to your explicit choice."
-                : "Auto: adapts to how much you actually open. Moving the slider locks it."}
-            </p>
-          </div>
-          <div>
-            <label style={{ display: "block", fontWeight: 500, marginBottom: 4 }}>
-              Discovery percentage: {user.serendipity_percentage}%
-            </label>
+          </Field>
+          <Field
+            label={
+              <span className="flex justify-between">
+                <span>Discovery</span>
+                <span className="font-mono text-[var(--text-secondary)]">{user.serendipity_percentage}%</span>
+              </span>
+            }
+            htmlFor="discovery-input"
+            hint="Share of each digest from outside your usual sources."
+          >
             <input
+              id="discovery-input"
               type="range"
+              className="w-full"
               min={0}
               max={50}
               value={user.serendipity_percentage}
               onChange={(e) => setUser({ ...user, serendipity_percentage: Number(e.target.value) })}
-              style={{ width: "100%" }}
             />
-            <p style={{ fontSize: 12, color: "var(--text-tertiary)" }}>
-              Percentage of digest items from outside your usual sources.
-            </p>
-          </div>
-          <div>
-            <label
-              htmlFor="send-time-input"
-              style={{ display: "block", fontWeight: 500, marginBottom: 4 }}
-            >
-              Send time (your timezone): {user.digest_time_morning.slice(0, 5)}
-              {user.send_time_locked ? " · locked" : " · auto-learned"}
-            </label>
+          </Field>
+          <Field
+            label={
+              <>
+                Send time <span className="font-normal text-[var(--text-tertiary)]">(your time zone)</span>
+                <span className="ml-2 chip border border-[var(--border-strong)] text-[10px] text-[var(--text-secondary)]">
+                  {user.send_time_locked ? "Locked" : "Auto-learned"}
+                </span>
+              </>
+            }
+            htmlFor="send-time-input"
+            hint={
+              user.send_time_locked
+                ? "Locked to the time you set."
+                : "Auto: follows when you actually open digests. Changing it locks it."
+            }
+          >
             <input
               id="send-time-input"
               type="time"
+              className="input w-auto"
               value={user.digest_time_morning.slice(0, 5)}
               onChange={(e) => setUser({ ...user, digest_time_morning: `${e.target.value}:00` })}
-              style={{ width: "100%", padding: "8px 12px", border: "1px solid var(--border-strong)", borderRadius: 6 }}
             />
-            <p style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 4 }}>
-              {user.send_time_locked
-                ? "Locked to your explicit time."
-                : "Auto: follows when you actually open digests. Changing it locks it."}
-            </p>
-          </div>
-          <div>
-            <label
-              htmlFor="languages-input"
-              style={{ display: "block", fontWeight: 500, marginBottom: 4 }}
-            >
-              Languages (comma-separated, empty = all)
-            </label>
+          </Field>
+          <Field label="Languages" htmlFor="languages-input" hint="Comma-separated codes, for example en, de. Empty = every language.">
             {/* Raw text while editing: splitting/filtering per keystroke would
                 eat the trailing comma and block typing the next language. */}
             <input
               id="languages-input"
               type="text"
+              className="input"
               value={languagesText}
               onChange={(e) => setLanguagesText(e.target.value)}
               placeholder="en, de, fr"
-              style={{ width: "100%", padding: "8px 12px", border: "1px solid var(--border-strong)", borderRadius: 6 }}
             />
-          </div>
+          </Field>
         </div>
         <LlmStatus />
-        <button
-          onClick={save}
-          disabled={saving}
-          style={{
-            marginTop: 16,
-            padding: "10px 24px",
-            background: "#b45309",
-            color: "#fff",
-            border: "none",
-            borderRadius: 6,
-            cursor: saving ? "not-allowed" : "pointer",
-            opacity: saving ? 0.7 : 1,
-          }}
-        >
-          {saving ? "Saving..." : saved ? "Saved!" : "Save preferences"}
-        </button>
+        <div className="mt-5 flex items-center gap-3">
+          <button type="button" className="btn-primary disabled:cursor-wait disabled:opacity-70" onClick={save} disabled={saving}>
+            {saving ? "Saving…" : "Save preferences"}
+          </button>
+          {saved && (
+            <span role="status" className="flex items-center gap-1.5 text-sm text-emerald-400">
+              <Check className="h-4 w-4" aria-hidden="true" /> Saved
+            </span>
+          )}
+        </div>
         {saveError && (
-          <p role="alert" style={{ color: "#f87171", fontSize: 14, marginTop: 8 }}>
+          <p role="alert" className="mt-2 text-sm text-red-400">
             {saveError}
           </p>
         )}
-      </section>
+      </Section>
 
       {graph && (
-        <section>
-          <h2 style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: 8 }}>Your Interest Graph</h2>
-          <p style={{ color: "var(--text-tertiary)", fontSize: 14, marginBottom: 16 }}>
-            Nodes = topics you engage with. Larger = higher weight. Bold border = core stable interest.
-            Lines between nodes = topics you often read together.
+        <Section
+          title="Your interest graph"
+          hint="Topics you engage with. Bigger = stronger; orange = core interest; lines join topics you read together. Hover a topic to see its neighbours."
+        >
+          <ForceGraph
+            nodes={graphNodes}
+            links={graphLinks}
+            height={380}
+            label={`Graph of your ${Math.min(60, graph.nodes.length)} strongest interests`}
+          />
+          <p className="mt-4 text-xs text-[var(--text-tertiary)]">
+            Click a topic to mute it for 30 days; ▲ asks for more of it. Rename, merge and the full map are on{" "}
+            <Link href="/interests" className="underline hover:text-[var(--text)]">
+              Interests
+            </Link>
+            .
           </p>
-
-          {/* SVG graph visualization */}
-          <InterestGraphSVG nodes={graph.nodes} edges={graph.edges} />
-
-          {/* Tag cloud — mute 30d / boost / rename / merge (UX-08). */}
-          <p style={{ color: "var(--text-tertiary)", fontSize: 13, marginTop: 16 }}>
-            Click a topic to mute it for 30 days; use the arrows to boost or
-            the rename and merge controls to rename or merge.
-          </p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
+          <div className="mt-2 flex flex-wrap gap-2">
             {graph.nodes.slice(0, 30).map((node) => (
               <span
                 key={node.label}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 4,
-                  padding: "4px 12px",
-                  borderRadius: 20,
-                  background: `rgba(37,99,235,${0.1 + node.weight * 0.5})`,
-                  color: "#f8a94a",
-                  fontSize: `${0.75 + node.weight * 0.5}rem`,
-                  fontWeight: node.is_core ? 700 : 400,
-                  border: node.is_core ? "2px solid #b45309" : "1px solid #3a3a3a",
-                }}
+                className={`chip border text-sm ${
+                  node.is_core
+                    ? "border-[var(--accent)]/60 bg-[var(--accent-soft)] text-prism-300"
+                    : "border-[var(--border-strong)] bg-[var(--bg-sunken)] text-[var(--text-secondary)]"
+                }`}
               >
                 <button
+                  type="button"
                   onClick={() => suppressTopic(node.label)}
                   title={`Mute "${node.label}" for 30 days`}
-                  style={{ cursor: "pointer", background: "none", border: "none", color: "inherit", font: "inherit", padding: 0 }}
+                  className="hover:text-[var(--text)]"
                 >
                   {node.label}
                 </button>
-                <button onClick={() => boostTopic(node.label)} title={`More of "${node.label}"`} style={{ cursor: "pointer", background: "none", border: "none", color: "#86efac", padding: 0, fontSize: "0.8em" }}>▲</button>
-                <button onClick={() => renameInterest(node.label)} title={`Rename "${node.label}"`} aria-label={`Rename "${node.label}"`} style={{ cursor: "pointer", background: "none", border: "none", color: "#f8a94a", padding: 0, fontSize: "0.8em", display: "inline-flex", alignItems: "center" }}><Pencil style={{ width: 12, height: 12 }} aria-hidden="true" /></button>
-                <button onClick={() => mergeInterest(node.label)} title={`Merge "${node.label}" into another topic`} style={{ cursor: "pointer", background: "none", border: "none", color: "#c4b5fd", padding: 0, fontSize: "0.8em" }}>⇄</button>
+                <button
+                  type="button"
+                  onClick={() => boostTopic(node.label)}
+                  title={`More of "${node.label}"`}
+                  aria-label={`More of "${node.label}"`}
+                  className="text-emerald-400 hover:text-emerald-300"
+                >
+                  ▲
+                </button>
+                <button
+                  type="button"
+                  onClick={() => renameInterest(node.label)}
+                  title={`Rename "${node.label}"`}
+                  aria-label={`Rename "${node.label}"`}
+                  className="inline-flex items-center opacity-70 hover:opacity-100"
+                >
+                  <Pencil className="h-3 w-3" aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => mergeInterest(node.label)}
+                  title={`Merge "${node.label}" into another topic`}
+                  aria-label={`Merge "${node.label}" into another topic`}
+                  className="opacity-70 hover:opacity-100"
+                >
+                  ⇄
+                </button>
               </span>
             ))}
           </div>
-        </section>
+        </Section>
       )}
 
-      <section style={{ marginTop: 40 }}>
-        <h2 style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: 8 }}>Newsletters</h2>
+      <Section title="Newsletters">
         <NewsletterAddressCard />
-      </section>
+      </Section>
 
-      <section style={{ marginTop: 40 }}>
-        <h2 style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: 8 }}>Weekly summary</h2>
-        <label style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 14 }}>
+      <Section title="Weekly summary">
+        <label className="flex items-start gap-2.5 text-sm">
           <input
             type="checkbox"
+            className="mt-0.5"
             checked={Boolean(user.weekly_email)}
             onChange={async (e) => {
               const updated = await api.preferences.update({ weekly_email: e.target.checked }).catch(() => null);
@@ -475,41 +456,42 @@ export default function PreferencesPage() {
             }}
           />
           <span>
-            Email me once a week with what Weirling learned: topics rising and fading, and the
-            source I finish most, each with a one-click undo.
+            Email me once a week with what Weirling learned: topics rising and fading, and the source I finish most,
+            each with a one-click undo.
           </span>
         </label>
-      </section>
+      </Section>
 
-      <section style={{ marginTop: 40 }}>
-        <h2 style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: 8 }}>Digest alerts</h2>
+      <Section title="Digest alerts">
         <PushAlerts />
-      </section>
+      </Section>
 
-      <section style={{ marginTop: 40 }}>
-        <h2 style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: 8 }}>Export saved articles</h2>
+      <Section title="Export saved articles">
         <CitationExport />
-      </section>
+      </Section>
 
       <PlanSection />
       <LlmKeySection />
 
-      <section style={{ marginTop: 40, borderTop: "1px solid var(--border)", paddingTop: 24 }}>
-        <h2 style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: 8 }}>Your Data</h2>
-        <p style={{ color: "var(--text-tertiary)", fontSize: 14, marginBottom: 16 }}>
-          Download a portable copy of everything Weirling stores about you, or
-          permanently delete your account. <a href="/privacy" style={{ textDecoration: "underline" }}>What we collect and why</a>.
-          {" "}Running this instance? <a href="/admin/setup" style={{ textDecoration: "underline" }}>Instance setup</a> and{" "}
-          <a href="/admin/metrics" style={{ textDecoration: "underline" }}>product metrics</a> (owner only).
-        </p>
-        <label style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 14, marginBottom: 16 }}>
+      <Section
+        title="Your data"
+        hint={
+          <>
+            Download a portable copy of everything Weirling stores about you, or permanently delete your account.{" "}
+            <a href="/privacy" className="underline hover:text-[var(--text)]">
+              What we collect and why
+            </a>
+            .
+          </>
+        }
+      >
+        <label className="mb-4 flex items-start gap-2.5 text-sm">
           <input
             type="checkbox"
+            className="mt-0.5"
             checked={!user.collaborative_opt_out}
             onChange={async (e) => {
-              const updated = await api.preferences
-                .update({ collaborative_opt_out: !e.target.checked })
-                .catch(() => null);
+              const updated = await api.preferences.update({ collaborative_opt_out: !e.target.checked }).catch(() => null);
               if (updated) {
                 setUser(updated);
                 setInitial(updated);
@@ -517,41 +499,24 @@ export default function PreferencesPage() {
             }}
           />
           <span>
-            Count my reading in anonymous &ldquo;popular with readers&rdquo; picks for new
-            users. Only articles at least 20 readers finished are ever used, and never
-            linked to you.
+            Count my reading in anonymous &ldquo;popular with readers&rdquo; picks for new users. Only articles at least
+            20 readers finished are ever used, and never linked to you.
           </span>
         </label>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <button
-            onClick={exportData}
-            disabled={busy}
-            style={{
-              padding: "8px 16px",
-              border: "1px solid var(--border-strong)",
-              borderRadius: 6,
-              background: "var(--bg-elevated)",
-              cursor: busy ? "not-allowed" : "pointer",
-            }}
-          >
+        <div className="flex flex-wrap gap-3">
+          <button type="button" className="btn-secondary disabled:opacity-50" onClick={exportData} disabled={busy}>
             Export my data
           </button>
-          <button
-            onClick={deleteAccount}
-            disabled={busy}
-            style={{
-              padding: "8px 16px",
-              border: "1px solid #7f1d1d",
-              borderRadius: 6,
-              background: "var(--bg-elevated)",
-              color: "#f87171",
-              cursor: busy ? "not-allowed" : "pointer",
-            }}
-          >
+          <button type="button" className="btn-secondary state-negative border disabled:opacity-50" onClick={deleteAccount} disabled={busy}>
             Delete account
           </button>
         </div>
-      </section>
+        <p className="mt-4 text-xs text-[var(--text-tertiary)]">
+          Running this instance? <a href="/admin/setup" className="underline hover:text-[var(--text)]">Instance setup</a>,{" "}
+          <a href="/admin/metrics" className="underline hover:text-[var(--text)]">product metrics</a> and{" "}
+          <a href="/admin/ingestion" className="underline hover:text-[var(--text)]">ingestion</a> (owner only).
+        </p>
+      </Section>
     </div>
   );
 }

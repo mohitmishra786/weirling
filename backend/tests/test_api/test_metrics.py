@@ -157,3 +157,22 @@ async def test_llm_status_reports_the_active_embedder_not_the_configured_one(
     with patch("app.utils.embeddings.is_hash_embeddings", return_value=False):
         body = (await client.get("/api/v1/metrics/llm-status", headers=headers)).json()
     assert body["embedding_model"] == "all-MiniLM-L6-v2" and body["embedding_upgrade_hint"] is None
+
+
+@pytest.mark.asyncio
+async def test_llm_status_counts_llm_api_key(client: AsyncClient, test_user_data, monkeypatch):
+    """LLM_API_KEY alone (no legacy GROQ_API_KEY) is a configured LLM."""
+    from app.config import get_settings
+
+    s = get_settings()
+    monkeypatch.setattr(s, "llm_api_key", "gsk_test_key")
+    monkeypatch.setattr(s, "groq_api_key", "")
+    monkeypatch.setattr(s, "openai_api_key", "")
+    reg = await client.post("/api/v1/auth/register", json=test_user_data)
+    headers = {"Authorization": f"Bearer {reg.json()['access_token']}"}
+    body = (await client.get("/api/v1/metrics/llm-status", headers=headers)).json()
+    assert body["llm_configured"] is True
+
+    monkeypatch.setattr(s, "llm_api_key", "")
+    body = (await client.get("/api/v1/metrics/llm-status", headers=headers)).json()
+    assert body["llm_configured"] is False
