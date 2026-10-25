@@ -86,6 +86,9 @@ async def _run(now: datetime | None = None) -> dict:
     settings = get_settings()
     if settings.deployment_mode != "hosted" or settings.hosted_paused_delete_days <= 0:
         return {"reminded": 0, "deleted": 0}
+    if not billing.billing_enabled():
+        # Nobody could have paid, so nobody is deleted for not paying.
+        return {"reminded": 0, "deleted": 0, "skipped": "billing off"}
     now = now or datetime.now(UTC)
     frontend = settings.frontend_url.rstrip("/")
     reminded = deleted = 0

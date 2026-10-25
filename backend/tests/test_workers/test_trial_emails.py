@@ -22,6 +22,7 @@ ENDS = START + timedelta(days=30)
 def hosted(monkeypatch):
     monkeypatch.setattr(get_settings(), "deployment_mode", "hosted")
     monkeypatch.setattr(get_settings(), "trial_ending_notice_days", 5)
+    monkeypatch.setattr(get_settings(), "billing_provider", "lemonsqueezy")
 
 
 @pytest.mark.parametrize(
@@ -125,3 +126,12 @@ async def test_export_works_after_the_trial_ends(client, db_session, monkeypatch
     await db_session.commit()
     assert (await client.get("/api/v1/billing", headers=headers)).json()["plan"] == "paused"
     assert (await client.get("/api/v1/account/export", headers=headers)).status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_no_trial_emails_while_billing_is_off(db_session, monkeypatch):
+    """Nothing to buy and nothing runs out, so "your trial ends" would be untrue."""
+    monkeypatch.setattr(get_settings(), "billing_provider", "")
+    user = await _user(db_session)
+    for day in (0, 26, 31):
+        assert not [m for m in await _run(START + timedelta(days=day)) if m["to"] == user.email]

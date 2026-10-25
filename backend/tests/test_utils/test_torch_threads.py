@@ -22,6 +22,9 @@ def _cgroup(monkeypatch, content: str | None):
 
 
 def test_quota_rounds_up_to_whole_cpus(monkeypatch):
+    import os
+
+    monkeypatch.setattr(os, "sched_getaffinity", lambda _pid: set(range(64)), raising=False)
     _cgroup(monkeypatch, "150000 100000\n")
     assert embeddings.container_cpus() == 2
     _cgroup(monkeypatch, "200000 100000\n")
@@ -54,3 +57,24 @@ def test_explicit_setting_wins(monkeypatch):
     monkeypatch.delenv("OMP_NUM_THREADS")
     _cgroup(monkeypatch, "100000 100000\n")
     assert embeddings.limit_torch_threads() == 1
+
+
+def test_affinity_caps_a_larger_quota(monkeypatch):
+    import os
+
+    _cgroup(monkeypatch, "800000 100000\n")  # quota allows 8
+    monkeypatch.setattr(os, "sched_getaffinity", lambda _pid: {0, 1}, raising=False)
+    assert embeddings.container_cpus() == 2
+
+
+def test_zero_or_junk_thread_settings_are_ignored(monkeypatch):
+    import sys
+    import types
+
+    calls = []
+    monkeypatch.setitem(sys.modules, "torch", types.SimpleNamespace(set_num_threads=calls.append))
+    monkeypatch.setenv("TORCH_NUM_THREADS", "0")
+    monkeypatch.setenv("OMP_NUM_THREADS", "lots")
+    monkeypatch.setattr(embeddings, "container_cpus", lambda: 2)
+    assert embeddings.limit_torch_threads() == 2
+    assert calls == [2]

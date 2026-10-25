@@ -19,6 +19,11 @@ def hosted(monkeypatch):
     monkeypatch.setattr(ent.settings, "deployment_mode", "hosted")
     monkeypatch.setattr(ent.settings, "billing_trial_days", 0)
     monkeypatch.setattr(ent.settings, "hosted_plan_quotas", {})
+    # Accounts are only paused once there is a way to pay (billing on).
+    from app.config import get_settings
+
+    for target in {id(ent.settings): ent.settings, id(get_settings()): get_settings()}.values():
+        monkeypatch.setattr(target, "billing_provider", "lemonsqueezy")
 
 
 def _user(tier="reader", **kw) -> User:

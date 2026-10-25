@@ -53,4 +53,9 @@ describe("StarterPackPicker (#152)", () => {
     expect(api.sources.subscribePacks).toHaveBeenCalledWith(["a", "b"]);
     expect(await subscribePacks([])).toBe(0);
   });
+
+  it("subscribePacks lets a failure reach the caller", async () => {
+    api.sources.subscribePacks.mockRejectedValueOnce(new Error("Unknown starter pack: x"));
+    await expect(subscribePacks(["x"])).rejects.toThrow("Unknown starter pack");
+  });
 });

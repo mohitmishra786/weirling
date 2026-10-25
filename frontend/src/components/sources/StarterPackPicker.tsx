@@ -59,11 +59,12 @@ const ICONS: Record<string, LucideIcon> = {
 
 /** Subscribe to the selected packs; returns how many new feeds were added.
  *  One request for all of them: one at a time made five packs a minute-long
- *  wait, and parallel requests would race on feeds the packs share. */
+ *  wait, and parallel requests would race on feeds the packs share. Throws on
+ *  failure so the caller can keep the selection and say what went wrong. */
 export async function subscribePacks(ids: string[]): Promise<number> {
   if (ids.length === 0) return 0;
-  const result = await api.sources.subscribePacks(ids).catch(() => null);
-  return result?.subscribed ?? 0;
+  const result = await api.sources.subscribePacks(ids);
+  return result.subscribed;
 }
 
 export function packSummary(packs: StarterPack[], selected: string[]): string {

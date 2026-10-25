@@ -91,6 +91,20 @@ describe("OnboardingWizard", () => {
     expect(replace).toHaveBeenCalledWith("/digest");
   });
 
+  it("keeps the selected packs and stays put when subscribing fails", async () => {
+    api.sources.subscribePacks.mockRejectedValueOnce(new Error("Service unavailable"));
+    render(<OnboardingWizard />);
+    await userEvent.type(screen.getByRole("textbox"), "rust");
+    await next(); // Confirm Topics
+    await screen.findByText("Rust");
+    await next(); // Starter Packs
+    const pack = await screen.findByRole("button", { name: /Systems Programming/ });
+    await next(); // tries to subscribe, fails
+    expect(await screen.findByRole("alert")).toHaveTextContent("Couldn't follow those packs");
+    expect(screen.getByText(/: Starter Packs$/)).toBeInTheDocument();
+    expect(pack).toHaveAttribute("aria-pressed", "true");
+  });
+
   async function walkToEnd() {
     await userEvent.type(screen.getByRole("textbox"), "rust");
     await next(); // Confirm Topics

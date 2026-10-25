@@ -187,3 +187,32 @@ async def test_falls_back_to_the_next_validated_ip_and_fails_only_when_all_do():
             transport=everything_down,
             pin_ip=True,
         )
+
+
+@pytest.mark.asyncio
+async def test_all_candidates_share_one_connect_budget():
+    import asyncio
+
+    class _BlackHole(httpx.AsyncBaseTransport):
+        def __init__(self):
+            self.tried = 0
+
+        async def handle_async_request(self, request):
+            self.tried += 1
+            await asyncio.sleep(0.15)  # each attempt eats part of the budget
+            raise httpx.ConnectTimeout("timed out", request=request)
+
+    transport = _BlackHole()
+    loop = asyncio.get_running_loop()
+    started = loop.time()
+    with pytest.raises(httpx.ConnectTimeout):
+        await safe_fetch(
+            "https://blog.example.com/feed",
+            resolver=lambda h: ["93.184.216.34", "8.8.8.8", "1.1.1.1", "9.9.9.9", "4.4.4.4"],
+            transport=transport,
+            pin_ip=True,
+            timeout=0.3,
+        )
+    # 5 addresses x 0.15 s would be 0.75 s; the shared 0.3 s budget stops early.
+    assert transport.tried < 5
+    assert loop.time() - started < 0.7

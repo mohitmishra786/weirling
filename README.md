@@ -12,6 +12,8 @@ What makes it different:
 
 **Who it's for:** built for developers and heavy readers who follow 50+ technical feeds: people who want an explainable, behavioral ranking engine that gets better the more they read. Weirling supports both single-tenant self-hosting and multi-tenant hosted operations.
 
+**Status:** early beta (v0.3.x). The hosted service at weirling.com is invite-only; self-hosting works today. Expect breaking changes between 0.x releases: each release's notes say what to do, and migrations run on start ([upgrading](docs/UPGRADING.md)). **License:** [MIT](LICENSE). **Contributing:** see [CONTRIBUTING.md](CONTRIBUTING.md); security reports go to [SECURITY.md](SECURITY.md).
+
 The product specification is [`spec/PCIP_Proposal_V2.md`](spec/PCIP_Proposal_V2.md). Where the code has moved on, [`spec/PCIP_Proposal_V2_addendum.md`](spec/PCIP_Proposal_V2_addendum.md) records the decision. The documentation site is built from [`docs/`](docs/index.md): start with [Install & run](docs/DEPLOYMENT.md) or [Architecture](docs/ARCHITECTURE.md). Work status is [`docs/PROGRESS.md`](docs/PROGRESS.md); the reasoning behind the backlog is [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ---
@@ -21,7 +23,7 @@ The product specification is [`spec/PCIP_Proposal_V2.md`](spec/PCIP_Proposal_V2.
 Weirling operates in two deployment modes controlled by `DEPLOYMENT_MODE` (`selfhost` or `hosted`):
 
 - **Self-Hosted (`DEPLOYMENT_MODE=selfhost`, default)**: Single-tenant deployment with no quota or plan gates. All ingested content is readable in full text within the in-app reader (`READER_FULL_TEXT=auto`), email verification defaults to off (`EMAIL_VERIFICATION=auto`), and registration is closed after setup by default (`REGISTRATION_MODE=closed`) to protect your instance.
-- **Hosted (`DEPLOYMENT_MODE=hosted`)**: Multi-tenant offering with Reader and Pro plans, a 30-day trial and per-plan quotas ([docs/HOSTING.md](docs/HOSTING.md)), mandatory email verification (`EMAIL_VERIFICATION=auto`), domain-level signup rate limits (`SIGNUP_PER_DOMAIN_PER_HOUR`), tenant fetch abuse controls (`HOSTED_FETCH_BUDGET_PER_HOUR`), reader full-text syndication safeguards (`READER_FULL_TEXT=auto`), and subscription billing via Lemon Squeezy or Paddle (`BILLING_PROVIDER`).
+- **Hosted (`DEPLOYMENT_MODE=hosted`)**: Multi-tenant offering with Reader and Pro plans, a 30-day trial and per-plan quotas ([docs/HOSTING.md](docs/HOSTING.md)), mandatory email verification (`EMAIL_VERIFICATION=auto`), domain-level signup rate limits (`SIGNUP_PER_DOMAIN_PER_HOUR`), tenant fetch abuse controls (`HOSTED_FETCH_BUDGET_PER_HOUR`), reader full-text syndication safeguards (`READER_FULL_TEXT=auto`), and subscription billing via Lemon Squeezy, Paddle or Razorpay (`BILLING_PROVIDER`). Until a billing provider is set, nothing expires: every account keeps the trial's features, and no trial emails, pausing or deletion happen.
 
 ---
 
@@ -73,7 +75,7 @@ open http://localhost:3001    # create your account and onboard
 
 - **Docker & Docker Compose (v2)**: Recommended for containerized deployment.
 - **Host Python ≥ 3.11**: Required if running backend tests, CLI tools, or development servers outside Docker (uses PEP 604 union syntax `X | Y` and modern typing features; Python 3.12 recommended).
-- **Node.js ≥ 20.9.0**: Required if running the frontend dev server or tests outside Docker.
+- **Node.js ≥ 22.22.2** (CI uses 26): Required if running the frontend dev server or tests outside Docker.
 - **RAM**:
   - ~1.0 GB RAM for the `lite` profile (hash embeddings)
   - ~2.5 GB RAM for the default self-host profile (MiniLM sentence-transformers)
@@ -104,7 +106,7 @@ SMTP_PASSWORD=<the mailbox or app password>
 FRONTEND_URL=http://localhost:3001
 ```
 
-`LLM_API_KEY` (or the legacy, deprecated `GROQ_API_KEY`, removed in v0.3) is optional: without a key, the digest still builds using extractive summaries. Without email credentials, digests are still readable in-app (email delivery is skipped). All other values have working defaults for local development.
+`LLM_API_KEY` (the deprecated `GROQ_API_KEY` is still read in 0.3.x) is optional: without a key, the digest still builds using extractive summaries. Without email credentials, digests are still readable in-app (email delivery is skipped). All other values have working defaults for local development.
 
 ### 2. Start the stack
 
@@ -120,14 +122,26 @@ This starts eight services by default:
 
 | Service | Port | Description |
 |---|---|---|
-| `db` | 5432 | PostgreSQL 16 with pgvector extension |
-| `redis` | 6379 | Cache and Celery broker |
+| `db` | internal | PostgreSQL 16 with pgvector extension |
+| `redis` | internal | Cache and Celery broker |
 | `backend` | 8000 | FastAPI application server |
 | `worker-scrape` | None | Celery solo worker for fetching and scraping feeds (`scrape` queue) |
 | `worker-embed` | None | Celery solo worker for computing semantic embeddings (`embed` queue) |
 | `worker-digest` | None | Celery solo worker for compiling and delivering digests (`digest`, `celery` queues) |
 | `beat` | None | Celery beat scheduler for periodic tasks |
 | `frontend` | 3001 | Next.js web application |
+
+Only ports 8000 and 3001 are published on the host. If one is taken (another
+dev server on 3001 is common), add a `docker-compose.override.yml`:
+
+```yaml
+services:
+  frontend:
+    ports: !override
+      - "3002:3000"
+```
+
+and set `FRONTEND_URL=http://localhost:3002` in `.env`.
 
 Additional services are enabled with profiles:
 - **`--profile full`**: `browserless` (port 3000, internal headless Chrome pool on an isolated network) and `egress-proxy` (Squid forward proxy; Browserless's only way out).

@@ -68,11 +68,20 @@ async def _seed_pack_interest(session: AsyncSession, user_id, title: str) -> Non
     await session.flush()
 
 
-def _fetch_new_sources_soon(user_id) -> None:
-    """Fetch a user's sources now instead of waiting for the next beat (#102)."""
+def _fetch_new_sources_soon(user_id, session: AsyncSession) -> None:
+    """Fetch a user's sources now instead of waiting for the next beat (#102).
+
+    Queued only once the request's transaction commits: queued earlier, the
+    worker could read the sources table before the new rows were visible and
+    skip them. Nothing is queued if the transaction rolls back."""
+    from sqlalchemy import event
+
     from app.workers.tasks.ingest_feeds import ingest_user_sources
 
-    ingest_user_sources.delay(str(user_id))
+    def _queue(_sync_session) -> None:
+        ingest_user_sources.delay(str(user_id))
+
+    event.listen(session.sync_session, "after_commit", _queue, once=True)
 
 
 @router.get("/starter-packs")
@@ -115,6 +124,15 @@ async def _subscribe_packs(session: AsyncSession, user: User, packs: list) -> in
     """Add every feed of `packs` the user doesn't follow yet, in one
     transaction (packs share feeds, so parallel requests would race on the
     same URL). Returns how many sources were created."""
+    from sqlalchemy import text
+
+    # One subscribe at a time per user, so two requests can't both treat a
+    # feed as new or pass the capacity check with a stale count. Released at
+    # commit or rollback.
+    await session.execute(
+        text("SELECT pg_advisory_xact_lock(hashtextextended(:key, 0))"),
+        {"key": f"subscribe-packs:{user.id}"},
+    )
     existing_urls = {
         row[0]
         for row in (await session.execute(select(Source.url).where(Source.user_id == user.id)))
@@ -148,7 +166,7 @@ async def _subscribe_packs(session: AsyncSession, user: User, packs: list) -> in
         from app.services.product_metrics import track
 
         await track(session, user.id, "source_added", count=created, via="starter_pack")
-        _fetch_new_sources_soon(user.id)
+        _fetch_new_sources_soon(user.id, session)
     return created
 
 
@@ -323,7 +341,7 @@ async def add_source(
 
     # Fetch this user's sources now. Never the whole instance: on hosted any
     # user could otherwise trigger a poll of every feed (#169).
-    _fetch_new_sources_soon(current_user.id)
+    _fetch_new_sources_soon(current_user.id, session)
 
     return SourceRead.model_validate(source)
 
@@ -414,7 +432,7 @@ async def import_opml(
             from app.services.product_metrics import track
 
             await track(session, current_user.id, "source_added", count=created, via="opml")
-            _fetch_new_sources_soon(current_user.id)
+            _fetch_new_sources_soon(current_user.id, session)
         return {"created": created}
     except ImportError:
         raise HTTPException(status_code=500, detail="listparser not installed")
@@ -489,7 +507,7 @@ async def import_opml_tagged(
         from app.services.product_metrics import track
 
         await track(session, current_user.id, "source_added", count=plan.created, via="opml")
-        _fetch_new_sources_soon(current_user.id)
+        _fetch_new_sources_soon(current_user.id, session)
     return {
         "created": plan.created,
         "skipped": plan.skipped,
@@ -696,7 +714,7 @@ async def fix_source(
     source.next_poll_at = None
     await session.flush()
     await sync_feeds(session, user_id=current_user.id)
-    _fetch_new_sources_soon(current_user.id)
+    _fetch_new_sources_soon(current_user.id, session)
     return {"status": "fixed", "feed_url": found}
 
 

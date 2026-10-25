@@ -54,10 +54,22 @@ export function OnboardingWizard({ onDone }: { onDone?: () => void } = {}) {
     // Leaving the pack step subscribes the chosen packs (#152).
     if (current === "Starter Packs" && packIds.length) {
       setSubscribing(true);
-      await subscribePacks(packIds);
-      setPackIds([]);
-      setSubscribing(false);
+      setError("");
+      try {
+        await subscribePacks(packIds);
+        setPackIds([]);
+      } catch (err: unknown) {
+        // Keep the selection so "Continue" retries; skipping is still possible
+        // by deselecting the packs.
+        setError(
+          `Couldn't follow those packs${err instanceof Error && err.message ? `: ${err.message}` : ""}. Try again.`,
+        );
+        return;
+      } finally {
+        setSubscribing(false);
+      }
     }
+    setError("");
     advance();
   };
   const back = () => setStep((s) => Math.max(s - 1, 0));

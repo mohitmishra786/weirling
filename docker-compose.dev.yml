@@ -1,4 +1,3 @@
-version: "3.9"
 
 # Local development overrides. Not applied automatically (#106):
 #   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build

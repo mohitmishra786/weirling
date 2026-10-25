@@ -64,38 +64,52 @@ def active_embedder() -> dict:
 
 
 def container_cpus() -> int:
-    """CPUs this process may actually use: the cgroup quota (Docker, Railway,
-    Kubernetes limits) when set, else the affinity mask. os.cpu_count() reports
-    the host's cores, which is far more than a 2-vCPU container gets."""
+    """CPUs this process may actually use: the smaller of the cgroup quota
+    (Docker, Railway, Kubernetes limits) and the affinity mask. os.cpu_count()
+    reports the host's cores, far more than a 2-vCPU container gets."""
+    import contextlib
     import math
     import os
 
+    limits: list[int] = []
     try:
         with open("/sys/fs/cgroup/cpu.max") as f:
             quota, period = f.read().split()[:2]
         if quota != "max":
-            return max(1, math.ceil(int(quota) / int(period)))
+            limits.append(math.ceil(int(quota) / int(period)))
     except (OSError, ValueError):
         pass
+    with contextlib.suppress(AttributeError, OSError):  # no affinity API on macOS
+        limits.append(len(os.sched_getaffinity(0)))
+    if not limits:
+        limits.append(os.cpu_count() or 1)
+    return max(1, min(limits))
+
+
+def _positive_int(value: str | None) -> int | None:
     try:
-        return max(1, len(os.sched_getaffinity(0)))
-    except (AttributeError, OSError):
-        return max(1, os.cpu_count() or 1)
+        number = int(value or "")
+    except ValueError:
+        return None
+    return number if number > 0 else None
 
 
 def limit_torch_threads() -> int | None:
     """Cap PyTorch's thread pool at the container's CPUs. Left at the host core
     count, its threads fight over a 2-vCPU quota and one article took 30-40 s
-    to embed on Railway instead of 0.06 s. OMP_NUM_THREADS/TORCH_NUM_THREADS
-    still win when an operator sets them."""
+    to embed on Railway instead of 0.06 s. A positive TORCH_NUM_THREADS or
+    OMP_NUM_THREADS still wins (0 or junk is ignored: PyTorch rejects 0)."""
     import os
 
     try:
         import torch
     except ImportError:
         return None
-    explicit = os.environ.get("TORCH_NUM_THREADS") or os.environ.get("OMP_NUM_THREADS")
-    threads = int(explicit) if explicit and explicit.isdigit() else container_cpus()
+    threads = (
+        _positive_int(os.environ.get("TORCH_NUM_THREADS"))
+        or _positive_int(os.environ.get("OMP_NUM_THREADS"))
+        or container_cpus()
+    )
     torch.set_num_threads(threads)
     return threads
 

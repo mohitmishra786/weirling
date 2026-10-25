@@ -107,7 +107,7 @@ async def _run(now: datetime | None = None) -> dict:
 
     from app.database import AsyncSessionLocal
     from app.models.user import User
-    from app.services.billing import PAID_TIERS, effective_plan
+    from app.services.billing import PAID_TIERS, billing_enabled, effective_plan
     from app.services.email_verification import may_email
     from app.utils.email import send_email
     from app.utils.unsubscribe import unsubscribe_url
@@ -115,6 +115,10 @@ async def _run(now: datetime | None = None) -> dict:
     settings = get_settings()
     if settings.deployment_mode != "hosted":
         return {"sent": 0}
+    if not billing_enabled():
+        # Without billing there is no plan to choose, and the trial never
+        # runs out (effective_plan): "your trial ends" would be untrue.
+        return {"sent": 0, "skipped": "billing off"}
     now = now or datetime.now(UTC)
     frontend = settings.frontend_url.rstrip("/")
     sent = {STARTED: 0, ENDING: 0, ENDED: 0}

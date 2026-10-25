@@ -1,0 +1,12 @@
+# Secret scanning (CI: .github/workflows/secrets.yml). Extends the default
+# rules; the allowlist covers fake values that tests use on purpose.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Test fixtures with fake keys"
+paths = [
+  '''backend/tests/.*''',
+  '''frontend/tests/.*''',
+  '''e2e/.*''',
+]

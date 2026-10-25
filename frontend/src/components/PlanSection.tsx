@@ -12,6 +12,9 @@ function day(iso: string | null): string {
 function describe(state: BillingState): string {
   switch (state.plan) {
     case "trial":
+      // Billing off (hosted beta): nothing runs out, so don't count down.
+      if (!state.billing_enabled || !state.trial_ends_at)
+        return "Early access: everything is included while Weirling is in beta. No payment needed.";
       return `Free trial: ${state.trial_days_left ?? 0} days left (until ${day(state.trial_ends_at)}).`;
     case "reader":
     case "pro":

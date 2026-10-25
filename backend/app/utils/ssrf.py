@@ -264,7 +264,7 @@ async def safe_fetch(
             )
             # Connect to each validated address in turn (IPv4 first): one
             # unreachable family or address must not fail the whole fetch.
-            candidates = prefer_ipv4(ips) if pin_ip and ips else [None]
+            candidates: list[str | None] = list(prefer_ipv4(ips)) if pin_ip and ips else [None]
             async with _open_first(client, method, current, candidates, headers, content) as resp:
                 if resp.is_redirect and resp.headers.get("location"):
                     saw_redirect = True
@@ -305,14 +305,31 @@ class _open_first:
         self._cm = None
 
     async def __aenter__(self):
+        import time
+
         client, method, url, candidates, headers, content = self._args
+        # One connect budget for all candidates: four black-holed addresses
+        # must not turn a 3 s connect timeout into 12 s.
+        base = client.timeout
+        budget = base.connect if base.connect is not None else 10.0
+        deadline = time.monotonic() + budget
         last_error: Exception | None = None
         for ip in candidates:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0 and last_error is not None:
+                break
             target, hop_headers, extensions = url, headers, {}
             if ip is not None:
                 target, hop_headers, extensions = _pinned_request(url, ip, headers)
             cm = client.stream(
-                method, target, headers=hop_headers, content=content, extensions=extensions
+                method,
+                target,
+                headers=hop_headers,
+                content=content,
+                extensions=extensions,
+                timeout=httpx.Timeout(
+                    connect=max(remaining, 0.05), read=base.read, write=base.write, pool=base.pool
+                ),
             )
             try:
                 resp = await cm.__aenter__()
