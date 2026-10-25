@@ -94,7 +94,9 @@ with the volume; off-site backups come in step 6.
 ### 2.3 Shared variables
 
 Project **Settings, Shared Variables**: add these once, then share them with
-the four app services below.
+the four app services below. The database and Redis addresses are **not**
+here: a shared variable can't reference another service (`${{Postgres...}}`
+resolves to an empty string there), so they go on each service in 2.4.
 
 ```bash
 DEPLOYMENT_MODE=hosted
@@ -106,11 +108,6 @@ SECRET_KEY=...                    # from step 0
 REFRESH_SECRET_KEY=...
 SECRETS_ENCRYPTION_KEY=...
 METRICS_TOKEN=...
-
-DATABASE_URL=${{Postgres.DATABASE_URL_PRIVATE}}    # the private-network URL
-REDIS_URL=${{Redis.REDIS_URL}}/0
-CELERY_BROKER_URL=${{Redis.REDIS_URL}}/1
-CELERY_RESULT_BACKEND=${{Redis.REDIS_URL}}/2
 
 FRONTEND_URL=https://weirling.com
 CORS_EXTRA_ORIGINS=https://www.weirling.com
@@ -139,8 +136,18 @@ invite-only beta.
 
 Each one: **New, Docker Image**,
 `ghcr.io/mohitmishra786/weirling/weirling-backend:0.3.0` (or `:latest`),
-attach the shared variables, and set the start command (Settings, Deploy,
-Custom Start Command):
+attach the shared variables (Variables, **Shared Variable**, select all), then
+in **Raw Editor** add the four connection variables:
+
+```bash
+DATABASE_URL="${{Postgres.DATABASE_URL_PRIVATE}}"
+REDIS_URL="${{Redis.REDIS_URL}}/0"
+CELERY_BROKER_URL="${{Redis.REDIS_URL}}/1"
+CELERY_RESULT_BACKEND="${{Redis.REDIS_URL}}/2"
+```
+
+Check them with the eye icon: the hosts must be `*.railway.internal`. Then
+set the start command (Settings, Deploy, Custom Start Command):
 
 | Service | Start command | Notes |
 |---|---|---|
@@ -220,7 +227,7 @@ sign-up. So, as soon as `https://weirling.com` loads:
 |---|---|
 | Signed in, but every page sends you back to sign-in | `COOKIE_DOMAIN` isn't `.weirling.com`, or `FRONTEND_URL` doesn't match the site's address |
 | The browser console shows CORS errors | `FRONTEND_URL` / `CORS_EXTRA_ORIGINS` don't list the exact origin (with `https://`) |
-| `DATABASE_URL is empty` or `Could not parse SQLAlchemy URL` | the reference resolved to nothing: use `${{Postgres.DATABASE_URL_PRIVATE}}` and check the value from the api service's Variables tab |
+| `DATABASE_URL is empty` or `Could not parse SQLAlchemy URL` | the reference resolved to nothing: set `DATABASE_URL=${{Postgres.DATABASE_URL_PRIVATE}}` on the service itself (not as a shared variable) and check the value with the eye icon |
 | api restarts during deploy | the migration failed: check the api logs right after `python -m app.migrate` |
 | No digests arrive | worker-digest or beat isn't running, or SMTP is wrong: test it in /admin/setup |
 | "too many clients" from Postgres | lower `DB_POOL_SIZE` / `DB_MAX_OVERFLOW` (workers don't pool) |
