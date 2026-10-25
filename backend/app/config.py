@@ -201,13 +201,17 @@ class Settings(BaseSettings):
     # (mail.spacemail.com), Zoho, Fastmail. SMTP_* names are preferred; the
     # older ZOHO_* names still work.
     zoho_smtp_host: str = Field(
-        "smtppro.zoho.in", validation_alias=AliasChoices("SMTP_HOST", "ZOHO_SMTP_HOST")
+        default="smtppro.zoho.in", validation_alias=AliasChoices("SMTP_HOST", "ZOHO_SMTP_HOST")
     )
-    zoho_smtp_port: int = Field(587, validation_alias=AliasChoices("SMTP_PORT", "ZOHO_SMTP_PORT"))
+    zoho_smtp_port: int = Field(
+        default=587, validation_alias=AliasChoices("SMTP_PORT", "ZOHO_SMTP_PORT")
+    )
     zoho_email: str = Field(
-        "admin@mohitmishra7.com", validation_alias=AliasChoices("SMTP_USER", "ZOHO_EMAIL")
+        default="admin@mohitmishra7.com", validation_alias=AliasChoices("SMTP_USER", "ZOHO_EMAIL")
     )
-    zoho_password: str = Field("", validation_alias=AliasChoices("SMTP_PASSWORD", "ZOHO_PASSWORD"))
+    zoho_password: str = Field(
+        default="", validation_alias=AliasChoices("SMTP_PASSWORD", "ZOHO_PASSWORD")
+    )
     from_email: str = "admin@mohitmishra7.com"
     # Externally-reachable base URL of this API — used to build one-click
     # unsubscribe links in digest emails (must be publicly routable in prod).
