@@ -1,7 +1,6 @@
 import { headers } from "next/headers";
 import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono, Playfair_Display, Source_Serif_4 } from "next/font/google";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../styles/globals.css";
 import { ServiceWorkerRegister } from "../components/ServiceWorkerRegister";
 import { InstallPrompt } from "../components/InstallPrompt";
@@ -124,7 +123,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <ServiceWorkerRegister />
         <InstallPrompt />
         {children}
-        <SpeedInsights />
       </body>
     </html>
   );
