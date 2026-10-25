@@ -1,19 +1,8 @@
 {
   "_about": "Offline topic taxonomy for onboarding without an LLM (#196). Grouped by starter pack. label: the chip shown; aliases: words or phrases that match it; related: chips offered alongside it.",
   "topics": [
-    {"pack": "systems-programming", "label": "Rust", "aliases": ["rust", "rustlang", "cargo", "crates"], "related": ["Memory safety", "Async Rust", "WebAssembly", "Systems programming"]},
-    {"pack": "systems-programming", "label": "Systems programming", "aliases": ["systems programming", "low level", "low-level", "systems"], "related": ["Operating systems", "Memory safety", "Concurrency"]},
-    {"pack": "systems-programming", "label": "Operating systems", "aliases": ["operating systems", "os", "linux kernel", "kernel", "kernels"], "related": ["Linux", "Schedulers", "File systems"]},
-    {"pack": "systems-programming", "label": "Linux", "aliases": ["linux", "unix", "posix"], "related": ["Operating systems", "eBPF", "Shell scripting"]},
-    {"pack": "systems-programming", "label": "Shell scripting", "aliases": ["shell", "bash", "zsh", "shell scripting", "command line", "cli"], "related": ["Linux", "Developer tools"]},
-    {"pack": "systems-programming", "label": "eBPF", "aliases": ["ebpf", "bpf"], "related": ["Linux", "Observability"]},
-    {"pack": "systems-programming", "label": "Memory safety", "aliases": ["memory safety", "memory management", "allocators", "garbage collection"], "related": ["Rust", "C and C++"]},
-    {"pack": "systems-programming", "label": "C and C++", "aliases": ["c++", "cpp", "c programming", "c/c++"], "related": ["Compilers", "Memory safety"]},
-    {"pack": "systems-programming", "label": "Concurrency", "aliases": ["concurrency", "parallelism", "multithreading", "threads", "lock-free", "async"], "related": ["Distributed systems", "Async Rust"]},
-    {"pack": "systems-programming", "label": "Async Rust", "aliases": ["tokio", "async rust"], "related": ["Rust", "Concurrency"]},
-    {"pack": "systems-programming", "label": "File systems", "aliases": ["file systems", "filesystems", "zfs", "ext4"], "related": ["Storage engines", "Operating systems"]},
-    {"pack": "systems-programming", "label": "Schedulers", "aliases": ["schedulers", "scheduling"], "related": ["Operating systems", "Concurrency"]},
-
+    {"pack": "programming-languages", "label": "Rust", "aliases": ["rust", "rustlang", "cargo", "crates"], "related": ["Memory safety", "Async Rust", "WebAssembly", "Systems programming"]},
+    {"pack": "programming-languages", "label": "Async Rust", "aliases": ["tokio", "async rust"], "related": ["Rust", "Concurrency"]},
     {"pack": "programming-languages", "label": "Compilers", "aliases": ["compilers", "compiler", "llvm", "codegen", "parsers", "parsing"], "related": ["Programming language design", "Type systems", "Interpreters"]},
     {"pack": "programming-languages", "label": "Programming language design", "aliases": ["programming languages", "language design", "plt", "pl"], "related": ["Type systems", "Compilers", "Functional programming"]},
     {"pack": "programming-languages", "label": "Type systems", "aliases": ["type systems", "types", "type theory", "typescript types"], "related": ["Programming language design", "Functional programming"]},
@@ -23,7 +12,16 @@
     {"pack": "programming-languages", "label": "Python", "aliases": ["python", "cpython", "pypy"], "related": ["Data engineering", "Machine learning"]},
     {"pack": "programming-languages", "label": "Zig", "aliases": ["zig"], "related": ["Systems programming", "C and C++"]},
     {"pack": "programming-languages", "label": "WebAssembly", "aliases": ["webassembly", "wasm", "wasi"], "related": ["Interpreters", "Rust", "Web performance"]},
-
+    {"pack": "systems-programming", "label": "Systems programming", "aliases": ["systems programming", "low level", "low-level", "systems"], "related": ["Operating systems", "Memory safety", "Concurrency"]},
+    {"pack": "systems-programming", "label": "Operating systems", "aliases": ["operating systems", "os", "linux kernel", "kernel", "kernels"], "related": ["Linux", "Schedulers", "File systems"]},
+    {"pack": "systems-programming", "label": "Linux", "aliases": ["linux", "unix", "posix"], "related": ["Operating systems", "eBPF", "Shell scripting"]},
+    {"pack": "systems-programming", "label": "Shell scripting", "aliases": ["shell", "bash", "zsh", "shell scripting", "command line", "cli"], "related": ["Linux", "Developer tools"]},
+    {"pack": "systems-programming", "label": "eBPF", "aliases": ["ebpf", "bpf"], "related": ["Linux", "Observability"]},
+    {"pack": "systems-programming", "label": "Memory safety", "aliases": ["memory safety", "memory management", "allocators", "garbage collection"], "related": ["Rust", "C and C++"]},
+    {"pack": "systems-programming", "label": "C and C++", "aliases": ["c++", "cpp", "c programming", "c/c++"], "related": ["Compilers", "Memory safety"]},
+    {"pack": "systems-programming", "label": "Concurrency", "aliases": ["concurrency", "parallelism", "multithreading", "threads", "lock-free", "async"], "related": ["Distributed systems", "Async Rust"]},
+    {"pack": "systems-programming", "label": "File systems", "aliases": ["file systems", "filesystems", "zfs", "ext4"], "related": ["Storage engines", "Operating systems"]},
+    {"pack": "systems-programming", "label": "Schedulers", "aliases": ["schedulers", "scheduling"], "related": ["Operating systems", "Concurrency"]},
     {"pack": "databases-data", "label": "PostgreSQL", "aliases": ["postgres", "postgresql", "pg", "psql"], "related": ["Database internals", "Query planning", "MVCC", "Indexing", "Replication"]},
     {"pack": "databases-data", "label": "Database internals", "aliases": ["database internals", "db internals", "internals", "storage engine", "storage engines"], "related": ["Storage engines", "Query planning", "MVCC", "Write-ahead logging"]},
     {"pack": "databases-data", "label": "Query planning", "aliases": ["query planning", "query optimizer", "query optimization", "explain analyze"], "related": ["Database internals", "Indexing"]},
@@ -36,8 +34,9 @@
     {"pack": "databases-data", "label": "Data engineering", "aliases": ["data engineering", "etl", "data pipelines", "dbt", "spark", "kafka", "streaming"], "related": ["Analytics", "Data warehouses"]},
     {"pack": "databases-data", "label": "Data warehouses", "aliases": ["data warehouse", "data warehouses", "snowflake", "bigquery", "olap", "columnar"], "related": ["Data engineering", "Analytics"]},
     {"pack": "databases-data", "label": "Analytics", "aliases": ["analytics", "business intelligence", "bi"], "related": ["Data warehouses", "Statistics"]},
-    {"pack": "databases-data", "label": "Distributed systems", "aliases": ["distributed systems", "distributed computing", "consistency", "cap theorem"], "related": ["Replication", "Concurrency", "Cloud native"]},
-
+    {"pack": "backend-distributed", "label": "Distributed systems", "aliases": ["cap theorem", "consistency", "distributed computing", "distributed systems", "event streaming", "fault tolerance", "kafka", "message queues", "microservices", "service mesh"], "related": ["Replication", "Concurrency", "Cloud native"]},
+    {"pack": "backend-distributed", "label": "Backend engineering", "aliases": ["backend", "back end", "server-side"], "related": ["APIs", "Distributed systems"]},
+    {"pack": "backend-distributed", "label": "System design", "aliases": ["system design", "systems design", "architecture at scale", "scalability", "high availability"], "related": ["Distributed systems", "Backend engineering"]},
     {"pack": "ai-machine-learning", "label": "Machine learning", "aliases": ["machine learning", "ml", "deep learning", "neural networks"], "related": ["Large language models", "MLOps", "Statistics"]},
     {"pack": "ai-machine-learning", "label": "Large language models", "aliases": ["llm", "llms", "large language models", "gpt", "transformers", "language models"], "related": ["Prompt engineering", "AI agents", "AI evaluation", "Retrieval-augmented generation"]},
     {"pack": "ai-machine-learning", "label": "AI agents", "aliases": ["agents", "ai agents", "agentic"], "related": ["Large language models", "AI evaluation"]},
@@ -47,7 +46,6 @@
     {"pack": "ai-machine-learning", "label": "Prompt engineering", "aliases": ["prompt engineering", "prompting"], "related": ["Large language models"]},
     {"pack": "ai-machine-learning", "label": "MLOps", "aliases": ["mlops", "model serving", "inference", "gpu"], "related": ["Machine learning", "Cloud native"]},
     {"pack": "ai-machine-learning", "label": "Computer vision", "aliases": ["computer vision", "image recognition", "diffusion models"], "related": ["Machine learning", "Robotics"]},
-
     {"pack": "web-development", "label": "Web development", "aliases": ["web development", "web dev", "webdev", "full stack", "fullstack"], "related": ["Frontend frameworks", "Web performance", "CSS"]},
     {"pack": "web-development", "label": "Frontend frameworks", "aliases": ["react", "vue", "svelte", "angular", "nextjs", "next.js", "frontend"], "related": ["JavaScript", "Web performance", "TypeScript"]},
     {"pack": "web-development", "label": "JavaScript", "aliases": ["javascript", "js", "node", "nodejs", "node.js", "deno", "bun"], "related": ["TypeScript", "Frontend frameworks"]},
@@ -56,8 +54,7 @@
     {"pack": "web-development", "label": "Web performance", "aliases": ["web performance", "performance", "core web vitals", "page speed"], "related": ["Frontend frameworks", "Browsers"]},
     {"pack": "web-development", "label": "Browsers", "aliases": ["browsers", "chrome", "firefox", "web standards", "w3c"], "related": ["Web performance", "Web security"]},
     {"pack": "web-development", "label": "APIs", "aliases": ["api", "apis", "rest", "graphql", "grpc"], "related": ["Backend engineering", "Web development"]},
-    {"pack": "web-development", "label": "Backend engineering", "aliases": ["backend", "back end", "server-side"], "related": ["APIs", "Distributed systems"]},
-
+    {"pack": "web-development", "label": "Search", "aliases": ["search", "search engines", "information retrieval", "elasticsearch", "lucene"], "related": ["Retrieval-augmented generation", "Indexing"]},
     {"pack": "devops-cloud", "label": "Cloud native", "aliases": ["cloud native", "cloud", "aws", "gcp", "azure"], "related": ["Kubernetes", "Infrastructure as code", "Observability"]},
     {"pack": "devops-cloud", "label": "Kubernetes", "aliases": ["kubernetes", "k8s", "containers", "docker"], "related": ["Cloud native", "Platform engineering"]},
     {"pack": "devops-cloud", "label": "Infrastructure as code", "aliases": ["terraform", "infrastructure as code", "iac", "pulumi", "ansible"], "related": ["Cloud native", "Platform engineering"]},
@@ -65,63 +62,50 @@
     {"pack": "devops-cloud", "label": "Site reliability engineering", "aliases": ["sre", "site reliability", "incident response", "on-call", "postmortems"], "related": ["Observability", "Platform engineering"]},
     {"pack": "devops-cloud", "label": "Platform engineering", "aliases": ["platform engineering", "devops", "ci/cd", "ci", "cd", "build systems"], "related": ["Kubernetes", "Developer tools"]},
     {"pack": "devops-cloud", "label": "Self-hosting", "aliases": ["self-hosting", "self hosting", "selfhosted", "homelab"], "related": ["Linux", "Kubernetes"]},
-
     {"pack": "security-privacy", "label": "Application security", "aliases": ["security", "appsec", "application security", "owasp"], "related": ["Web security", "Vulnerability research", "Cryptography"]},
     {"pack": "security-privacy", "label": "Web security", "aliases": ["web security", "xss", "csrf", "ssrf"], "related": ["Application security", "Browsers"]},
     {"pack": "security-privacy", "label": "Vulnerability research", "aliases": ["vulnerabilities", "exploits", "cve", "fuzzing", "reverse engineering"], "related": ["Application security", "Malware analysis"]},
     {"pack": "security-privacy", "label": "Cryptography", "aliases": ["cryptography", "crypto engineering", "encryption", "tls"], "related": ["Privacy", "Application security"]},
     {"pack": "security-privacy", "label": "Privacy", "aliases": ["privacy", "data protection", "gdpr", "surveillance"], "related": ["Cryptography", "Tech policy"]},
     {"pack": "security-privacy", "label": "Malware analysis", "aliases": ["malware", "threat intelligence", "ransomware"], "related": ["Vulnerability research"]},
-
     {"pack": "open-source-devtools", "label": "Developer tools", "aliases": ["developer tools", "devtools", "dev tools", "editors", "ide", "vim", "neovim", "emacs"], "related": ["Open source", "Platform engineering"]},
     {"pack": "open-source-devtools", "label": "Open source", "aliases": ["open source", "oss", "foss", "maintainers"], "related": ["Developer tools", "Software licensing"]},
     {"pack": "open-source-devtools", "label": "Git", "aliases": ["git", "version control", "github"], "related": ["Developer tools"]},
     {"pack": "open-source-devtools", "label": "Software architecture", "aliases": ["software architecture", "architecture", "design patterns", "software design", "software engineering"], "related": ["Distributed systems", "Backend engineering"]},
     {"pack": "open-source-devtools", "label": "Software licensing", "aliases": ["licensing", "licenses"], "related": ["Open source"]},
-
     {"pack": "mobile-development", "label": "iOS development", "aliases": ["ios", "swift", "swiftui", "iphone"], "related": ["Mobile development"]},
     {"pack": "mobile-development", "label": "Android development", "aliases": ["android", "kotlin", "jetpack compose"], "related": ["Mobile development"]},
     {"pack": "mobile-development", "label": "Mobile development", "aliases": ["mobile", "mobile apps", "react native", "flutter"], "related": ["iOS development", "Android development"]},
-
     {"pack": "gamedev", "label": "Game development", "aliases": ["game development", "gamedev", "games", "game design", "unity", "unreal", "godot"], "related": ["Graphics programming"]},
     {"pack": "gamedev", "label": "Graphics programming", "aliases": ["graphics", "rendering", "shaders", "gpu programming", "vulkan", "opengl"], "related": ["Game development", "Computer vision"]},
-
     {"pack": "hardware-electronics", "label": "Hardware", "aliases": ["hardware", "electronics", "pcb", "fpga", "embedded"], "related": ["Embedded systems", "Chip design"]},
     {"pack": "hardware-electronics", "label": "Embedded systems", "aliases": ["embedded systems", "microcontrollers", "arduino", "esp32", "firmware", "raspberry pi"], "related": ["Hardware", "Robotics"]},
     {"pack": "hardware-electronics", "label": "Chip design", "aliases": ["semiconductors", "chips", "risc-v", "cpu design", "chip design"], "related": ["Hardware", "Computer architecture"]},
     {"pack": "hardware-electronics", "label": "Computer architecture", "aliases": ["computer architecture", "cpu", "caches", "microarchitecture"], "related": ["Chip design", "Systems programming"]},
-
     {"pack": "robotics-automation", "label": "Robotics", "aliases": ["robotics", "robots", "ros", "autonomous vehicles", "self-driving"], "related": ["Embedded systems", "Computer vision"]},
-
     {"pack": "science-research", "label": "Science", "aliases": ["science", "research", "physics", "biology", "chemistry"], "related": ["Mathematics", "Statistics"]},
     {"pack": "science-research", "label": "Mathematics", "aliases": ["math", "mathematics", "maths", "algorithms"], "related": ["Statistics", "Algorithms and data structures"]},
     {"pack": "science-research", "label": "Algorithms and data structures", "aliases": ["algorithms", "data structures", "complexity"], "related": ["Mathematics", "Compilers"]},
     {"pack": "science-research", "label": "Statistics", "aliases": ["statistics", "stats", "probability", "bayesian"], "related": ["Machine learning", "Analytics"]},
     {"pack": "academic-computing", "label": "Computer science research", "aliases": ["cs research", "papers", "academic", "arxiv"], "related": ["Algorithms and data structures", "Machine learning"]},
-
     {"pack": "space-astronomy", "label": "Space", "aliases": ["space", "spaceflight", "nasa", "spacex", "rockets", "astronomy", "astrophysics"], "related": ["Science"]},
     {"pack": "climate-energy", "label": "Climate tech", "aliases": ["climate", "climate tech", "energy", "renewables", "solar", "batteries", "nuclear"], "related": ["Science", "Tech policy"]},
     {"pack": "biotech-health", "label": "Biotech", "aliases": ["biotech", "health", "medicine", "genomics", "bioinformatics"], "related": ["Science"]},
-
     {"pack": "startups-business", "label": "Startups", "aliases": ["startups", "startup", "founders", "venture capital", "vc", "fundraising"], "related": ["Product management", "Business strategy"]},
     {"pack": "startups-business", "label": "Product management", "aliases": ["product management", "product", "pm", "roadmaps"], "related": ["Startups", "UI design"]},
     {"pack": "startups-business", "label": "Business strategy", "aliases": ["strategy", "business", "economics", "pricing", "saas"], "related": ["Startups"]},
     {"pack": "startups-business", "label": "Tech policy", "aliases": ["tech policy", "regulation", "antitrust", "law"], "related": ["Privacy"]},
     {"pack": "startups-business", "label": "Engineering management", "aliases": ["engineering management", "management", "leadership", "hiring"], "related": ["Startups"]},
-
     {"pack": "design-ux", "label": "UI design", "aliases": ["ui", "ui design", "design", "design systems", "typography", "figma"], "related": ["UX research", "Accessibility"]},
     {"pack": "design-ux", "label": "UX research", "aliases": ["ux", "user experience", "ux research", "usability"], "related": ["UI design", "Product management"]},
     {"pack": "design-ux", "label": "Accessibility", "aliases": ["accessibility", "a11y", "wcag"], "related": ["UI design", "Web development"]},
-
     {"pack": "quant-finance", "label": "Quantitative finance", "aliases": ["quant", "quantitative finance", "trading", "markets", "finance"], "related": ["Statistics", "Algorithms and data structures"]},
     {"pack": "crypto-web3", "label": "Crypto and blockchain", "aliases": ["blockchain", "web3", "ethereum", "bitcoin", "cryptocurrency", "defi"], "related": ["Cryptography", "Distributed systems"]},
-
     {"pack": "research-papers", "label": "Research papers", "aliases": ["research papers", "preprints", "preprint", "journals", "peer review", "academic research", "phd", "literature review"], "related": ["Statistics", "Science", "Public policy"]},
     {"pack": "research-papers", "label": "Econometrics", "aliases": ["econometrics", "economics research", "causal inference"], "related": ["Statistics", "Public policy"]},
     {"pack": "policy-research", "label": "Public policy", "aliases": ["public policy", "policy", "think tanks", "government", "legislation", "fiscal policy", "regulation research"], "related": ["Economics", "Tech policy"]},
     {"pack": "policy-research", "label": "Economics", "aliases": ["economics", "macroeconomics", "inflation", "labour market", "labor market"], "related": ["Public policy", "Econometrics", "Central banks"]},
     {"pack": "filings-markets", "label": "SEC filings", "aliases": ["sec filings", "filings", "10-k", "8-k", "edgar", "annual reports", "ipo", "s-1"], "related": ["Central banks", "Quantitative finance"]},
-    {"pack": "filings-markets", "label": "Central banks", "aliases": ["central banks", "federal reserve", "the fed", "ecb", "monetary policy", "interest rates"], "related": ["Economics", "SEC filings"]},
-    {"pack": "web-development", "label": "Search", "aliases": ["search", "search engines", "information retrieval", "elasticsearch", "lucene"], "related": ["Retrieval-augmented generation", "Indexing"]}
+    {"pack": "filings-markets", "label": "Central banks", "aliases": ["central banks", "federal reserve", "the fed", "ecb", "monetary policy", "interest rates"], "related": ["Economics", "SEC filings"]}
   ]
 }

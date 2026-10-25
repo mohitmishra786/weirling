@@ -8,6 +8,17 @@ from app.utils.observability import init_sentry
 settings = get_settings()
 
 
+@signals.setup_logging.connect
+def _use_app_logging(**_kwargs) -> None:
+    # Connecting this stops Celery installing its own stderr handler. Workers
+    # and beat then log like the API: one JSON object per line on stdout,
+    # with a "level" field, so a platform log view (Railway's "Error logs")
+    # shows only real errors instead of every INFO line written to stderr.
+    from app.utils.logging import setup_logging
+
+    setup_logging()
+
+
 @signals.worker_process_init.connect
 def _init_worker_sentry(**_kwargs) -> None:
     # Initialize per worker/beat process so uncaught task errors are reported.
@@ -97,6 +108,29 @@ celery_app.conf.update(
     task_acks_late=True,
     task_reject_on_worker_lost=True,
     worker_prefetch_multiplier=1,
+    # Redis connections (broker and results): keepalives, timeouts and a
+    # health check, so a connection the network dropped while idle is
+    # replaced quickly instead of hanging .delay() inside an API request.
+    broker_transport_options={
+        "socket_keepalive": True,
+        "socket_connect_timeout": 5,
+        "socket_timeout": 10,
+        "health_check_interval": 30,
+        # No retry_on_timeout here: a publish whose reply timed out may
+        # already be queued, and retrying it would run the task twice.
+    },
+    redis_socket_keepalive=True,
+    redis_socket_connect_timeout=5,
+    redis_socket_timeout=10,
+    redis_retry_on_timeout=True,
+    redis_backend_health_check_interval=30,
+    broker_connection_retry_on_startup=True,
+    task_publish_retry_policy={
+        "max_retries": 3,
+        "interval_start": 0,
+        "interval_step": 0.2,
+        "interval_max": 1,
+    },
 )
 
 # Import schedules (beat config is set in schedules.py)

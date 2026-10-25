@@ -2,19 +2,21 @@
 <opml version="2.0">
   <head>
     <title>Quant &amp; Finance: Weirling starter pack</title>
+    <!-- Scope: Markets, investing and quantitative finance. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Quant &amp; Finance" title="Quant &amp; Finance">
-        <outline text="CNBC Markets" title="CNBC Markets" type="rss" xmlUrl="https://www.cnbc.com/id/100003114/device/rss/rss.html" htmlUrl="https://www.cnbc.com/id/100003114/device/rss/rss.html"/>
-        <outline text="Matt Levine (Bloomberg)" title="Matt Levine (Bloomberg)" type="rss" xmlUrl="https://www.bloomberg.com/opinion/authors/ARbTQlRLRjE/matthew-s-levine.rss" htmlUrl="https://www.bloomberg.com/opinion/authors/ARbTQlRLRjE/matthew-s-levine.rss"/>
-        <outline text="FT Alphaville" title="FT Alphaville" type="rss" xmlUrl="https://www.ft.com/rss/home/uk" htmlUrl="https://www.ft.com/rss/home/uk"/>
-        <outline text="Econbrowser" title="Econbrowser" type="rss" xmlUrl="https://econbrowser.com/feed" htmlUrl="https://econbrowser.com/feed"/>
-        <outline text="FRED Blog" title="FRED Blog" type="rss" xmlUrl="https://fredblog.stlouisfed.org/feed/" htmlUrl="https://fredblog.stlouisfed.org/feed/"/>
-        <outline text="Alpha Architect" title="Alpha Architect" type="rss" xmlUrl="https://alphaarchitect.com/feed/" htmlUrl="https://alphaarchitect.com/feed/"/>
-        <outline text="QuantConnect" title="QuantConnect" type="rss" xmlUrl="https://www.quantconnect.com/blog/feed/" htmlUrl="https://www.quantconnect.com/blog/feed/"/>
-        <outline text="Jane Street Tech Blog" title="Jane Street Tech Blog" type="rss" xmlUrl="https://blog.janestreet.com/feed.xml" htmlUrl="https://blog.janestreet.com/feed.xml"/>
-        <outline text="PensionCraft" title="PensionCraft" type="rss" xmlUrl="https://www.pensioncraft.com/feed/" htmlUrl="https://www.pensioncraft.com/feed/"/>
-        <outline text="Of Dollars And Data" title="Of Dollars And Data" type="rss" xmlUrl="https://ofdollarsanddata.com/feed/" htmlUrl="https://ofdollarsanddata.com/feed/"/>
+      <outline text="Matt Levine: Money Stuff" title="Matt Levine: Money Stuff" type="rss" xmlUrl="https://www.bloomberg.com/opinion/authors/ARbTQlRLRjE/matthew-s-levine.rss" htmlUrl="https://www.bloomberg.com/opinion/authors/ARbTQlRLRjE/matthew-s-levine"/>
+      <outline text="FT Alphaville" title="FT Alphaville" type="rss" xmlUrl="https://www.ft.com/alphaville?format=rss" htmlUrl="https://www.ft.com/alphaville"/>
+      <outline text="Alpha Architect" title="Alpha Architect" type="rss" xmlUrl="https://alphaarchitect.com/feed/" htmlUrl="https://alphaarchitect.com/blog/"/>
+      <outline text="Quantocracy" title="Quantocracy" type="rss" xmlUrl="https://quantocracy.com/feed/" htmlUrl="https://quantocracy.com/"/>
+      <outline text="Robot Wealth" title="Robot Wealth" type="rss" xmlUrl="https://robotwealth.com/feed/" htmlUrl="https://robotwealth.com/blog/"/>
+      <outline text="Jane Street Tech Blog" title="Jane Street Tech Blog" type="rss" xmlUrl="https://blog.janestreet.com/feed.xml" htmlUrl="https://blog.janestreet.com/"/>
+      <outline text="Of Dollars And Data" title="Of Dollars And Data" type="rss" xmlUrl="https://ofdollarsanddata.com/feed/" htmlUrl="https://ofdollarsanddata.com/"/>
+      <outline text="Abnormal Returns" title="Abnormal Returns" type="rss" xmlUrl="https://abnormalreturns.com/feed/" htmlUrl="https://abnormalreturns.com/"/>
+      <outline text="Calculated Risk" title="Calculated Risk" type="rss" xmlUrl="https://www.calculatedriskblog.com/feeds/posts/default" htmlUrl="https://www.calculatedriskblog.com/"/>
+      <outline text="Econbrowser" title="Econbrowser" type="rss" xmlUrl="https://econbrowser.com/feed" htmlUrl="https://econbrowser.com/"/>
+      <outline text="CNBC Markets" title="CNBC Markets" type="rss" xmlUrl="https://www.cnbc.com/id/100003114/device/rss/rss.html" htmlUrl="https://www.cnbc.com/markets/"/>
     </outline>
   </body>
 </opml>

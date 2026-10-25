@@ -2,19 +2,20 @@
 <opml version="2.0">
   <head>
     <title>Design &amp; UX: Weirling starter pack</title>
+    <!-- Scope: Interface design, UX research and design systems. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Design &amp; UX" title="Design &amp; UX">
-        <outline text="Nielsen Norman Group" title="Nielsen Norman Group" type="rss" xmlUrl="https://www.nngroup.com/feed/rss/" htmlUrl="https://www.nngroup.com/feed/rss/"/>
-        <outline text="Studio by UX Collective" title="Studio by UX Collective" type="rss" xmlUrl="https://uxdesign.cc/feed" htmlUrl="https://uxdesign.cc/feed"/>
-        <outline text="Baymard Institute" title="Baymard Institute" type="rss" xmlUrl="https://baymard.com/blog/rss" htmlUrl="https://baymard.com/blog/rss"/>
-        <outline text="UX Planet" title="UX Planet" type="rss" xmlUrl="https://uxplanet.org/feed" htmlUrl="https://uxplanet.org/feed"/>
-        <outline text="UX Collective" title="UX Collective" type="rss" xmlUrl="https://uxdesign.cc/feed" htmlUrl="https://uxdesign.cc/feed"/>
-        <outline text="Fast Company Design" title="Fast Company Design" type="rss" xmlUrl="https://www.fastcompany.com/technology/rss" htmlUrl="https://www.fastcompany.com/technology/rss"/>
-        <outline text="Sidebar (Design)" title="Sidebar (Design)" type="rss" xmlUrl="https://sidebar.io/feed.xml" htmlUrl="https://sidebar.io/feed.xml"/>
-        <outline text="Google Design (Medium)" title="Google Design (Medium)" type="rss" xmlUrl="https://medium.com/feed/google-design" htmlUrl="https://medium.com/feed/google-design"/>
-        <outline text="Prototypr" title="Prototypr" type="rss" xmlUrl="https://blog.prototypr.io/feed" htmlUrl="https://blog.prototypr.io/feed"/>
-        <outline text="Creative Bloq" title="Creative Bloq" type="rss" xmlUrl="https://www.creativebloq.com/feed/" htmlUrl="https://www.creativebloq.com/feed/"/>
+      <outline text="Nielsen Norman Group" title="Nielsen Norman Group" type="rss" xmlUrl="https://www.nngroup.com/feed/rss/" htmlUrl="https://www.nngroup.com/"/>
+      <outline text="UX Collective" title="UX Collective" type="rss" xmlUrl="https://uxdesign.cc/feed" htmlUrl="https://uxdesign.cc/"/>
+      <outline text="UX Planet" title="UX Planet" type="rss" xmlUrl="https://uxplanet.org/feed" htmlUrl="https://uxplanet.org/"/>
+      <outline text="Figma Blog" title="Figma Blog" type="rss" xmlUrl="https://www.figma.com/blog/feed/atom.xml" htmlUrl="https://www.figma.com/blog/"/>
+      <outline text="Brad Frost" title="Brad Frost" type="rss" xmlUrl="https://bradfrost.com/feed/" htmlUrl="https://bradfrost.com/blog/"/>
+      <outline text="Fast Company: Design" title="Fast Company: Design" type="rss" xmlUrl="https://www.fastcompany.com/co-design/rss" htmlUrl="https://www.fastcompany.com/co-design"/>
+      <outline text="Sidebar" title="Sidebar" type="rss" xmlUrl="https://sidebar.io/feed.xml" htmlUrl="https://sidebar.io/"/>
+      <outline text="Creative Bloq" title="Creative Bloq" type="rss" xmlUrl="https://www.creativebloq.com/feed/" htmlUrl="https://www.creativebloq.com/"/>
+      <outline text="LukeW" title="LukeW" type="rss" xmlUrl="https://www.lukew.com/ff/rss.asp" htmlUrl="https://www.lukew.com/"/>
+      <outline text="A List Apart" title="A List Apart" type="rss" xmlUrl="https://alistapart.com/main/feed/" htmlUrl="https://alistapart.com/"/>
     </outline>
   </body>
 </opml>

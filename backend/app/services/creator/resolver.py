@@ -175,8 +175,16 @@ def _autodiscover_feed_url(
     path_segments = [s for s in parsed.path.split("/") if s]
 
     if platform == "substack":
-        host = parsed.netloc
-        return f"https://{host}/feed", None
+        host = _strip_www(parsed.netloc.lower())
+        if host != "substack.com":
+            return f"https://{host}/feed", None
+        # substack.com/@handle is a profile page; the posts are on the
+        # handle's subdomain. Other substack.com links (redirects, the app,
+        # a post's share link) don't name a publication.
+        handle = next((s[1:] for s in path_segments if s.startswith("@") and len(s) > 1), "")
+        if handle:
+            return f"https://{handle}.substack.com/feed", None
+        return None, "Use the publication's address (name.substack.com) to follow it."
     if platform == "medium":
         # Two valid Medium URL forms:
         #   1. https://medium.com/@author/post  → feed: medium.com/feed/@author
@@ -269,6 +277,16 @@ async def resolve_creator(
 
             feed_url = await confirmed_platform_feed(name_or_url, html or "")
             feed_warning = None if feed_url else "Could not confirm a GitHub feed."
+        elif primary_platform == "blog":
+            # The same ranked, confirmed discovery as adding a source: <link>
+            # tags, feed links in the page, then common paths under the
+            # page's own folder and the site root.
+            from app.services.ingestion.discover import best_feed_url
+
+            feed_url = await best_feed_url(name_or_url, html=html or "")
+            feed_warning = (
+                None if feed_url else "No RSS feed found; content tracking may be limited."
+            )
         else:
             feed_url, feed_warning = _autodiscover_feed_url(
                 primary_platform, name_or_url, html or ""

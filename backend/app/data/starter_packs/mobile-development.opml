@@ -2,19 +2,20 @@
 <opml version="2.0">
   <head>
     <title>Mobile Development: Weirling starter pack</title>
+    <!-- Scope: iOS, Android and cross-platform apps. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Mobile Development" title="Mobile Development">
-        <outline text="Android Developers Blog" title="Android Developers Blog" type="rss" xmlUrl="https://android-developers.googleblog.com/feeds/posts/default" htmlUrl="https://android-developers.googleblog.com/feeds/posts/default"/>
-        <outline text="Apple Developer News" title="Apple Developer News" type="rss" xmlUrl="https://developer.apple.com/news/rss/news.rss" htmlUrl="https://developer.apple.com/news/rss/news.rss"/>
-        <outline text="Swift.org" title="Swift.org" type="rss" xmlUrl="https://www.swift.org/atom.xml" htmlUrl="https://www.swift.org/atom.xml"/>
-        <outline text="Flutter Blog" title="Flutter Blog" type="rss" xmlUrl="https://blog.flutter.dev/feed.xml" htmlUrl="https://blog.flutter.dev/feed.xml"/>
-        <outline text="React Native Blog" title="React Native Blog" type="rss" xmlUrl="https://reactnative.dev/blog/rss.xml" htmlUrl="https://reactnative.dev/blog/rss.xml"/>
-        <outline text="Kotlin Blog" title="Kotlin Blog" type="rss" xmlUrl="https://blog.jetbrains.com/kotlin/feed/" htmlUrl="https://blog.jetbrains.com/kotlin/feed/"/>
-        <outline text="Hacking with Swift" title="Hacking with Swift" type="rss" xmlUrl="https://www.hackingwithswift.com/articles/rss" htmlUrl="https://www.hackingwithswift.com/articles/rss"/>
-        <outline text="9to5Mac" title="9to5Mac" type="rss" xmlUrl="https://9to5mac.com/feed/" htmlUrl="https://9to5mac.com/feed/"/>
-        <outline text="ProAndroidDev" title="ProAndroidDev" type="rss" xmlUrl="https://proandroiddev.com/feed" htmlUrl="https://proandroiddev.com/feed"/>
-        <outline text="Donny Wals" title="Donny Wals" type="rss" xmlUrl="https://www.donnywals.com/feed/" htmlUrl="https://www.donnywals.com/feed/"/>
+      <outline text="Apple Developer News" title="Apple Developer News" type="rss" xmlUrl="https://developer.apple.com/news/rss/news.rss" htmlUrl="https://developer.apple.com/news/"/>
+      <outline text="Android Developers Blog" title="Android Developers Blog" type="rss" xmlUrl="https://android-developers.googleblog.com/feeds/posts/default" htmlUrl="https://android-developers.googleblog.com/"/>
+      <outline text="Swift.org" title="Swift.org" type="rss" xmlUrl="https://www.swift.org/atom.xml" htmlUrl="https://www.swift.org/blog/"/>
+      <outline text="Kotlin Blog" title="Kotlin Blog" type="rss" xmlUrl="https://blog.jetbrains.com/kotlin/feed/" htmlUrl="https://blog.jetbrains.com/kotlin/"/>
+      <outline text="Flutter Blog" title="Flutter Blog" type="rss" xmlUrl="https://blog.flutter.dev/feed.xml" htmlUrl="https://blog.flutter.dev/"/>
+      <outline text="React Native Blog" title="React Native Blog" type="rss" xmlUrl="https://reactnative.dev/blog/rss.xml" htmlUrl="https://reactnative.dev/blog"/>
+      <outline text="Hacking with Swift" title="Hacking with Swift" type="rss" xmlUrl="https://www.hackingwithswift.com/articles/rss" htmlUrl="https://www.hackingwithswift.com/articles"/>
+      <outline text="Donny Wals" title="Donny Wals" type="rss" xmlUrl="https://www.donnywals.com/feed/" htmlUrl="https://www.donnywals.com/"/>
+      <outline text="ProAndroidDev" title="ProAndroidDev" type="rss" xmlUrl="https://proandroiddev.com/feed" htmlUrl="https://proandroiddev.com/"/>
+      <outline text="9to5Mac" title="9to5Mac" type="rss" xmlUrl="https://9to5mac.com/feed/" htmlUrl="https://9to5mac.com/"/>
     </outline>
   </body>
 </opml>

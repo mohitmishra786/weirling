@@ -2,19 +2,20 @@
 <opml version="2.0">
   <head>
     <title>Filings &amp; Regulators: Weirling starter pack</title>
+    <!-- Scope: Primary sources: filings, regulators and central banks. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Filings &amp; Regulators" title="Filings &amp; Regulators">
-        <outline text="SEC EDGAR: latest 8-K filings" title="SEC EDGAR: latest 8-K filings" type="rss" xmlUrl="https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&amp;type=8-K&amp;company=&amp;dateb=&amp;owner=include&amp;start=0&amp;count=40&amp;output=atom" htmlUrl="https://www.sec.gov/edgar/search/"/>
-        <outline text="SEC EDGAR: latest 10-K filings" title="SEC EDGAR: latest 10-K filings" type="rss" xmlUrl="https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&amp;type=10-K&amp;company=&amp;dateb=&amp;owner=include&amp;start=0&amp;count=40&amp;output=atom" htmlUrl="https://www.sec.gov/edgar/search/"/>
-        <outline text="SEC EDGAR: latest S-1 filings" title="SEC EDGAR: latest S-1 filings" type="rss" xmlUrl="https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&amp;type=S-1&amp;company=&amp;dateb=&amp;owner=include&amp;start=0&amp;count=40&amp;output=atom" htmlUrl="https://www.sec.gov/edgar/search/"/>
-        <outline text="SEC EDGAR: latest 10-Q filings" title="SEC EDGAR: latest 10-Q filings" type="rss" xmlUrl="https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&amp;type=10-Q&amp;company=&amp;dateb=&amp;owner=include&amp;start=0&amp;count=40&amp;output=atom" htmlUrl="https://www.sec.gov/edgar/search/"/>
-        <outline text="SEC press releases" title="SEC press releases" type="rss" xmlUrl="https://www.sec.gov/news/pressreleases.rss" htmlUrl="https://www.sec.gov/newsroom/press-releases"/>
-        <outline text="Federal Reserve press releases" title="Federal Reserve press releases" type="rss" xmlUrl="https://www.federalreserve.gov/feeds/press_all.xml" htmlUrl="https://www.federalreserve.gov/newsevents/pressreleases.htm"/>
-        <outline text="CFTC press releases" title="CFTC press releases" type="rss" xmlUrl="https://www.cftc.gov/RSS/RSSGP/rssgp.xml" htmlUrl="https://www.cftc.gov/PressRoom/PressReleases"/>
-        <outline text="ECB press releases" title="ECB press releases" type="rss" xmlUrl="https://www.ecb.europa.eu/rss/press.html" htmlUrl="https://www.ecb.europa.eu/press/"/>
-        <outline text="Bank of England news" title="Bank of England news" type="rss" xmlUrl="https://www.bankofengland.co.uk/rss/news" htmlUrl="https://www.bankofengland.co.uk/news"/>
-        <outline text="BIS central bank speeches" title="BIS central bank speeches" type="rss" xmlUrl="https://www.bis.org/doclist/cbspeeches.rss" htmlUrl="https://www.bis.org/cbspeeches/"/>
+      <outline text="SEC EDGAR: latest 10-K filings" title="SEC EDGAR: latest 10-K filings" type="rss" xmlUrl="https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&amp;type=10-K&amp;company=&amp;dateb=&amp;owner=include&amp;start=0&amp;count=40&amp;output=atom" htmlUrl="https://www.sec.gov/edgar"/>
+      <outline text="SEC EDGAR: latest 10-Q filings" title="SEC EDGAR: latest 10-Q filings" type="rss" xmlUrl="https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&amp;type=10-Q&amp;company=&amp;dateb=&amp;owner=include&amp;start=0&amp;count=40&amp;output=atom" htmlUrl="https://www.sec.gov/edgar"/>
+      <outline text="SEC EDGAR: latest 8-K filings" title="SEC EDGAR: latest 8-K filings" type="rss" xmlUrl="https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&amp;type=8-K&amp;company=&amp;dateb=&amp;owner=include&amp;start=0&amp;count=40&amp;output=atom" htmlUrl="https://www.sec.gov/edgar"/>
+      <outline text="SEC EDGAR: latest S-1 filings" title="SEC EDGAR: latest S-1 filings" type="rss" xmlUrl="https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&amp;type=S-1&amp;company=&amp;dateb=&amp;owner=include&amp;start=0&amp;count=40&amp;output=atom" htmlUrl="https://www.sec.gov/edgar"/>
+      <outline text="SEC press releases" title="SEC press releases" type="rss" xmlUrl="https://www.sec.gov/news/pressreleases.rss" htmlUrl="https://www.sec.gov/newsroom"/>
+      <outline text="CFTC press releases" title="CFTC press releases" type="rss" xmlUrl="https://www.cftc.gov/RSS/RSSGP/rssgp.xml" htmlUrl="https://www.cftc.gov/PressRoom"/>
+      <outline text="Federal Reserve press releases" title="Federal Reserve press releases" type="rss" xmlUrl="https://www.federalreserve.gov/feeds/press_all.xml" htmlUrl="https://www.federalreserve.gov/newsevents.htm"/>
+      <outline text="ECB press releases" title="ECB press releases" type="rss" xmlUrl="https://www.ecb.europa.eu/rss/press.html" htmlUrl="https://www.ecb.europa.eu/press/"/>
+      <outline text="Bank of England news" title="Bank of England news" type="rss" xmlUrl="https://www.bankofengland.co.uk/rss/news" htmlUrl="https://www.bankofengland.co.uk/news"/>
+      <outline text="BIS central bank speeches" title="BIS central bank speeches" type="rss" xmlUrl="https://www.bis.org/doclist/cbspeeches.rss" htmlUrl="https://www.bis.org/cbspeeches/"/>
     </outline>
   </body>
 </opml>

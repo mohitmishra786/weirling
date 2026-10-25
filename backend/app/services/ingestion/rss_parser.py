@@ -6,6 +6,8 @@ from datetime import UTC, datetime
 
 import feedparser
 
+from app.config import get_settings
+from app.services.ingestion.extract import aggregator_stub
 from app.utils.logging import get_logger, sanitize_log
 from app.utils.sanitize import sanitize_stored_html
 from app.utils.ssrf import UnsafeURLError, safe_fetch, validate_public_url
@@ -19,7 +21,6 @@ _FEED_HEADERS = {
     "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
     "Accept-Encoding": "gzip, deflate, br",
 }
-_FEED_MAX_BYTES = 2_000_000
 
 logger = get_logger(__name__)
 
@@ -121,7 +122,7 @@ async def _autodiscover_feed(page_url: str) -> str | None:
     async def _fetch(url: str) -> str | None:
         try:
             resp = await safe_fetch(
-                url, headers=_FEED_HEADERS, timeout=3, max_bytes=_FEED_MAX_BYTES
+                url, headers=_FEED_HEADERS, timeout=3, max_bytes=get_settings().feed_max_bytes
             )
         except Exception as e:
             logger.debug("Feed probe failed for %s: %s", sanitize_log(url), e)
@@ -159,7 +160,7 @@ async def _load_feed_bytes(
             url,
             headers=_conditional_headers(etag, last_modified),
             timeout=20,
-            max_bytes=_FEED_MAX_BYTES,
+            max_bytes=get_settings().feed_max_bytes,
         )
     except UnsafeURLError as e:
         logger.warning("Blocked feed fetch for %s: %s", sanitize_log(url), e)
@@ -174,7 +175,7 @@ async def _load_feed_bytes(
         logger.warning("Feed %s returned HTTP %s", sanitize_log(url), resp.status_code)
         return _HttpFeed(resp.status_code, None, response_etag, response_modified)
     try:
-        body = assert_xml_safe(resp.content, max_bytes=_FEED_MAX_BYTES)
+        body = assert_xml_safe(resp.content, max_bytes=get_settings().feed_max_bytes)
     except UnsafeXMLError as e:
         logger.warning("Rejected unsafe feed XML from %s: %s", sanitize_log(url), e)
         return None
@@ -232,6 +233,9 @@ def _items_from_feed(feed, source_url: str, raw_xml: str | None = None) -> list[
         if not link:
             continue
         text = _extract_text(entry)
+        # Hacker News / Lobsters entries hold only link metadata, not the
+        # article: keep a clean pointer to the discussion instead of markup.
+        text = aggregator_stub(text, source_url) or text
         word_count = _count_words(text) if text else None
         guid = getattr(entry, "id", None) or getattr(entry, "guid", None)
         items.append(

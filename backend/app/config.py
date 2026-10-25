@@ -169,6 +169,17 @@ class Settings(BaseSettings):
         "https://openrouter.ai/api/v1,https://api.together.xyz/v1,"
         "https://api.fireworks.ai/inference/v1,https://api.deepinfra.com/v1/openai"
     )
+    # Claude, tried before LLM_* when ANTHROPIC_API_KEY is set. Every task
+    # uses ANTHROPIC_MODEL; LLM_* (Groq by default) takes a call Claude can't
+    # answer, then the extractive summary does.
+    anthropic_api_key: str = ""
+    anthropic_model: str = "claude-haiku-5-5"
+    # Thinking depth, "low" through "max". Low keeps summaries fast and cheap.
+    anthropic_effort: str = "low"
+    # Retries inside one call (429, 5xx, timeouts); the SDK honors retry-after.
+    anthropic_max_retries: int = 2
+    anthropic_tpm_limit: int = 200000
+    anthropic_rpm_limit: int = 50
     # Optional second provider. Used only when all three are set.
     openai_fallback_enabled: bool = False
     openai_api_key: str = ""
@@ -179,6 +190,9 @@ class Settings(BaseSettings):
     rate_limit_feedback_per_minute: int = 60
     # Feed / OPML body cap and outline cap (XML bombs and huge imports).
     xml_max_bytes: int = 2_000_000
+    # Fetched feeds may be bigger than uploads: some blogs publish their whole
+    # archive in one feed (danluu.com: 6.6 MB). Parsing stays XML-bomb safe.
+    feed_max_bytes: int = 8_000_000
     opml_max_outlines: int = 5000
 
     # Embeddings (local sentence-transformers)
@@ -531,6 +545,11 @@ class Settings(BaseSettings):
         )
         return self
 
+    @property
+    def llm_model_label(self) -> str:
+        """The model most calls go to, for health and status pages."""
+        return self.anthropic_model if self.anthropic_api_key else self.llm_model_primary
+
     def model_for(self, task: str) -> str:
         """The model id for an LLM task: summary, topics, synthesis or interests (#225)."""
         own = getattr(self, f"llm_model_{task}")
@@ -562,7 +581,7 @@ class Settings(BaseSettings):
         When False, summaries are extractive and onboarding falls back to
         keyword topic extraction. The health endpoint reports this explicitly.
         """
-        return bool(self.llm_api_key) or (
+        return bool(self.llm_api_key or self.anthropic_api_key) or (
             self.openai_fallback_enabled and bool(self.openai_api_key) and bool(self.openai_model)
         )
 
@@ -653,7 +672,7 @@ def get_settings() -> Settings:
         import warnings
 
         warnings.warn(
-            "LLM_API_KEY is not set (GROQ_API_KEY is also accepted). "
+            "Neither ANTHROPIC_API_KEY nor LLM_API_KEY is set (GROQ_API_KEY is also accepted). "
             "Summaries will use the extractive fallback and topic extraction "
             "will use keywords. The digest still builds.",
             stacklevel=2,

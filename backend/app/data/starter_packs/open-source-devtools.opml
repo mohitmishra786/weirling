@@ -2,19 +2,20 @@
 <opml version="2.0">
   <head>
     <title>Open Source &amp; DevTools: Weirling starter pack</title>
+    <!-- Scope: Open-source projects, Linux and developer tools. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Open Source &amp; DevTools" title="Open Source &amp; DevTools">
-        <outline text="GitHub Blog" title="GitHub Blog" type="rss" xmlUrl="https://github.blog/feed/" htmlUrl="https://github.blog/feed/"/>
-        <outline text="GitLab Blog" title="GitLab Blog" type="rss" xmlUrl="https://about.gitlab.com/atom.xml" htmlUrl="https://about.gitlab.com/atom.xml"/>
-        <outline text="Changelog" title="Changelog" type="rss" xmlUrl="https://changelog.com/feed" htmlUrl="https://changelog.com/feed"/>
-        <outline text="GitHub Changelog" title="GitHub Changelog" type="rss" xmlUrl="https://github.blog/changelog/feed/" htmlUrl="https://github.blog/changelog/feed/"/>
-        <outline text="DistroWatch Weekly" title="DistroWatch Weekly" type="rss" xmlUrl="https://distrowatch.com/news/dwd.xml" htmlUrl="https://distrowatch.com/news/dwd.xml"/>
-        <outline text="The New Stack" title="The New Stack" type="rss" xmlUrl="https://thenewstack.io/feed/" htmlUrl="https://thenewstack.io/feed/"/>
-        <outline text="It's FOSS" title="It's FOSS" type="rss" xmlUrl="https://itsfoss.com/feed/" htmlUrl="https://itsfoss.com/feed/"/>
-        <outline text="Phoronix" title="Phoronix" type="rss" xmlUrl="https://www.phoronix.com/rss.php" htmlUrl="https://www.phoronix.com/rss.php"/>
-        <outline text="OMG Ubuntu" title="OMG Ubuntu" type="rss" xmlUrl="https://www.omgubuntu.co.uk/feed" htmlUrl="https://www.omgubuntu.co.uk/feed"/>
-        <outline text="Linux Kernel (LWN)" title="Linux Kernel (LWN)" type="rss" xmlUrl="https://lwn.net/headlines/rss" htmlUrl="https://lwn.net/headlines/rss"/>
+      <outline text="GitHub Blog" title="GitHub Blog" type="rss" xmlUrl="https://github.blog/feed/" htmlUrl="https://github.blog/"/>
+      <outline text="GitHub Changelog" title="GitHub Changelog" type="rss" xmlUrl="https://github.blog/changelog/feed/" htmlUrl="https://github.blog/changelog/"/>
+      <outline text="GitLab Blog" title="GitLab Blog" type="rss" xmlUrl="https://about.gitlab.com/atom.xml" htmlUrl="https://about.gitlab.com/blog/"/>
+      <outline text="Changelog" title="Changelog" type="rss" xmlUrl="https://changelog.com/feed" htmlUrl="https://changelog.com/"/>
+      <outline text="The New Stack" title="The New Stack" type="rss" xmlUrl="https://thenewstack.io/feed/" htmlUrl="https://thenewstack.io/"/>
+      <outline text="Lobsters" title="Lobsters" type="rss" xmlUrl="https://lobste.rs/rss" htmlUrl="https://lobste.rs/"/>
+      <outline text="Phoronix" title="Phoronix" type="rss" xmlUrl="https://www.phoronix.com/rss.php" htmlUrl="https://www.phoronix.com/"/>
+      <outline text="It's FOSS" title="It's FOSS" type="rss" xmlUrl="https://itsfoss.com/feed/" htmlUrl="https://itsfoss.com/"/>
+      <outline text="OMG! Ubuntu" title="OMG! Ubuntu" type="rss" xmlUrl="https://www.omgubuntu.co.uk/feed" htmlUrl="https://www.omgubuntu.co.uk/"/>
+      <outline text="DistroWatch Weekly" title="DistroWatch Weekly" type="rss" xmlUrl="https://distrowatch.com/news/dwd.xml" htmlUrl="https://distrowatch.com/weekly.php"/>
     </outline>
   </body>
 </opml>

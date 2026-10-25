@@ -2,19 +2,20 @@
 <opml version="2.0">
   <head>
     <title>Startups &amp; Business: Weirling starter pack</title>
+    <!-- Scope: Building companies, strategy and product. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Startups &amp; Business" title="Startups &amp; Business">
-        <outline text="Y Combinator Blog" title="Y Combinator Blog" type="rss" xmlUrl="https://www.ycombinator.com/blog/feed" htmlUrl="https://www.ycombinator.com/blog/feed"/>
-        <outline text="Y Combinator Library" title="Y Combinator Library" type="rss" xmlUrl="https://www.ycombinator.com/blog/feed" htmlUrl="https://www.ycombinator.com/blog/feed"/>
-        <outline text="Stratechery" title="Stratechery" type="rss" xmlUrl="https://stratechery.com/feed/" htmlUrl="https://stratechery.com/feed/"/>
-        <outline text="Lenny's Newsletter" title="Lenny's Newsletter" type="rss" xmlUrl="https://www.lennysnewsletter.com/feed" htmlUrl="https://www.lennysnewsletter.com/feed"/>
-        <outline text="TechCrunch Startups" title="TechCrunch Startups" type="rss" xmlUrl="https://techcrunch.com/category/startups/feed/" htmlUrl="https://techcrunch.com/category/startups/feed/"/>
-        <outline text="Both Sides of the Table" title="Both Sides of the Table" type="rss" xmlUrl="https://bothsidesofthetable.com/feed" htmlUrl="https://bothsidesofthetable.com/feed"/>
-        <outline text="Stripe Blog" title="Stripe Blog" type="rss" xmlUrl="https://stripe.com/blog/feed.rss" htmlUrl="https://stripe.com/blog/feed.rss"/>
-        <outline text="SaaStr" title="SaaStr" type="rss" xmlUrl="https://www.saastr.com/feed/" htmlUrl="https://www.saastr.com/feed/"/>
-        <outline text="The Information" title="The Information" type="rss" xmlUrl="https://www.theinformation.com/feed" htmlUrl="https://www.theinformation.com/feed"/>
-        <outline text="Farnam Street" title="Farnam Street" type="rss" xmlUrl="https://fs.blog/feed/" htmlUrl="https://fs.blog/feed/"/>
+      <outline text="Stratechery" title="Stratechery" type="rss" xmlUrl="https://stratechery.com/feed/" htmlUrl="https://stratechery.com/"/>
+      <outline text="Y Combinator Blog" title="Y Combinator Blog" type="rss" xmlUrl="https://www.ycombinator.com/blog/feed" htmlUrl="https://www.ycombinator.com/blog"/>
+      <outline text="Lenny's Newsletter" title="Lenny's Newsletter" type="rss" xmlUrl="https://www.lennysnewsletter.com/feed" htmlUrl="https://www.lennysnewsletter.com/"/>
+      <outline text="Not Boring" title="Not Boring" type="rss" xmlUrl="https://www.notboring.co/feed" htmlUrl="https://www.notboring.co/"/>
+      <outline text="Stripe Blog" title="Stripe Blog" type="rss" xmlUrl="https://stripe.com/blog/feed.rss" htmlUrl="https://stripe.com/blog"/>
+      <outline text="SaaStr" title="SaaStr" type="rss" xmlUrl="https://www.saastr.com/feed/" htmlUrl="https://www.saastr.com/"/>
+      <outline text="TechCrunch: Startups" title="TechCrunch: Startups" type="rss" xmlUrl="https://techcrunch.com/category/startups/feed/" htmlUrl="https://techcrunch.com/category/startups/"/>
+      <outline text="The Information" title="The Information" type="rss" xmlUrl="https://www.theinformation.com/feed" htmlUrl="https://www.theinformation.com/"/>
+      <outline text="Farnam Street" title="Farnam Street" type="rss" xmlUrl="https://fs.blog/feed/" htmlUrl="https://fs.blog/"/>
+      <outline text="Irrational Exuberance (Will Larson)" title="Irrational Exuberance (Will Larson)" type="rss" xmlUrl="https://lethain.com/feeds.xml" htmlUrl="https://lethain.com/"/>
     </outline>
   </body>
 </opml>

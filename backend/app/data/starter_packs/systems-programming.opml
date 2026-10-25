@@ -2,19 +2,20 @@
 <opml version="2.0">
   <head>
     <title>Systems Programming: Weirling starter pack</title>
+    <!-- Scope: Operating systems, kernels, performance and low-level code. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Systems Programming" title="Systems Programming">
-        <outline text="Hacker News" title="Hacker News" type="rss" xmlUrl="https://hnrss.org/frontpage" htmlUrl="https://hnrss.org/frontpage"/>
-        <outline text="Lobsters" title="Lobsters" type="rss" xmlUrl="https://lobste.rs/rss" htmlUrl="https://lobste.rs/rss"/>
-        <outline text="Rust Blog" title="Rust Blog" type="rss" xmlUrl="https://blog.rust-lang.org/feed.xml" htmlUrl="https://blog.rust-lang.org/feed.xml"/>
-        <outline text="Go Blog" title="Go Blog" type="rss" xmlUrl="https://go.dev/blog/feed.atom" htmlUrl="https://go.dev/blog/feed.atom"/>
-        <outline text="Julia Blog" title="Julia Blog" type="rss" xmlUrl="https://julialang.org/feed.xml" htmlUrl="https://julialang.org/feed.xml"/>
-        <outline text="Dan Luu" title="Dan Luu" type="rss" xmlUrl="https://danluu.com/atom.xml" htmlUrl="https://danluu.com/atom.xml"/>
-        <outline text="Brendan Gregg" title="Brendan Gregg" type="rss" xmlUrl="https://www.brendangregg.com/blog/rss.xml" htmlUrl="https://www.brendangregg.com/blog/rss.xml"/>
-        <outline text="Julia Evans" title="Julia Evans" type="rss" xmlUrl="https://jvns.ca/atom.xml" htmlUrl="https://jvns.ca/atom.xml"/>
-        <outline text="Systems Approach (Percival)" title="Systems Approach (Percival)" type="rss" xmlUrl="https://systemsapproach.org/feed" htmlUrl="https://systemsapproach.org/feed"/>
-        <outline text="Chris Siebenmann (wandering)" title="Chris Siebenmann (wandering)" type="rss" xmlUrl="https://utcc.utoronto.ca/~cks/space/blog/?feed=atom" htmlUrl="https://utcc.utoronto.ca/~cks/space/blog/?feed=atom"/>
+      <outline text="LWN.net" title="LWN.net" type="rss" xmlUrl="https://lwn.net/headlines/rss" htmlUrl="https://lwn.net/"/>
+      <outline text="Dan Luu" title="Dan Luu" type="rss" xmlUrl="https://danluu.com/atom.xml" htmlUrl="https://danluu.com/"/>
+      <outline text="Julia Evans" title="Julia Evans" type="rss" xmlUrl="https://jvns.ca/atom.xml" htmlUrl="https://jvns.ca/"/>
+      <outline text="Brendan Gregg" title="Brendan Gregg" type="rss" xmlUrl="https://www.brendangregg.com/blog/rss.xml" htmlUrl="https://www.brendangregg.com/blog/"/>
+      <outline text="The Old New Thing (Raymond Chen)" title="The Old New Thing (Raymond Chen)" type="rss" xmlUrl="https://devblogs.microsoft.com/oldnewthing/feed" htmlUrl="https://devblogs.microsoft.com/oldnewthing/"/>
+      <outline text="Systems Approach" title="Systems Approach" type="rss" xmlUrl="https://systemsapproach.org/feed" htmlUrl="https://systemsapproach.org/"/>
+      <outline text="matklad" title="matklad" type="rss" xmlUrl="https://matklad.github.io/feed.xml" htmlUrl="https://matklad.github.io/"/>
+      <outline text="Chris Wellons (null program)" title="Chris Wellons (null program)" type="rss" xmlUrl="https://nullprogram.com/feed/" htmlUrl="https://nullprogram.com/"/>
+      <outline text="Daniel Stenberg (curl)" title="Daniel Stenberg (curl)" type="rss" xmlUrl="https://daniel.haxx.se/blog/feed/" htmlUrl="https://daniel.haxx.se/blog/"/>
+      <outline text="Drew DeVault" title="Drew DeVault" type="rss" xmlUrl="https://drewdevault.com/blog/index.xml" htmlUrl="https://drewdevault.com/"/>
     </outline>
   </body>
 </opml>

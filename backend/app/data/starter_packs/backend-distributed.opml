@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+  <head>
+    <title>Backend &amp; Distributed Systems: Weirling starter pack</title>
+    <!-- Scope: Distributed systems, scaling and how large services are built. Each feed belongs to one pack only. -->
+  </head>
+  <body>
+    <outline text="Backend &amp; Distributed Systems" title="Backend &amp; Distributed Systems">
+      <outline text="Marc Brooker" title="Marc Brooker" type="rss" xmlUrl="https://brooker.co.za/blog/rss.xml" htmlUrl="https://brooker.co.za/blog/"/>
+      <outline text="Martin Kleppmann" title="Martin Kleppmann" type="rss" xmlUrl="https://feeds.feedburner.com/martinkl?format=xml" htmlUrl="https://martin.kleppmann.com/"/>
+      <outline text="All Things Distributed (Werner Vogels)" title="All Things Distributed (Werner Vogels)" type="rss" xmlUrl="https://www.allthingsdistributed.com/atom.xml" htmlUrl="https://www.allthingsdistributed.com/"/>
+      <outline text="aphyr (Kyle Kingsbury)" title="aphyr (Kyle Kingsbury)" type="rss" xmlUrl="https://aphyr.com/posts.atom" htmlUrl="https://aphyr.com/"/>
+      <outline text="Metadata (Murat Demirbas)" title="Metadata (Murat Demirbas)" type="rss" xmlUrl="https://muratbuffalo.blogspot.com/feeds/posts/default" htmlUrl="https://muratbuffalo.blogspot.com/"/>
+      <outline text="ByteByteGo" title="ByteByteGo" type="rss" xmlUrl="https://blog.bytebytego.com/feed" htmlUrl="https://blog.bytebytego.com/"/>
+      <outline text="The Pragmatic Engineer" title="The Pragmatic Engineer" type="rss" xmlUrl="https://newsletter.pragmaticengineer.com/feed" htmlUrl="https://newsletter.pragmaticengineer.com/"/>
+      <outline text="Netflix Tech Blog" title="Netflix Tech Blog" type="rss" xmlUrl="https://netflixtechblog.com/feed" htmlUrl="https://netflixtechblog.com/"/>
+      <outline text="Dropbox Tech" title="Dropbox Tech" type="rss" xmlUrl="https://dropbox.tech/feed" htmlUrl="https://dropbox.tech/"/>
+      <outline text="Slack Engineering" title="Slack Engineering" type="rss" xmlUrl="https://slack.engineering/feed/" htmlUrl="https://slack.engineering/"/>
+      <outline text="Engineering at Meta" title="Engineering at Meta" type="rss" xmlUrl="https://engineering.fb.com/feed/" htmlUrl="https://engineering.fb.com/"/>
+      <outline text="Jack Vanlightly" title="Jack Vanlightly" type="rss" xmlUrl="https://jack-vanlightly.com/blog?format=rss" htmlUrl="https://jack-vanlightly.com/"/>
+    </outline>
+  </body>
+</opml>

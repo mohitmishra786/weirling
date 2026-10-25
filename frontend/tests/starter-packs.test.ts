@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { packSummary } from "../src/components/sources/StarterPackPicker";
+import { packSummary, searchPacks } from "../src/components/sources/StarterPackPicker";
 import type { StarterPack } from "../src/lib/types";
 
 const pack = (id: string, feed_count: number): StarterPack => ({
@@ -17,5 +17,15 @@ describe("starter pack picker (#152)", () => {
     expect(packSummary(packs, ["a", "b"])).toBe("2 packs · 31 sources");
     expect(packSummary(packs, ["c"])).toBe("1 pack · 5 sources");
     expect(packSummary(packs, [])).toBe("0 packs · 0 sources");
+  });
+
+  it("search keeps suggested packs first and reports matching sources", () => {
+    const packs: StarterPack[] = [
+      { ...pack("a", 2), title: "Alpha", feeds: [{ name: "Dan Luu", url: "x" }] },
+      { ...pack("b", 2), title: "Beta", suggested: true },
+    ];
+    expect(searchPacks(packs, "").map((r) => r.pack.id)).toEqual(["b", "a"]);
+    expect(searchPacks(packs, "dan luu")).toEqual([{ pack: packs[0], matchedFeeds: ["Dan Luu"] }]);
+    expect(searchPacks(packs, "beta")[0].matchedFeeds).toEqual([]);
   });
 });

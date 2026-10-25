@@ -45,6 +45,10 @@ restart keeps sessions and pending sign-in links. `make backup` snapshots it.
 
 | Variable | Default | What it does |
 |---|---|---|
+| `ANTHROPIC_API_KEY` | empty | A Claude API key (Claude Console). When set, Claude answers first and `LLM_*` takes any call Claude can't (no credit left, rate limited, an outage). |
+| `ANTHROPIC_MODEL` | `claude-haiku-5-5` | The Claude model for every task. |
+| `ANTHROPIC_EFFORT` | `low` | Thinking depth, `low` to `max`. Low keeps summaries fast and cheap. |
+| `ANTHROPIC_RPM_LIMIT` / `ANTHROPIC_TPM_LIMIT` | `50` / `200000` | Requests and tokens per minute sent to Claude; match your Claude rate-limit tier. |
 | `LLM_API_KEY` | empty | Any OpenAI-compatible key. Without one, summaries are extracts and nothing is sent anywhere. *Setup screen* |
 | `LLM_BASE_URL` | `https://api.groq.com/openai/v1` | Groq, OpenAI, OpenRouter, a local Ollama. *Setup screen* |
 | `LLM_MODEL_PRIMARY` | `openai/gpt-oss-120b` | Story synthesis and interest expansion. *Setup screen* |
@@ -52,6 +56,12 @@ restart keeps sessions and pending sign-in links. `make backup` snapshots it.
 | `LLM_MODEL_SUMMARY`, `_TOPICS`, `_SYNTHESIS`, `_INTERESTS` | empty | Override the model for one task ([which model does what](DEPLOYMENT.md#which-model-does-what-225)). |
 | `LLM_SUMMARIZE` | `lazy` | `lazy`: only items that reach a digest or the reader. `all`: every item. |
 | `OPENAI_FALLBACK_ENABLED` | `false` | Fall back to `OPENAI_API_KEY` / `OPENAI_MODEL` when the main provider fails. |
+
+Order of providers: Claude (`ANTHROPIC_API_KEY`), then `LLM_*`, then the
+OpenAI fallback, then an extract of the article. A provider that rejects the
+key, is out of credit or is rate limited is skipped for a while (an hour, 30
+minutes, a minute) so the next one answers straight away; Groq's daily cap
+is skipped until its `Retry-After`.
 
 `GROQ_API_KEY` is still read in 0.3.x and will be removed; use `LLM_API_KEY`.
 
@@ -104,6 +114,7 @@ More on plans, quotas and the account lifecycle: [Hosted service](HOSTING.md).
 
 | Variable | Default | What it does |
 |---|---|---|
+| `FEED_MAX_BYTES` | `8000000` | Largest feed fetched, in bytes (danluu.com's feed is 6.6 MB). |
 | `SSRF_PROTECTION_ENABLED` | `true` | Every fetch resolves the host, refuses private addresses and connects to the checked IP. |
 | `BROWSERLESS_URL` | `http://browserless:3000` | Headless Chrome for pages that need JavaScript (`full` profile). |
 | `RSSHUB_BASE_URL` | empty | RSSHub bridge for platforms without feeds (`bridge` profile). |

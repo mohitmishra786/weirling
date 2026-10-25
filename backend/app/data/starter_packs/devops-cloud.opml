@@ -2,19 +2,21 @@
 <opml version="2.0">
   <head>
     <title>DevOps &amp; Cloud: Weirling starter pack</title>
+    <!-- Scope: Cloud platforms, infrastructure and operations. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="DevOps &amp; Cloud" title="DevOps &amp; Cloud">
-        <outline text="AWS News Blog" title="AWS News Blog" type="rss" xmlUrl="https://aws.amazon.com/blogs/aws/feed/" htmlUrl="https://aws.amazon.com/blogs/aws/feed/"/>
-        <outline text="Google Cloud Blog" title="Google Cloud Blog" type="rss" xmlUrl="https://cloud.google.com/blog/rss/" htmlUrl="https://cloud.google.com/blog/rss/"/>
-        <outline text="Microsoft Azure Blog" title="Microsoft Azure Blog" type="rss" xmlUrl="https://azure.microsoft.com/en-us/blog/feed/" htmlUrl="https://azure.microsoft.com/en-us/blog/feed/"/>
-        <outline text="Netflix Tech Blog" title="Netflix Tech Blog" type="rss" xmlUrl="https://netflixtechblog.com/feed" htmlUrl="https://netflixtechblog.com/feed"/>
-        <outline text="Spotify Engineering" title="Spotify Engineering" type="rss" xmlUrl="https://engineering.atspotify.com/feed/" htmlUrl="https://engineering.atspotify.com/feed/"/>
-        <outline text="Kubernetes Blog" title="Kubernetes Blog" type="rss" xmlUrl="https://kubernetes.io/feed.xml" htmlUrl="https://kubernetes.io/feed.xml"/>
-        <outline text="HashiCorp Blog" title="HashiCorp Blog" type="rss" xmlUrl="https://www.hashicorp.com/blog/feed.xml" htmlUrl="https://www.hashicorp.com/blog/feed.xml"/>
-        <outline text="DevOps.com" title="DevOps.com" type="rss" xmlUrl="https://devops.com/feed/" htmlUrl="https://devops.com/feed/"/>
-        <outline text="Cloudflare Blog" title="Cloudflare Blog" type="rss" xmlUrl="https://blog.cloudflare.com/rss/" htmlUrl="https://blog.cloudflare.com/rss/"/>
-        <outline text="Docker Blog" title="Docker Blog" type="rss" xmlUrl="https://www.docker.com/feed/" htmlUrl="https://www.docker.com/feed/"/>
+      <outline text="AWS News Blog" title="AWS News Blog" type="rss" xmlUrl="https://aws.amazon.com/blogs/aws/feed/" htmlUrl="https://aws.amazon.com/blogs/aws/"/>
+      <outline text="Google Cloud Blog" title="Google Cloud Blog" type="rss" xmlUrl="https://cloudblog.withgoogle.com/rss/" htmlUrl="https://cloud.google.com/blog/"/>
+      <outline text="Microsoft Azure Blog" title="Microsoft Azure Blog" type="rss" xmlUrl="https://azure.microsoft.com/en-us/blog/feed/" htmlUrl="https://azure.microsoft.com/en-us/blog/"/>
+      <outline text="Cloudflare Blog" title="Cloudflare Blog" type="rss" xmlUrl="https://blog.cloudflare.com/rss/" htmlUrl="https://blog.cloudflare.com/"/>
+      <outline text="Kubernetes Blog" title="Kubernetes Blog" type="rss" xmlUrl="https://kubernetes.io/feed.xml" htmlUrl="https://kubernetes.io/blog/"/>
+      <outline text="Docker Blog" title="Docker Blog" type="rss" xmlUrl="https://www.docker.com/feed/" htmlUrl="https://www.docker.com/blog/"/>
+      <outline text="HashiCorp Blog" title="HashiCorp Blog" type="rss" xmlUrl="https://www.hashicorp.com/blog/feed.xml" htmlUrl="https://www.hashicorp.com/blog"/>
+      <outline text="Spotify Engineering" title="Spotify Engineering" type="rss" xmlUrl="https://engineering.atspotify.com/feed/" htmlUrl="https://engineering.atspotify.com/"/>
+      <outline text="SRE Weekly" title="SRE Weekly" type="rss" xmlUrl="https://sreweekly.com/feed/" htmlUrl="https://sreweekly.com/"/>
+      <outline text="Last Week in AWS" title="Last Week in AWS" type="rss" xmlUrl="https://www.lastweekinaws.com/feed/" htmlUrl="https://www.lastweekinaws.com/"/>
+      <outline text="charity.wtf (Charity Majors)" title="charity.wtf (Charity Majors)" type="rss" xmlUrl="https://charity.wtf/feed/" htmlUrl="https://charity.wtf/"/>
     </outline>
   </body>
 </opml>

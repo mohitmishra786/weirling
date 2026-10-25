@@ -168,15 +168,18 @@ def _keyword_topics(text: str) -> list[str]:
 SEED_FEEDS_MAX = 8
 
 
-def _seeds_from_packs(topics: list[str], max_sources: int = SEED_FEEDS_MAX) -> list[dict]:
-    """Feeds from the starter packs that match the user's topics (#152)."""
+def _seeds_from_packs(
+    topics: list[str], max_sources: int = SEED_FEEDS_MAX, *, pack_ids: list[str] | None = None
+) -> list[dict]:
+    """Feeds from the starter packs that match the user's topics (#152).
+    `pack_ids` is the LLM's choice; the taxonomy order is used without it."""
     from app.services.cold_start.starter_packs import list_starter_packs
     from app.services.cold_start.taxonomy import packs_for_topics
 
     packs = {pack.id: pack for pack in list_starter_packs()}
     seeds: list[dict] = []
     seen: set[str] = set()
-    for pack_id in packs_for_topics(topics):
+    for pack_id in pack_ids if pack_ids is not None else packs_for_topics(topics):
         for feed in packs[pack_id].feeds if pack_id in packs else []:
             if feed["url"] in seen:
                 continue
@@ -197,7 +200,9 @@ async def _seed_starter_sources(
     existing_urls = {row[0] for row in existing_result.fetchall()}
     if existing_urls:
         return 0  # they chose packs or imported feeds themselves
-    seeds = _seeds_from_packs(topics)
+    from app.services.cold_start.pack_picker import suggest_packs
+
+    seeds = _seeds_from_packs(topics, pack_ids=await suggest_packs(topics))
     if not seeds:
         return 0
 

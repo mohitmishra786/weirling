@@ -34,6 +34,11 @@ def _topics() -> list[dict]:
     return out
 
 
+def known_labels() -> list[str]:
+    """Every taxonomy topic name, in file order."""
+    return [t["label"] for t in _topics()]
+
+
 def _labels() -> dict[str, str]:
     return {t["label"].lower(): t["label"] for t in _topics()}
 

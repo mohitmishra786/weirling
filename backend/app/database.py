@@ -32,13 +32,18 @@ def pool_options(argv: list[str], mode: str, size: int, overflow: int) -> dict:
     )
     if mode == "none" or (mode == "auto" and in_celery):
         return {"poolclass": NullPool}
-    return {"pool_size": size, "max_overflow": overflow}
+    # Recycle pooled connections before a platform proxy can drop them while
+    # idle: a dropped connection otherwise hangs the next request until TCP
+    # gives up (a 15 s "rate this" on Railway).
+    return {"pool_size": size, "max_overflow": overflow, "pool_recycle": 300}
 
 
 engine = create_async_engine(
     settings.database_url,
     echo=settings.app_env == "development",
     pool_pre_ping=True,
+    # Fail fast instead of waiting on a database that doesn't answer.
+    connect_args={"timeout": 10},
     **pool_options(sys.argv, settings.db_pool, settings.db_pool_size, settings.db_max_overflow),
 )
 

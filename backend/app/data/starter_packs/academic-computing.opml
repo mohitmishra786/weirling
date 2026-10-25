@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <opml version="2.0">
   <head>
-    <title>Academic Computing: Weirling starter pack</title>
+    <title>Computer Science Research: Weirling starter pack</title>
+    <!-- Scope: CS papers and researchers outside machine learning. Each feed belongs to one pack only. -->
   </head>
   <body>
-    <outline text="Academic Computing" title="Academic Computing">
-        <outline text="arXiv cs.LG" title="arXiv cs.LG" type="rss" xmlUrl="https://rss.arxiv.org/rss/cs.LG" htmlUrl="https://rss.arxiv.org/rss/cs.LG"/>
-        <outline text="arXiv cs.DC" title="arXiv cs.DC" type="rss" xmlUrl="https://rss.arxiv.org/rss/cs.DC" htmlUrl="https://rss.arxiv.org/rss/cs.DC"/>
-        <outline text="arXiv cs.CR" title="arXiv cs.CR" type="rss" xmlUrl="https://rss.arxiv.org/rss/cs.CR" htmlUrl="https://rss.arxiv.org/rss/cs.CR"/>
-        <outline text="arXiv cs.DB" title="arXiv cs.DB" type="rss" xmlUrl="https://rss.arxiv.org/rss/cs.DB" htmlUrl="https://rss.arxiv.org/rss/cs.DB"/>
-        <outline text="arXiv cs.SE" title="arXiv cs.SE" type="rss" xmlUrl="https://rss.arxiv.org/rss/cs.SE" htmlUrl="https://rss.arxiv.org/rss/cs.SE"/>
-        <outline text="arXiv cs.PL" title="arXiv cs.PL" type="rss" xmlUrl="https://rss.arxiv.org/rss/cs.PL" htmlUrl="https://rss.arxiv.org/rss/cs.PL"/>
-        <outline text="arXiv cs.AI" title="arXiv cs.AI" type="rss" xmlUrl="https://rss.arxiv.org/rss/cs.AI" htmlUrl="https://rss.arxiv.org/rss/cs.AI"/>
-        <outline text="Berkeley AI Research" title="Berkeley AI Research" type="rss" xmlUrl="https://bair.berkeley.edu/blog/feed.xml" htmlUrl="https://bair.berkeley.edu/blog/feed.xml"/>
-        <outline text="Stanford HAI" title="Stanford HAI" type="rss" xmlUrl="https://hai.stanford.edu/news/rss" htmlUrl="https://hai.stanford.edu/news/rss"/>
-        <outline text="MIT Technology Review" title="MIT Technology Review" type="rss" xmlUrl="https://www.technologyreview.com/feed/" htmlUrl="https://www.technologyreview.com/feed/"/>
+    <outline text="Computer Science Research" title="Computer Science Research">
+      <outline text="arXiv: Distributed Computing (cs.DC)" title="arXiv: Distributed Computing (cs.DC)" type="rss" xmlUrl="https://rss.arxiv.org/rss/cs.DC" htmlUrl="https://arxiv.org/list/cs.DC/recent"/>
+      <outline text="arXiv: Databases (cs.DB)" title="arXiv: Databases (cs.DB)" type="rss" xmlUrl="https://rss.arxiv.org/rss/cs.DB" htmlUrl="https://arxiv.org/list/cs.DB/recent"/>
+      <outline text="arXiv: Programming Languages (cs.PL)" title="arXiv: Programming Languages (cs.PL)" type="rss" xmlUrl="https://rss.arxiv.org/rss/cs.PL" htmlUrl="https://arxiv.org/list/cs.PL/recent"/>
+      <outline text="arXiv: Software Engineering (cs.SE)" title="arXiv: Software Engineering (cs.SE)" type="rss" xmlUrl="https://rss.arxiv.org/rss/cs.SE" htmlUrl="https://arxiv.org/list/cs.SE/recent"/>
+      <outline text="arXiv: Cryptography and Security (cs.CR)" title="arXiv: Cryptography and Security (cs.CR)" type="rss" xmlUrl="https://rss.arxiv.org/rss/cs.CR" htmlUrl="https://arxiv.org/list/cs.CR/recent"/>
+      <outline text="arXiv: Data Structures and Algorithms (cs.DS)" title="arXiv: Data Structures and Algorithms (cs.DS)" type="rss" xmlUrl="https://rss.arxiv.org/rss/cs.DS" htmlUrl="https://arxiv.org/list/cs.DS/recent"/>
+      <outline text="Computational Complexity" title="Computational Complexity" type="rss" xmlUrl="https://blog.computationalcomplexity.org/feeds/posts/default" htmlUrl="https://blog.computationalcomplexity.org/"/>
+      <outline text="Shtetl-Optimized (Scott Aaronson)" title="Shtetl-Optimized (Scott Aaronson)" type="rss" xmlUrl="https://scottaaronson.blog/?feed=rss2" htmlUrl="https://scottaaronson.blog/"/>
+      <outline text="Gödel's Lost Letter (Lipton and Regan)" title="Gödel's Lost Letter (Lipton and Regan)" type="rss" xmlUrl="https://rjlipton.com/feed/" htmlUrl="https://rjlipton.com/"/>
+      <outline text="Hillel Wayne" title="Hillel Wayne" type="rss" xmlUrl="https://buttondown.com/hillelwayne/rss" htmlUrl="https://www.hillelwayne.com/"/>
     </outline>
   </body>
 </opml>

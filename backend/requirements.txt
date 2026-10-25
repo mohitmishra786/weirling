@@ -36,6 +36,9 @@ groq==0.37.1
 # LLM — Fallback (only loaded when OPENAI_FALLBACK_ENABLED=true)
 openai==1.109.1
 
+# Claude, tried first when ANTHROPIC_API_KEY is set
+anthropic==0.125.0
+
 # Embeddings
 sentence-transformers==5.7.0
 numpy==1.26.4

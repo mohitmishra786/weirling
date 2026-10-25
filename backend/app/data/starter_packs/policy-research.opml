@@ -2,21 +2,22 @@
 <opml version="2.0">
   <head>
     <title>Policy Research: Weirling starter pack</title>
+    <!-- Scope: Think tanks, official research and public policy. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Policy Research" title="Policy Research">
-        <outline text="GAO reports" title="GAO reports" type="rss" xmlUrl="https://www.gao.gov/rss/reports.xml" htmlUrl="https://www.gao.gov/"/>
-        <outline text="CBO publications" title="CBO publications" type="rss" xmlUrl="https://www.cbo.gov/publications/all/rss.xml" htmlUrl="https://www.cbo.gov/"/>
-        <outline text="Congressional Research Service (EveryCRSReport)" title="Congressional Research Service (EveryCRSReport)" type="rss" xmlUrl="https://www.everycrsreport.com/rss.xml" htmlUrl="https://www.everycrsreport.com/"/>
-        <outline text="Federal Reserve FEDS Notes" title="Federal Reserve FEDS Notes" type="rss" xmlUrl="https://www.federalreserve.gov/feeds/feds_notes.xml" htmlUrl="https://www.federalreserve.gov/econres/notes/feds-notes/default.htm"/>
-        <outline text="NBER new working papers" title="NBER new working papers" type="rss" xmlUrl="https://www.nber.org/rss/new.xml" htmlUrl="https://www.nber.org/"/>
-        <outline text="CEPR VoxEU columns" title="CEPR VoxEU columns" type="rss" xmlUrl="https://cepr.org/rss/vox-content" htmlUrl="https://cepr.org/voxeu"/>
-        <outline text="Bruegel" title="Bruegel" type="rss" xmlUrl="https://www.bruegel.org/rss.xml" htmlUrl="https://www.bruegel.org/"/>
-        <outline text="Institute for Fiscal Studies" title="Institute for Fiscal Studies" type="rss" xmlUrl="https://ifs.org.uk/rss.xml" htmlUrl="https://ifs.org.uk/"/>
-        <outline text="Resolution Foundation" title="Resolution Foundation" type="rss" xmlUrl="https://www.resolutionfoundation.org/feed/" htmlUrl="https://www.resolutionfoundation.org/"/>
-        <outline text="UK Parliament POST" title="UK Parliament POST" type="rss" xmlUrl="https://post.parliament.uk/feed/" htmlUrl="https://post.parliament.uk/"/>
-        <outline text="Pew Research Center" title="Pew Research Center" type="rss" xmlUrl="https://www.pewresearch.org/feed/" htmlUrl="https://www.pewresearch.org/"/>
-        <outline text="Our World in Data" title="Our World in Data" type="rss" xmlUrl="https://ourworldindata.org/atom.xml" htmlUrl="https://ourworldindata.org/"/>
+      <outline text="NBER new working papers" title="NBER new working papers" type="rss" xmlUrl="https://www.nber.org/rss/new.xml" htmlUrl="https://www.nber.org/papers"/>
+      <outline text="CEPR VoxEU columns" title="CEPR VoxEU columns" type="rss" xmlUrl="https://cepr.org/rss/vox-content" htmlUrl="https://cepr.org/voxeu"/>
+      <outline text="Federal Reserve FEDS Notes" title="Federal Reserve FEDS Notes" type="rss" xmlUrl="https://www.federalreserve.gov/feeds/feds_notes.xml" htmlUrl="https://www.federalreserve.gov/econres/notes/feds-notes/default.htm"/>
+      <outline text="CBO publications" title="CBO publications" type="rss" xmlUrl="https://www.cbo.gov/publications/all/rss.xml" htmlUrl="https://www.cbo.gov/"/>
+      <outline text="GAO reports" title="GAO reports" type="rss" xmlUrl="https://www.gao.gov/rss/reports.xml" htmlUrl="https://www.gao.gov/"/>
+      <outline text="Congressional Research Service (EveryCRSReport)" title="Congressional Research Service (EveryCRSReport)" type="rss" xmlUrl="https://www.everycrsreport.com/rss.xml" htmlUrl="https://www.everycrsreport.com/"/>
+      <outline text="Brookings" title="Brookings" type="rss" xmlUrl="https://www.brookings.edu/feed/?post_type=article" htmlUrl="https://www.brookings.edu/"/>
+      <outline text="Bruegel" title="Bruegel" type="rss" xmlUrl="https://www.bruegel.org/rss.xml" htmlUrl="https://www.bruegel.org/"/>
+      <outline text="Resolution Foundation" title="Resolution Foundation" type="rss" xmlUrl="https://www.resolutionfoundation.org/feed/" htmlUrl="https://www.resolutionfoundation.org/"/>
+      <outline text="UK Parliament POST" title="UK Parliament POST" type="rss" xmlUrl="https://post.parliament.uk/feed/" htmlUrl="https://post.parliament.uk/"/>
+      <outline text="Pew Research Center" title="Pew Research Center" type="rss" xmlUrl="https://www.pewresearch.org/feed/" htmlUrl="https://www.pewresearch.org/"/>
+      <outline text="Our World in Data" title="Our World in Data" type="rss" xmlUrl="https://ourworldindata.org/atom.xml" htmlUrl="https://ourworldindata.org/"/>
     </outline>
   </body>
 </opml>

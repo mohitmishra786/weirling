@@ -2,20 +2,23 @@
 <opml version="2.0">
   <head>
     <title>AI &amp; Machine Learning: Weirling starter pack</title>
+    <!-- Scope: Models, ML research and applied AI. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="AI &amp; Machine Learning" title="AI &amp; Machine Learning">
-        <outline text="Simon Willison" title="Simon Willison" type="rss" xmlUrl="https://simonwillison.net/atom/everything/" htmlUrl="https://simonwillison.net/atom/everything/"/>
-        <outline text="Hugging Face Blog" title="Hugging Face Blog" type="rss" xmlUrl="https://huggingface.co/blog/feed.xml" htmlUrl="https://huggingface.co/blog/feed.xml"/>
-        <outline text="Google Research Blog" title="Google Research Blog" type="rss" xmlUrl="https://research.google/blog/rss/" htmlUrl="https://research.google/blog/rss/"/>
-        <outline text="Import AI (Substack)" title="Import AI (Substack)" type="rss" xmlUrl="https://importai.substack.com/feed" htmlUrl="https://importai.substack.com/feed"/>
-        <outline text="Google DeepMind Blog" title="Google DeepMind Blog" type="rss" xmlUrl="https://deepmind.google/blog/rss.xml" htmlUrl="https://deepmind.google/blog/rss.xml"/>
-        <outline text="MIT News AI" title="MIT News AI" type="rss" xmlUrl="https://news.mit.edu/topic/mitartificial-intelligence2-rss.xml" htmlUrl="https://news.mit.edu/topic/mitartificial-intelligence2-rss.xml"/>
-        <outline text="Sebastian Raschka" title="Sebastian Raschka" type="rss" xmlUrl="https://magazine.sebastianraschka.com/feed" htmlUrl="https://magazine.sebastianraschka.com/feed"/>
-        <outline text="AI Impacts" title="AI Impacts" type="rss" xmlUrl="https://aiimpacts.org/feed/" htmlUrl="https://aiimpacts.org/feed/"/>
-        <outline text="MIT TR: Artificial Intelligence" title="MIT TR: Artificial Intelligence" type="rss" xmlUrl="https://www.technologyreview.com/topic/artificial-intelligence/feed" htmlUrl="https://www.technologyreview.com/topic/artificial-intelligence/feed"/>
-        <outline text="Marktechpost" title="Marktechpost" type="rss" xmlUrl="https://www.marktechpost.com/feed/" htmlUrl="https://www.marktechpost.com/feed/"/>
-        <outline text="OpenAI News" title="OpenAI News" type="rss" xmlUrl="https://openai.com/news/rss.xml" htmlUrl="https://openai.com/news/rss.xml"/>
+      <outline text="Google DeepMind Blog" title="Google DeepMind Blog" type="rss" xmlUrl="https://deepmind.google/blog/rss.xml" htmlUrl="https://deepmind.google/discover/blog/"/>
+      <outline text="Google Research Blog" title="Google Research Blog" type="rss" xmlUrl="https://research.google/blog/rss/" htmlUrl="https://research.google/blog/"/>
+      <outline text="Hugging Face Blog" title="Hugging Face Blog" type="rss" xmlUrl="https://huggingface.co/blog/feed.xml" htmlUrl="https://huggingface.co/blog"/>
+      <outline text="OpenAI News" title="OpenAI News" type="rss" xmlUrl="https://openai.com/news/rss.xml" htmlUrl="https://openai.com/news/"/>
+      <outline text="Berkeley AI Research" title="Berkeley AI Research" type="rss" xmlUrl="https://bair.berkeley.edu/blog/feed.xml" htmlUrl="https://bair.berkeley.edu/blog/"/>
+      <outline text="Import AI" title="Import AI" type="rss" xmlUrl="https://importai.substack.com/feed" htmlUrl="https://importai.substack.com/"/>
+      <outline text="Interconnects (Nathan Lambert)" title="Interconnects (Nathan Lambert)" type="rss" xmlUrl="https://www.interconnects.ai/feed" htmlUrl="https://www.interconnects.ai/"/>
+      <outline text="Lilian Weng" title="Lilian Weng" type="rss" xmlUrl="https://lilianweng.github.io/index.xml" htmlUrl="https://lilianweng.github.io/"/>
+      <outline text="Sebastian Raschka" title="Sebastian Raschka" type="rss" xmlUrl="https://magazine.sebastianraschka.com/feed" htmlUrl="https://magazine.sebastianraschka.com/"/>
+      <outline text="Simon Willison" title="Simon Willison" type="rss" xmlUrl="https://simonwillison.net/atom/everything/" htmlUrl="https://simonwillison.net/"/>
+      <outline text="MIT Technology Review: AI" title="MIT Technology Review: AI" type="rss" xmlUrl="https://www.technologyreview.com/topic/artificial-intelligence/feed" htmlUrl="https://www.technologyreview.com/topic/artificial-intelligence/"/>
+      <outline text="arXiv: Machine Learning (cs.LG)" title="arXiv: Machine Learning (cs.LG)" type="rss" xmlUrl="https://rss.arxiv.org/rss/cs.LG" htmlUrl="https://arxiv.org/list/cs.LG/recent"/>
+      <outline text="arXiv: Artificial Intelligence (cs.AI)" title="arXiv: Artificial Intelligence (cs.AI)" type="rss" xmlUrl="https://rss.arxiv.org/rss/cs.AI" htmlUrl="https://arxiv.org/list/cs.AI/recent"/>
     </outline>
   </body>
 </opml>

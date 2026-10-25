@@ -244,6 +244,8 @@ export interface PlanQuota {
 export interface StarterPack {
   id: string;
   title: string;
+  /** One line on what the pack covers. */
+  description?: string;
   feed_count: number;
   feeds: { name: string; url: string }[];
   /** Matches the user's confirmed topics; pre-selected in the picker. */

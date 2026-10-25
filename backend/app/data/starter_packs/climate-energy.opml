@@ -2,19 +2,20 @@
 <opml version="2.0">
   <head>
     <title>Climate &amp; Energy: Weirling starter pack</title>
+    <!-- Scope: Climate science, policy and the energy transition. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Climate &amp; Energy" title="Climate &amp; Energy">
-        <outline text="Guardian Energy" title="Guardian Energy" type="rss" xmlUrl="https://www.theguardian.com/environment/energy/rss" htmlUrl="https://www.theguardian.com/environment/energy/rss"/>
-        <outline text="Guardian Environment" title="Guardian Environment" type="rss" xmlUrl="https://www.theguardian.com/environment/rss" htmlUrl="https://www.theguardian.com/environment/rss"/>
-        <outline text="Heatmap News" title="Heatmap News" type="rss" xmlUrl="https://www.canarymedia.com/rss" htmlUrl="https://www.canarymedia.com/rss"/>
-        <outline text="Carbon Brief" title="Carbon Brief" type="rss" xmlUrl="https://www.carbonbrief.org/feed/" htmlUrl="https://www.carbonbrief.org/feed/"/>
-        <outline text="Grist" title="Grist" type="rss" xmlUrl="https://grist.org/feed/" htmlUrl="https://grist.org/feed/"/>
-        <outline text="Inside Climate News" title="Inside Climate News" type="rss" xmlUrl="https://insideclimatenews.org/feed/" htmlUrl="https://insideclimatenews.org/feed/"/>
-        <outline text="Electrek" title="Electrek" type="rss" xmlUrl="https://electrek.co/feed/" htmlUrl="https://electrek.co/feed/"/>
-        <outline text="CleanTechnica" title="CleanTechnica" type="rss" xmlUrl="https://cleantechnica.com/feed/" htmlUrl="https://cleantechnica.com/feed/"/>
-        <outline text="Canary Media" title="Canary Media" type="rss" xmlUrl="https://www.canarymedia.com/rss" htmlUrl="https://www.canarymedia.com/rss"/>
-        <outline text="Heatmap News" title="Heatmap News" type="rss" xmlUrl="https://www.canarymedia.com/rss" htmlUrl="https://www.canarymedia.com/rss"/>
+      <outline text="Carbon Brief" title="Carbon Brief" type="rss" xmlUrl="https://www.carbonbrief.org/feed/" htmlUrl="https://www.carbonbrief.org/"/>
+      <outline text="Canary Media" title="Canary Media" type="rss" xmlUrl="https://www.canarymedia.com/rss" htmlUrl="https://www.canarymedia.com/"/>
+      <outline text="Volts (David Roberts)" title="Volts (David Roberts)" type="rss" xmlUrl="https://www.volts.wtf/feed" htmlUrl="https://www.volts.wtf/"/>
+      <outline text="Utility Dive" title="Utility Dive" type="rss" xmlUrl="https://www.utilitydive.com/feeds/news/" htmlUrl="https://www.utilitydive.com/"/>
+      <outline text="Inside Climate News" title="Inside Climate News" type="rss" xmlUrl="https://insideclimatenews.org/feed/" htmlUrl="https://insideclimatenews.org/"/>
+      <outline text="Grist" title="Grist" type="rss" xmlUrl="https://grist.org/feed/" htmlUrl="https://grist.org/"/>
+      <outline text="Guardian: Energy" title="Guardian: Energy" type="rss" xmlUrl="https://www.theguardian.com/environment/energy/rss" htmlUrl="https://www.theguardian.com/environment/energy"/>
+      <outline text="Guardian: Environment" title="Guardian: Environment" type="rss" xmlUrl="https://www.theguardian.com/environment/rss" htmlUrl="https://www.theguardian.com/environment"/>
+      <outline text="CleanTechnica" title="CleanTechnica" type="rss" xmlUrl="https://cleantechnica.com/feed/" htmlUrl="https://cleantechnica.com/"/>
+      <outline text="Electrek" title="Electrek" type="rss" xmlUrl="https://electrek.co/feed/" htmlUrl="https://electrek.co/"/>
     </outline>
   </body>
 </opml>

@@ -2,19 +2,20 @@
 <opml version="2.0">
   <head>
     <title>Biotech &amp; Health: Weirling starter pack</title>
+    <!-- Scope: Drug development, biotech business and medicine. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Biotech &amp; Health" title="Biotech &amp; Health">
-        <outline text="STAT News" title="STAT News" type="rss" xmlUrl="https://www.statnews.com/feed/" htmlUrl="https://www.statnews.com/feed/"/>
-        <outline text="BioPharma Dive" title="BioPharma Dive" type="rss" xmlUrl="https://www.biopharmadive.com/feeds/news/" htmlUrl="https://www.biopharmadive.com/feeds/news/"/>
-        <outline text="Nature Biotechnology" title="Nature Biotechnology" type="rss" xmlUrl="https://www.nature.com/nbt.rss" htmlUrl="https://www.nature.com/nbt.rss"/>
-        <outline text="Genetic Engineering News" title="Genetic Engineering News" type="rss" xmlUrl="https://www.genengnews.com/feed/" htmlUrl="https://www.genengnews.com/feed/"/>
-        <outline text="Bio-IT World" title="Bio-IT World" type="rss" xmlUrl="https://www.bio-itworld.com/rss" htmlUrl="https://www.bio-itworld.com/rss"/>
-        <outline text="CDC Newsroom" title="CDC Newsroom" type="rss" xmlUrl="https://tools.cdc.gov/api/v2/resources/media/132608.rss" htmlUrl="https://tools.cdc.gov/api/v2/resources/media/132608.rss"/>
-        <outline text="Kevin MD" title="Kevin MD" type="rss" xmlUrl="https://www.kevinmd.com/feed/" htmlUrl="https://www.kevinmd.com/feed/"/>
-        <outline text="ScienceDaily: Health" title="ScienceDaily: Health" type="rss" xmlUrl="https://www.sciencedaily.com/rss/health_medicine.xml" htmlUrl="https://www.sciencedaily.com/rss/health_medicine.xml"/>
-        <outline text="STAT News Plus" title="STAT News Plus" type="rss" xmlUrl="https://www.statnews.com/feed/" htmlUrl="https://www.statnews.com/feed/"/>
-        <outline text="Science Translational Medicine" title="Science Translational Medicine" type="rss" xmlUrl="https://www.science.org/action/showFeed?jc=stm&amp;type=etoc&amp;feed=rss" htmlUrl="https://www.science.org/action/showFeed?jc=stm&amp;type=etoc&amp;feed=rss"/>
+      <outline text="STAT News" title="STAT News" type="rss" xmlUrl="https://www.statnews.com/feed/" htmlUrl="https://www.statnews.com/"/>
+      <outline text="BioPharma Dive" title="BioPharma Dive" type="rss" xmlUrl="https://www.biopharmadive.com/feeds/news/" htmlUrl="https://www.biopharmadive.com/"/>
+      <outline text="In the Pipeline (Derek Lowe)" title="In the Pipeline (Derek Lowe)" type="rss" xmlUrl="https://www.science.org/blogs/pipeline/feed" htmlUrl="https://www.science.org/blogs/pipeline"/>
+      <outline text="Nature Biotechnology" title="Nature Biotechnology" type="rss" xmlUrl="https://www.nature.com/nbt.rss" htmlUrl="https://www.nature.com/nbt/"/>
+      <outline text="Science Translational Medicine" title="Science Translational Medicine" type="rss" xmlUrl="https://www.science.org/action/showFeed?jc=stm&amp;type=etoc&amp;feed=rss" htmlUrl="https://www.science.org/journal/stm"/>
+      <outline text="Genetic Engineering News" title="Genetic Engineering News" type="rss" xmlUrl="https://www.genengnews.com/feed/" htmlUrl="https://www.genengnews.com/"/>
+      <outline text="Bio-IT World" title="Bio-IT World" type="rss" xmlUrl="https://www.bio-itworld.com/rss" htmlUrl="https://www.bio-itworld.com/"/>
+      <outline text="CDC Newsroom" title="CDC Newsroom" type="rss" xmlUrl="https://tools.cdc.gov/api/v2/resources/media/132608.rss" htmlUrl="https://www.cdc.gov/media/"/>
+      <outline text="KevinMD" title="KevinMD" type="rss" xmlUrl="https://www.kevinmd.com/feed/" htmlUrl="https://www.kevinmd.com/"/>
+      <outline text="Nature Medicine" title="Nature Medicine" type="rss" xmlUrl="https://www.nature.com/nm.rss" htmlUrl="https://www.nature.com/nm/"/>
     </outline>
   </body>
 </opml>

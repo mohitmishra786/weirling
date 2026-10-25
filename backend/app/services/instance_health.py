@@ -147,7 +147,7 @@ async def check(
                 "llm",
                 f"The LLM provider is failing ({error.get('reason') or 'unknown error'}). "
                 "Summaries fall back to extracts.",
-                "Check LLM_API_KEY, your provider quota and the model names in .env.",
+                "Check ANTHROPIC_API_KEY or LLM_API_KEY, your credit or quota and the model names in .env.",
             )
         )
     return problems

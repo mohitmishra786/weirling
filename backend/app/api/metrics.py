@@ -95,6 +95,8 @@ async def llm_status(
         "llm_configured": has_primary_key,
         "model_primary": s.llm_model_primary,
         "model_fast": s.llm_model_fast,
+        # Claude, tried before the models above when its key is set.
+        "claude_model": s.anthropic_model if s.anthropic_api_key else None,
         "openai_fallback_enabled": s.openai_fallback_enabled and bool(s.openai_api_key),
         # The embedder that is really running, not just the configured one (#195).
         "embedding_model": embedder["name"],

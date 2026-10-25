@@ -111,6 +111,57 @@ def extract_html(
     return Extraction("", "failed", 0.0, kind)
 
 
+_AGGREGATOR_SITES = {
+    "news.ycombinator.com": "Hacker News",
+    "lobste.rs": "Lobsters",
+}
+
+
+# Feeds whose entries are links to elsewhere plus a discussion thread.
+_AGGREGATOR_FEED_HOSTS = ("hnrss.org", "lobste.rs", "news.ycombinator.com")
+
+
+def aggregator_stub(html: str | None, feed_url: str = "") -> str | None:
+    """A link aggregator's entry (hnrss.org, Lobsters) carries no article, only
+    "Article URL: … Comments URL: … Points: … # Comments: …" markup. Return one
+    clean line pointing at the discussion instead, or None for a real body.
+    Only for aggregator feeds: a blog post quoting that format keeps its text."""
+    from urllib.parse import urlparse as _urlparse
+
+    feed_host = (_urlparse(feed_url).hostname or "").lower()
+    if not any(feed_host == h or feed_host.endswith("." + h) for h in _AGGREGATOR_FEED_HOSTS):
+        return None
+    if not html or "Comments URL" not in html or "Article URL" not in html:
+        return None
+    from html import escape
+
+    text = _plain(html)
+    if len(text.split()) > 60:  # a real body that happens to quote the format
+        return None
+    import re
+
+    comments = re.search(r"Comments URL:\s*(https?://\S+)", text)
+    points = re.search(r"Points:\s*(\d+)", text)
+    count = re.search(r"# Comments:\s*(\d+)", text)
+    if not comments:
+        return None
+    url = comments.group(1)
+    from urllib.parse import urlparse
+
+    host = (urlparse(url).hostname or "").removeprefix("www.")
+    site = _AGGREGATOR_SITES.get(host, host)
+    stats = ", ".join(
+        part
+        for part in (
+            f"{points.group(1)} points" if points else "",
+            f"{count.group(1)} comments" if count else "",
+        )
+        if part
+    )
+    label = f"{stats} on {site}" if stats else f"Discussion on {site}"
+    return f'<p>Discussion: <a href="{escape(url)}">{escape(label)}</a></p>'
+
+
 def from_feed_text(text: str | None) -> Extraction:
     body = (text or "").strip()
     words = len(body.split())

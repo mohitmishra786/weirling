@@ -602,6 +602,27 @@
   .prose-reader figure {
     margin: 1.5em 0;
   }
+  /* Nothing in an article may widen the page on a phone: long URLs wrap,
+     wide tables scroll inside themselves, embeds keep their aspect ratio. */
+  .prose-reader {
+    overflow-wrap: anywhere;
+  }
+  .prose-reader table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+  }
+  .prose-reader video,
+  .prose-reader iframe,
+  .prose-reader svg {
+    max-width: 100%;
+    height: auto;
+  }
+  .prose-reader iframe {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+  }
   .prose-reader figcaption {
     font-size: 0.85rem;
     color: var(--reader-muted, var(--text-tertiary));

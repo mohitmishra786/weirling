@@ -2,19 +2,21 @@
 <opml version="2.0">
   <head>
     <title>Hardware &amp; Electronics: Weirling starter pack</title>
+    <!-- Scope: Electronics, embedded systems and chips. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Hardware &amp; Electronics" title="Hardware &amp; Electronics">
-        <outline text="Hackaday" title="Hackaday" type="rss" xmlUrl="https://hackaday.com/feed/" htmlUrl="https://hackaday.com/feed/"/>
-        <outline text="Adafruit Blog" title="Adafruit Blog" type="rss" xmlUrl="https://blog.adafruit.com/feed/" htmlUrl="https://blog.adafruit.com/feed/"/>
-        <outline text="Tom's Hardware" title="Tom's Hardware" type="rss" xmlUrl="https://www.tomshardware.com/feeds/all" htmlUrl="https://www.tomshardware.com/feeds/all"/>
-        <outline text="EE Times" title="EE Times" type="rss" xmlUrl="https://www.eetimes.com/feed/" htmlUrl="https://www.eetimes.com/feed/"/>
-        <outline text="Analog IC Design" title="Analog IC Design" type="rss" xmlUrl="https://www.electronics-tutorials.ws/feed" htmlUrl="https://www.electronics-tutorials.ws/feed"/>
-        <outline text="ESP32" title="ESP32" type="rss" xmlUrl="https://esp32.com/feed" htmlUrl="https://esp32.com/feed"/>
-        <outline text="Raspberry Pi Blog" title="Raspberry Pi Blog" type="rss" xmlUrl="https://www.raspberrypi.com/news/feed/" htmlUrl="https://www.raspberrypi.com/news/feed/"/>
-        <outline text="Arduino Blog" title="Arduino Blog" type="rss" xmlUrl="https://blog.arduino.cc/feed/" htmlUrl="https://blog.arduino.cc/feed/"/>
-        <outline text="Tindie Blog" title="Tindie Blog" type="rss" xmlUrl="https://blog.tindie.com/feed/" htmlUrl="https://blog.tindie.com/feed/"/>
-        <outline text="CNX Software" title="CNX Software" type="rss" xmlUrl="https://www.cnx-software.com/feed/" htmlUrl="https://www.cnx-software.com/feed/"/>
+      <outline text="Hackaday" title="Hackaday" type="rss" xmlUrl="https://hackaday.com/feed/" htmlUrl="https://hackaday.com/"/>
+      <outline text="Adafruit Blog" title="Adafruit Blog" type="rss" xmlUrl="https://blog.adafruit.com/feed/" htmlUrl="https://blog.adafruit.com/"/>
+      <outline text="Arduino Blog" title="Arduino Blog" type="rss" xmlUrl="https://blog.arduino.cc/feed/" htmlUrl="https://blog.arduino.cc/"/>
+      <outline text="Raspberry Pi News" title="Raspberry Pi News" type="rss" xmlUrl="https://www.raspberrypi.com/news/feed/" htmlUrl="https://www.raspberrypi.com/news/"/>
+      <outline text="CNX Software" title="CNX Software" type="rss" xmlUrl="https://www.cnx-software.com/feed/" htmlUrl="https://www.cnx-software.com/"/>
+      <outline text="Interrupt (Memfault)" title="Interrupt (Memfault)" type="rss" xmlUrl="https://interrupt.memfault.com/feed.xml" htmlUrl="https://interrupt.memfault.com/"/>
+      <outline text="SemiEngineering" title="SemiEngineering" type="rss" xmlUrl="https://semiengineering.com/feed/" htmlUrl="https://semiengineering.com/"/>
+      <outline text="EE Times" title="EE Times" type="rss" xmlUrl="https://www.eetimes.com/feed/" htmlUrl="https://www.eetimes.com/"/>
+      <outline text="Electronics Tutorials" title="Electronics Tutorials" type="rss" xmlUrl="https://www.electronics-tutorials.ws/feed" htmlUrl="https://www.electronics-tutorials.ws/"/>
+      <outline text="Tindie Blog" title="Tindie Blog" type="rss" xmlUrl="https://blog.tindie.com/feed/" htmlUrl="https://blog.tindie.com/"/>
+      <outline text="Tom's Hardware" title="Tom's Hardware" type="rss" xmlUrl="https://www.tomshardware.com/feeds/all" htmlUrl="https://www.tomshardware.com/"/>
     </outline>
   </body>
 </opml>

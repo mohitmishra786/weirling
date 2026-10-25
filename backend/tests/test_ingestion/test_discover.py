@@ -213,3 +213,81 @@ def test_link_candidates_with_multi_value_and_list_attributes():
     urls = [c.url for c in candidates]
     assert "https://example.com/rss.xml" in urls
     assert "https://example.com/atom.xml" in urls
+
+
+def _only(feed_url: str):
+    seen: list[str] = []
+
+    async def _fetch(url: str) -> str | None:
+        seen.append(url)
+        return FEED if url == feed_url else None
+
+    return _fetch, seen
+
+
+@pytest.mark.asyncio
+async def test_blog_in_a_subfolder_is_found_without_a_link_tag(monkeypatch):
+    """A GitHub Pages project site (user.github.io/Blog/) has its feed under
+    the folder, not the host root, and themes often skip <link rel=alternate>."""
+    monkeypatch.setattr(get_settings(), "rsshub_base_url", "")
+    fetch, seen = _only("https://user.github.io/Blog/feed.xml")
+    html = "<html><head></head><body><a href='/Blog/about'>About</a></body></html>"
+    found = await discover_feed_candidates("https://user.github.io/Blog/", html=html, fetch=fetch)
+    assert found[0].url == "https://user.github.io/Blog/feed.xml"
+    assert found[0].method == "well_known"
+    # The folder is tried before the site root.
+    assert seen.index("https://user.github.io/Blog/feed.xml") < len(seen)
+    assert "https://user.github.io/feed.xml" not in seen
+
+
+@pytest.mark.asyncio
+async def test_feed_link_in_the_page_body_is_used_once_confirmed(monkeypatch):
+    monkeypatch.setattr(get_settings(), "rsshub_base_url", "")
+    fetch, _ = _only("https://user.github.io/Blog/feed.xml")
+    html = (
+        "<html><body><a href='/Blog/sitemap.xml'>map</a>"
+        "<a href='/Blog/feed.xml'><i class='rss'></i></a></body></html>"
+    )
+    found = await discover_feed_candidates(
+        "https://user.github.io/Blog/posts/hello/", html=html, fetch=fetch
+    )
+    assert found[0].url == "https://user.github.io/Blog/feed.xml"
+    assert found[0].method == "anchor"
+
+
+def test_substack_profile_url_maps_to_the_publication():
+    from app.services.creator.resolver import _autodiscover_feed_url
+    from app.services.ingestion.discover import platform_candidates
+
+    assert _autodiscover_feed_url("substack", "https://substack.com/@lenny", "") == (
+        "https://lenny.substack.com/feed",
+        None,
+    )
+    feed, warning = _autodiscover_feed_url("substack", "https://substack.com/redirect/abc", "")
+    assert feed is None and warning
+    assert [c.url for c in platform_candidates("https://substack.com/@lenny", "")] == [
+        "https://lenny.substack.com/feed"
+    ]
+    assert platform_candidates("https://substack.com/inbox", "") == []
+
+
+def test_well_known_order_folder_root_then_bare_segment():
+    from app.services.ingestion.discover import _well_known_targets
+
+    project = _well_known_targets("https://user.github.io/Blog/posts/x/")
+    assert project[0] == "https://user.github.io/Blog/feed.xml"
+    assert not any("/Blog/posts/" in t for t in project)
+    page = _well_known_targets("https://docs.example.com/guide")
+    assert page[0].startswith("https://docs.example.com/") and "/guide/" in page[-1]
+    assert page.index("https://docs.example.com/index.xml") < page.index(
+        "https://docs.example.com/guide/index.xml"
+    )
+
+
+def test_a_malformed_link_does_not_stop_discovery():
+    from app.services.ingestion.discover import anchor_candidates
+
+    html = "<a href='http://['>bad</a><a href='/feed.xml'>rss</a>"
+    assert [c.url for c in anchor_candidates("https://x.example/", html)] == [
+        "https://x.example/feed.xml"
+    ]

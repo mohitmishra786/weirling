@@ -2,19 +2,22 @@
 <opml version="2.0">
   <head>
     <title>Programming Languages: Weirling starter pack</title>
+    <!-- Scope: Languages, compilers and the craft of code. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Programming Languages" title="Programming Languages">
-        <outline text="Python Insider" title="Python Insider" type="rss" xmlUrl="https://pythoninsider.blogspot.com/feeds/posts/default" htmlUrl="https://pythoninsider.blogspot.com/feeds/posts/default"/>
-        <outline text="Python Software Foundation News" title="Python Software Foundation News" type="rss" xmlUrl="https://pyfound.blogspot.com/feeds/posts/default" htmlUrl="https://pyfound.blogspot.com/feeds/posts/default"/>
-        <outline text="Python Weekly" title="Python Weekly" type="rss" xmlUrl="https://www.pythonweekly.com/feed/" htmlUrl="https://www.pythonweekly.com/feed/"/>
-        <outline text="Rust Blog" title="Rust Blog" type="rss" xmlUrl="https://blog.rust-lang.org/feed.xml" htmlUrl="https://blog.rust-lang.org/feed.xml"/>
-        <outline text="Go Blog" title="Go Blog" type="rss" xmlUrl="https://go.dev/blog/feed.atom" htmlUrl="https://go.dev/blog/feed.atom"/>
-        <outline text="TypeScript Blog" title="TypeScript Blog" type="rss" xmlUrl="https://devblogs.microsoft.com/typescript/feed/" htmlUrl="https://devblogs.microsoft.com/typescript/feed/"/>
-        <outline text="C++ Team Blog" title="C++ Team Blog" type="rss" xmlUrl="https://devblogs.microsoft.com/cppblog/feed/" htmlUrl="https://devblogs.microsoft.com/cppblog/feed/"/>
-        <outline text="The Pragmatic Engineer" title="The Pragmatic Engineer" type="rss" xmlUrl="https://newsletter.pragmaticengineer.com/feed" htmlUrl="https://newsletter.pragmaticengineer.com/feed"/>
-        <outline text="Fly.io Blog" title="Fly.io Blog" type="rss" xmlUrl="https://fly.io/blog/feed.xml" htmlUrl="https://fly.io/blog/feed.xml"/>
-        <outline text="InfoQ" title="InfoQ" type="rss" xmlUrl="https://feed.infoq.com/" htmlUrl="https://feed.infoq.com/"/>
+      <outline text="Rust Blog" title="Rust Blog" type="rss" xmlUrl="https://blog.rust-lang.org/feed.xml" htmlUrl="https://blog.rust-lang.org/"/>
+      <outline text="This Week in Rust" title="This Week in Rust" type="rss" xmlUrl="https://this-week-in-rust.org/atom.xml" htmlUrl="https://this-week-in-rust.org/"/>
+      <outline text="Go Blog" title="Go Blog" type="rss" xmlUrl="https://go.dev/blog/feed.atom" htmlUrl="https://go.dev/blog/"/>
+      <outline text="TypeScript Blog" title="TypeScript Blog" type="rss" xmlUrl="https://devblogs.microsoft.com/typescript/feed/" htmlUrl="https://devblogs.microsoft.com/typescript/"/>
+      <outline text="C++ Team Blog" title="C++ Team Blog" type="rss" xmlUrl="https://devblogs.microsoft.com/cppblog/feed/" htmlUrl="https://devblogs.microsoft.com/cppblog/"/>
+      <outline text="Python Software Foundation News" title="Python Software Foundation News" type="rss" xmlUrl="https://pyfound.blogspot.com/feeds/posts/default" htmlUrl="https://pyfound.blogspot.com/"/>
+      <outline text="Real Python" title="Real Python" type="rss" xmlUrl="https://realpython.com/atom.xml" htmlUrl="https://realpython.com/"/>
+      <outline text="Inside Java" title="Inside Java" type="rss" xmlUrl="https://inside.java/feed.xml" htmlUrl="https://inside.java/"/>
+      <outline text="Julia Blog" title="Julia Blog" type="rss" xmlUrl="https://julialang.org/feed.xml" htmlUrl="https://julialang.org/blog/"/>
+      <outline text="Zig News" title="Zig News" type="rss" xmlUrl="https://ziglang.org/news/index.xml" htmlUrl="https://ziglang.org/news/"/>
+      <outline text="Eli Bendersky" title="Eli Bendersky" type="rss" xmlUrl="https://eli.thegreenplace.net/feeds/all.atom.xml" htmlUrl="https://eli.thegreenplace.net/"/>
+      <outline text="fasterthanlime" title="fasterthanlime" type="rss" xmlUrl="https://fasterthanli.me/index.xml" htmlUrl="https://fasterthanli.me/"/>
     </outline>
   </body>
 </opml>

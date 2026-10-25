@@ -58,4 +58,23 @@ describe("StarterPackPicker (#152)", () => {
     api.sources.subscribePacks.mockRejectedValueOnce(new Error("Unknown starter pack: x"));
     await expect(subscribePacks(["x"])).rejects.toThrow("Unknown starter pack");
   });
+
+  it("searches pack titles, scopes and source names", async () => {
+    api.sources.starterPacks.mockResolvedValue([
+      ...packs,
+      { id: "backend-distributed", title: "Backend & Distributed Systems", description: "Distributed systems, scaling", feed_count: 12, feeds: [{ name: "Marc Brooker", url: "u3" }], suggested: false, subscribed: 0 },
+    ]);
+    render(<Harness />);
+    const search = await screen.findByRole("searchbox", { name: /Search starter packs/ });
+    await userEvent.type(search, "brooker");
+    expect(screen.getByRole("button", { name: /Backend & Distributed/ })).toBeInTheDocument();
+    expect(screen.getByText(/Marc Brooker/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Design & UX/ })).not.toBeInTheDocument();
+    await userEvent.clear(search);
+    await userEvent.type(search, "scaling");
+    expect(screen.getByRole("button", { name: /Backend & Distributed/ })).toBeInTheDocument();
+    await userEvent.clear(search);
+    await userEvent.type(search, "zzqx");
+    expect(screen.getByRole("status")).toHaveTextContent("No pack matches");
+  });
 });

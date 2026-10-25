@@ -22,10 +22,18 @@ def test_celery_processes_do_not_pool():
 
 def test_api_pools_and_settings_override():
     api = ["/usr/local/bin/uvicorn", "app.main:app"]
-    assert pool_options(api, "auto", 5, 3) == {"pool_size": 5, "max_overflow": 3}
+    assert pool_options(api, "auto", 5, 3) == {
+        "pool_size": 5,
+        "max_overflow": 3,
+        "pool_recycle": 300,
+    }
     assert pool_options(api, "none", 5, 3) == {"poolclass": NullPool}
     worker = ["celery", "-A", "app.workers.celery_app", "worker"]
-    assert pool_options(worker, "queue", 5, 3) == {"pool_size": 5, "max_overflow": 3}
+    assert pool_options(worker, "queue", 5, 3) == {
+        "pool_size": 5,
+        "max_overflow": 3,
+        "pool_recycle": 300,
+    }
 
 
 def test_unknown_db_pool_is_rejected(monkeypatch):

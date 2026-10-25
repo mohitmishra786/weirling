@@ -33,6 +33,15 @@ def get_redis() -> aioredis.Redis:
             settings.redis_url,
             encoding="utf-8",
             decode_responses=True,
+            # Idle connections can be dropped silently by the network between
+            # services; keepalives, timeouts and a periodic check turn a hang
+            # into a quick reconnect.
+            socket_keepalive=True,
+            socket_connect_timeout=5,
+            socket_timeout=5,
+            health_check_interval=30,
+            # No retry_on_timeout: rate-limit and quota counters use INCR, and
+            # a retried INCR whose first reply was lost would count twice.
         )
         _redis_loop = loop
     return _redis_client
