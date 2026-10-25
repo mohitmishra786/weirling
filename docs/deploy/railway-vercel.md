@@ -77,6 +77,13 @@ Name the service **Postgres**. It gets a volume (Hobby: up to 5 GB; the
 database is about 50 MB per 5,000 articles). The app creates the `vector`
 extension itself on first start.
 
+In its Settings, Networking, **delete the public TCP proxy**: the app reaches
+the database over Railway's private network, and nothing else should. The
+template's `DATABASE_URL` is built from that public proxy, so it is empty
+afterwards; use `DATABASE_URL_PRIVATE` (host `*.railway.internal`), as below.
+Do the same for Redis: if its `REDIS_URL` loses its host after you remove
+the proxy, use its private variant instead.
+
 Turn on **Backups** in the Postgres service (Backups tab): daily. These live
 with the volume; off-site backups come in step 6.
 
@@ -100,7 +107,7 @@ REFRESH_SECRET_KEY=...
 SECRETS_ENCRYPTION_KEY=...
 METRICS_TOKEN=...
 
-DATABASE_URL=${{Postgres.DATABASE_URL}}    # plain postgres:// is fine
+DATABASE_URL=${{Postgres.DATABASE_URL_PRIVATE}}    # the private-network URL
 REDIS_URL=${{Redis.REDIS_URL}}/0
 CELERY_BROKER_URL=${{Redis.REDIS_URL}}/1
 CELERY_RESULT_BACKEND=${{Redis.REDIS_URL}}/2
@@ -213,6 +220,7 @@ sign-up. So, as soon as `https://weirling.com` loads:
 |---|---|
 | Signed in, but every page sends you back to sign-in | `COOKIE_DOMAIN` isn't `.weirling.com`, or `FRONTEND_URL` doesn't match the site's address |
 | The browser console shows CORS errors | `FRONTEND_URL` / `CORS_EXTRA_ORIGINS` don't list the exact origin (with `https://`) |
+| `DATABASE_URL is empty` or `Could not parse SQLAlchemy URL` | the reference resolved to nothing: use `${{Postgres.DATABASE_URL_PRIVATE}}` and check the value from the api service's Variables tab |
 | api restarts during deploy | the migration failed: check the api logs right after `python -m app.migrate` |
 | No digests arrive | worker-digest or beat isn't running, or SMTP is wrong: test it in /admin/setup |
 | "too many clients" from Postgres | lower `DB_POOL_SIZE` / `DB_MAX_OVERFLOW` (workers don't pool) |
