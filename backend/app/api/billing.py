@@ -61,7 +61,9 @@ async def billing_state(
         # How a subscriber changes or cancels: the provider's portal, or by
         # email where the provider has none (Razorpay, #342).
         "manage_via": _manage_via(),
-        "support_email": get_settings().grievance_contact_email or None,
+        "support_email": get_settings().support_email
+        or get_settings().grievance_contact_email
+        or None,
         # Plan quotas and today's use (#172); empty on self-host.
         "quotas": await entitlements.usage(session, user),
         # What can be bought, cheapest first, with each plan's limits (#172).

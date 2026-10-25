@@ -51,7 +51,7 @@ async def _config(session: AsyncSession) -> dict:
         "can_store_secrets": secretbox.configured(),
         "effective_registration_mode": effective_mode(),
         "llm_configured": s.llm_configured,
-        "email_configured": bool(s.zoho_password),
+        "email_configured": bool(s.smtp_host and s.smtp_password),
         "fields": instance_config.describe(stored),
     }
 
@@ -117,10 +117,10 @@ async def test_smtp(body: SMTPTest, owner: User = Depends(require_owner)) -> dic
 
     s = get_settings()
     ok, message = await check_smtp(
-        host=body.host or s.zoho_smtp_host,
-        port=body.port or s.zoho_smtp_port,
-        username=body.username or s.zoho_email,
-        password=body.password or s.zoho_password,
+        host=body.host or s.smtp_host,
+        port=body.port or s.smtp_port,
+        username=body.username or s.smtp_user,
+        password=body.password or s.smtp_password,
         to=owner.email,
     )
     return {"ok": ok, "message": message}

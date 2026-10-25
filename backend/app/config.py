@@ -195,12 +195,23 @@ class Settings(BaseSettings):
     ranking_interleaving: bool = False
     ranker_version: str = "2"
 
-    # Email delivery — Zoho SMTP
-    zoho_smtp_host: str = "smtppro.zoho.in"
-    zoho_smtp_port: int = 587
-    zoho_email: str = "admin@mohitmishra7.com"
-    zoho_password: str = ""
-    from_email: str = "admin@mohitmishra7.com"
+    # Email delivery over SMTP: STARTTLS on 587 (the usual) or implicit TLS on
+    # 465. Any provider works; the hosted service uses Spacemail
+    # (mail.spacemail.com). Email is skipped while SMTP_PASSWORD is empty.
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    # The From address; empty sends from SMTP_USER. Most providers only let a
+    # mailbox send as itself, so keep it the same as SMTP_USER unless yours
+    # allows aliases.
+    from_email: str = ""
+    from_name: str = "Weirling"
+    # Where replies to any email go (e.g. support@); empty: back to the sender.
+    reply_to_email: str = ""
+    # Shown to users for help, e.g. managing a subscription; empty falls back
+    # to the grievance contact.
+    support_email: str = ""
     # Externally-reachable base URL of this API — used to build one-click
     # unsubscribe links in digest emails (must be publicly routable in prod).
     public_api_url: str = "http://localhost:8000"
@@ -442,6 +453,27 @@ class Settings(BaseSettings):
         return self
 
     @model_validator(mode="after")
+    def _normalize_database_urls(self) -> Settings:
+        """Accept a plain postgres:// URL (what Railway, Render, Heroku and
+        most managed Postgres hand out) and derive what the app needs: the
+        asyncpg URL, and the psycopg2 URL unless DATABASE_SYNC_URL is set."""
+        import re
+
+        plain = re.compile(r"^postgres(?:ql)?://")
+        url = self.database_url
+        if plain.match(url):
+            self.database_url = plain.sub("postgresql+asyncpg://", url, count=1)
+        if "database_sync_url" not in self.model_fields_set:
+            self.database_sync_url = re.sub(
+                r"^postgresql\+asyncpg://", "postgresql+psycopg2://", self.database_url, count=1
+            )
+        elif plain.match(self.database_sync_url):
+            self.database_sync_url = plain.sub(
+                "postgresql+psycopg2://", self.database_sync_url, count=1
+            )
+        return self
+
+    @model_validator(mode="after")
     def _check_db_pool(self) -> Settings:
         # A typo must not silently fall back to pooling in workers, which
         # brings back the cross-event-loop connection leak (database.py).
@@ -484,6 +516,10 @@ class Settings(BaseSettings):
         if own:
             return own
         return self.llm_model_fast if task in ("summary", "topics") else self.llm_model_primary
+
+    @property
+    def sender_email(self) -> str:
+        return self.from_email or self.smtp_user
 
     @property
     def llm_configured(self) -> bool:

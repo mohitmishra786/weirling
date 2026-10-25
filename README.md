@@ -79,7 +79,7 @@ open http://localhost:3001    # create your account and onboard
   - ~2.5 GB RAM for the default self-host profile (MiniLM sentence-transformers)
   - ~3.5 GB RAM minimum for the `full` profile (MiniLM + Browserless)
 - **LLM API Key (Optional)**: Groq (default), OpenAI, or any OpenAI-compatible provider. If unset, Weirling automatically falls back to extractive summaries (`summary_source=extractive`) with zero API dependencies.
-- **SMTP Credentials (Optional)**: Any standard SMTP provider (Zoho, Postmark, SendGrid, etc.) for daily email digest delivery. If omitted, digests are still compiled and accessible in-app.
+- **SMTP Credentials (Optional)**: Any standard SMTP provider (Spacemail, Fastmail, Postmark, SendGrid, etc.) for daily email digest delivery. If omitted, digests are still compiled and accessible in-app.
 
 ---
 
@@ -98,9 +98,9 @@ The app runs in production mode by default and refuses to start without a strong
 
 ```env
 LLM_API_KEY=<your Groq (or other OpenAI-compatible) API key>
-ZOHO_EMAIL=<your SMTP username>
-ZOHO_PASSWORD=<your SMTP app password>
-FROM_EMAIL=digest@yourdomain.com
+SMTP_HOST=<your SMTP server, e.g. mail.spacemail.com>
+SMTP_USER=<your mailbox, e.g. hello@yourdomain.com>
+SMTP_PASSWORD=<the mailbox or app password>
 FRONTEND_URL=http://localhost:3001
 ```
 
@@ -334,8 +334,11 @@ Redis is persistent: the compose service runs with AOF (`--appendonly yes --appe
 
 | Variable | Default | Description |
 |---|---|---|
-| `ZOHO_EMAIL` / `ZOHO_PASSWORD` | Empty | SMTP credentials for email digest delivery (email skipped if unset). |
-| `FROM_EMAIL` | Empty | Sender address for outgoing digest emails. |
+| `SMTP_HOST` / `SMTP_PORT` | Empty / `587` | SMTP server. Port 587 uses STARTTLS, 465 uses TLS. |
+| `SMTP_USER` / `SMTP_PASSWORD` | Empty | Mailbox login (email skipped if unset). |
+| `FROM_EMAIL` / `FROM_NAME` | `SMTP_USER` / `Weirling` | Sender of every email. |
+| `REPLY_TO_EMAIL` | Empty | Where replies go (e.g. `support@`); empty means back to the sender. |
+| `SUPPORT_EMAIL` | Empty | Help address shown in the app (falls back to `GRIEVANCE_CONTACT_EMAIL`). |
 | `EMAIL_PHYSICAL_ADDRESS` | Empty | Physical mailing address included in digest email footer (CAN-SPAM). |
 | `SSRF_PROTECTION_ENABLED` | `true` | Pin and validate resolved IPs against loopback/private CIDRs. |
 | `BROWSERLESS_URL` | `http://browserless:3000` | Headless Chrome URL for rendered scraping (`full` profile). |
@@ -431,7 +434,7 @@ reviewed by counsel before collecting user data. Licensed under
 | Cache & Queue | Redis 7 + Celery |
 | Embeddings | sentence-transformers (`all-MiniLM-L6-v2`, local, no API cost; or hash embeddings in `lite` profile) |
 | Summarization LLM | OpenAI-compatible HTTP (`LLM_BASE_URL` + `LLM_MODEL_*`). Default host is Groq with `openai/gpt-oss-120b` and `openai/gpt-oss-20b`. Optional; falls back to extractive summarization. |
-| Email delivery | SMTP (Zoho by default) |
+| Email delivery | Any SMTP provider (Spacemail on the hosted service) |
 | Scraping | trafilatura + Playwright / Browserless (in `full` profile) |
 | ORM | SQLAlchemy 2.0 (async) |
 | Migrations | Alembic |

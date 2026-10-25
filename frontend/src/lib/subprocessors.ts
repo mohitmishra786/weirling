@@ -25,10 +25,10 @@ export const SUBPROCESSORS: Subprocessor[] = [
     termsNotes: "Same content-policy considerations as Groq. Disabled by default.",
   },
   {
-    service: "Zoho SMTP / Resend",
-    usedFor: "Digest email delivery",
-    dataSent: "Recipient email + digest content",
-    location: "United States / EU",
+    service: "Spacemail by Spaceship (SMTP)",
+    usedFor: "Digest and account email delivery (hosted)",
+    dataSent: "Recipient email + email content",
+    location: "United States",
     termsNotes:
       "Transactional/user-requested email only: no cold or bulk marketing. Include a working unsubscribe (implemented) and, for bulk sending, a physical address and SPF/DKIM/DMARC on a sending subdomain.",
   },

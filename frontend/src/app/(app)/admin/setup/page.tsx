@@ -17,7 +17,7 @@ const GROUPS: { id: SetupField["group"]; title: string; intro: string }[] = [
   {
     id: "smtp",
     title: "Email",
-    intro: "SMTP with STARTTLS (usually port 587), for digests and account emails.",
+    intro: "SMTP with STARTTLS on port 587, or TLS on 465, for digests and account emails.",
   },
   {
     id: "registration",
@@ -93,10 +93,10 @@ export default function SetupPage() {
               model: pick("llm_model_fast"),
             })
           : await api.setup.testSmtp({
-              host: pick("zoho_smtp_host"),
-              port: pick("zoho_smtp_port") ? Number(pick("zoho_smtp_port")) : undefined,
-              username: pick("zoho_email"),
-              password: pick("zoho_password"),
+              host: pick("smtp_host"),
+              port: pick("smtp_port") ? Number(pick("smtp_port")) : undefined,
+              username: pick("smtp_user"),
+              password: pick("smtp_password"),
             });
       setResults((r) => ({ ...r, [group]: res }));
     } catch (e: unknown) {

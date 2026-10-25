@@ -67,7 +67,7 @@ def test_json_formatter_uses_sanitize_log():
 def test_email_log_lines_do_not_carry_the_recipient(caplog, monkeypatch):
     """The send path must never log the email address or the subject (#198)."""
     with caplog.at_level(logging.INFO, logger="app.utils.email"):
-        monkeypatch.setattr(app_logging.get_settings(), "zoho_password", "configured")
+        monkeypatch.setattr(app_logging.get_settings(), "smtp_password", "configured")
         monkeypatch.setattr("app.utils.email.smtplib.SMTP", MagicMock())
         email = f"secret_{uuid.uuid4().hex[:8]}@example.com"
         from app.utils.email import send_email_sync

@@ -223,10 +223,10 @@ async def test_stored_settings_load_at_start_up(db_session):
 
     db_session.add(
         InstanceSetting(
-            key="zoho_smtp_port",
+            key="smtp_port",
             value_encrypted=secretbox.encrypt("2525", purpose=instance_config.PURPOSE),
         )
     )
     await db_session.commit()
     await instance_config.load(db_session)
-    assert get_settings().zoho_smtp_port == 2525
+    assert get_settings().smtp_port == 2525

@@ -40,7 +40,7 @@ Do not delete or overwrite evidence during containment. Preserve logs before res
    - Rotate database passwords (`DATABASE_URL`, `POSTGRES_PASSWORD`).
    - Rotate application encryption keys (`SECRET_KEY`, `REFRESH_SECRET_KEY`, `SESSION_ENCRYPTION_KEY`).
    - Invalidate all active Redis refresh sessions (`cache_delete("refresh:*")`) and API tokens (`UPDATE api_tokens SET revoked = true`).
-   - Rotate external third-party API keys (Groq, OpenAI, Resend, Zoho SMTP, Cloudflare, Lemon Squeezy / Paddle).
+   - Rotate external third-party API keys (Groq, OpenAI, Resend, the SMTP mailbox password, Cloudflare, Lemon Squeezy / Paddle).
 2. **Network Isolation:**
    - Terminate suspicious ingress connections and restrict database access to localhost / private docker network only.
    - If a crawler SSRF vulnerability is exploited, disable rendered extraction (`BROWSERLESS_HOSTED_ALLOWED=false`).

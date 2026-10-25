@@ -177,7 +177,7 @@ header, which only help if the mail arrives. For the domain in the `from`
 address:
 
 1. **SPF:** a TXT record allowing your provider's servers, for example
-   `v=spf1 include:zoho.com ~all`.
+   `v=spf1 include:spf.spacemail.com ~all` for Spacemail.
 2. **DKIM:** turn it on in the provider's console and publish its keys.
 3. **DMARC** (recommended): start with
    `v=DMARC1; p=none; rua=mailto:postmaster@yourdomain` and tighten it once
