@@ -1,5 +1,8 @@
 """Settings that make managed hosting (Railway etc.) a copy-paste."""
 
+import pytest
+from pydantic import ValidationError
+
 from app.config import Settings
 
 
@@ -39,3 +42,9 @@ def test_smtp_settings_and_sender(monkeypatch):
     assert s.sender_email == "hello@weirling.com"  # FROM_EMAIL empty: send as the login
     monkeypatch.setenv("FROM_EMAIL", "news@weirling.com")
     assert Settings(_env_file=None).sender_email == "news@weirling.com"
+
+
+def test_empty_database_url_says_so(monkeypatch):
+    monkeypatch.setenv("DATABASE_URL", "")
+    with pytest.raises(ValidationError, match="DATABASE_URL is empty"):
+        Settings(_env_file=None)
