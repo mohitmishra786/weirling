@@ -460,7 +460,14 @@ class Settings(BaseSettings):
         import re
 
         plain = re.compile(r"^postgres(?:ql)?://")
-        url = self.database_url
+        url = self.database_url.strip()
+        if not url:
+            # Usually a host variable reference that resolved to nothing, e.g.
+            # ${{Postgres.DATABASE_URL}} when the database service has another name.
+            raise ValueError(
+                "DATABASE_URL is empty. Set it to your Postgres connection URL "
+                "(on Railway, check that the reference names your database service)."
+            )
         if plain.match(url):
             self.database_url = plain.sub("postgresql+asyncpg://", url, count=1)
         if "database_sync_url" not in self.model_fields_set:
