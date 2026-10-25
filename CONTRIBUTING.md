@@ -5,7 +5,7 @@ a pull request.
 
 ## Developer environment
 
-See the [README](README.md) for the general stack architecture and Quickstart.
+See [Development](docs/DEVELOPMENT.md) for running from source and the code layout, and [Architecture](docs/ARCHITECTURE.md) for how the pieces fit.
 
 ### Running Backend Tests
 
