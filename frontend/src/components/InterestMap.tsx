@@ -36,11 +36,14 @@ export function InterestMap() {
   const graphRef = useRef<ForceGraphHandle | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   // Below the two-column layout the edit panel sits under the graph: bring it
-  // into view after a tap, or the tap looks like it did nothing.
+  // into view after every tap (also on the topic already selected), or the
+  // tap looks like it did nothing. No animation for reduced motion.
+  const [revealTick, setRevealTick] = useState(0);
   useEffect(() => {
     if (!selected || window.matchMedia?.("(min-width: 1024px)").matches) return;
-    panelRef.current?.scrollIntoView?.({ behavior: "smooth", block: "nearest" });
-  }, [selected]);
+    const still = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    panelRef.current?.scrollIntoView?.({ behavior: still ? "auto" : "smooth", block: "nearest" });
+  }, [selected, revealTick]);
   const [now] = useState(() => Date.now());
 
   const load = useCallback(() => {
@@ -89,6 +92,7 @@ export function InterestMap() {
       : undefined;
   const choose = (label: string) => {
     setSelected(label);
+    setRevealTick((n) => n + 1);
     setRename(label);
     setMergeInto("");
   };

@@ -432,7 +432,7 @@ export const ForceGraph = forwardRef<ForceGraphHandle, {
             aria-label={b.label}
             title={b.label}
             onClick={b.run}
-            className="h-9 w-9 border-b border-[var(--border)] text-base leading-none text-[var(--text-secondary)] last:border-b-0 hover:bg-[var(--bg-sunken)] hover:text-[var(--text)]"
+            className="h-11 w-11 border-b border-[var(--border)] text-lg leading-none text-[var(--text-secondary)] last:border-b-0 hover:bg-[var(--bg-sunken)] hover:text-[var(--text)]"
           >
             {b.text}
           </button>

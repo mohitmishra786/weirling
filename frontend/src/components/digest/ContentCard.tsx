@@ -33,6 +33,7 @@ export function ContentCard({
   const router = useRouter();
   const [showWhy, setShowWhy] = useState(false);
   const whyRef = useRef<HTMLDivElement | null>(null);
+  const whyButton = useRef<HTMLButtonElement | null>(null);
   // The explanation is a popover: a click anywhere else or Escape closes it,
   // so it never sits over the next item.
   useEffect(() => {
@@ -41,7 +42,11 @@ export function ContentCard({
       if (whyRef.current && !whyRef.current.contains(e.target as Node)) setShowWhy(false);
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setShowWhy(false);
+      if (e.key !== "Escape") return;
+      // Focus inside the popover would vanish with it: hand it back to the
+      // button so keyboard users keep their place.
+      if (whyRef.current?.contains(document.activeElement)) whyButton.current?.focus();
+      setShowWhy(false);
     };
     document.addEventListener("pointerdown", onDown);
     document.addEventListener("keydown", onKey);
@@ -170,6 +175,7 @@ export function ContentCard({
           <div className="relative" ref={whyRef}>
             <button
               type="button"
+              ref={whyButton}
               onClick={() => setShowWhy((v) => !v)}
               aria-expanded={showWhy}
               aria-controls={`why-${content.id}`}
