@@ -117,10 +117,20 @@ _AGGREGATOR_SITES = {
 }
 
 
-def aggregator_stub(html: str | None) -> str | None:
+# Feeds whose entries are links to elsewhere plus a discussion thread.
+_AGGREGATOR_FEED_HOSTS = ("hnrss.org", "lobste.rs", "news.ycombinator.com")
+
+
+def aggregator_stub(html: str | None, feed_url: str = "") -> str | None:
     """A link aggregator's entry (hnrss.org, Lobsters) carries no article, only
     "Article URL: … Comments URL: … Points: … # Comments: …" markup. Return one
-    clean line pointing at the discussion instead, or None for a real body."""
+    clean line pointing at the discussion instead, or None for a real body.
+    Only for aggregator feeds: a blog post quoting that format keeps its text."""
+    from urllib.parse import urlparse as _urlparse
+
+    feed_host = (_urlparse(feed_url).hostname or "").lower()
+    if not any(feed_host == h or feed_host.endswith("." + h) for h in _AGGREGATOR_FEED_HOSTS):
+        return None
     if not html or "Comments URL" not in html or "Article URL" not in html:
         return None
     from html import escape

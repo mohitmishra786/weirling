@@ -116,7 +116,8 @@ celery_app.conf.update(
         "socket_connect_timeout": 5,
         "socket_timeout": 10,
         "health_check_interval": 30,
-        "retry_on_timeout": True,
+        # No retry_on_timeout here: a publish whose reply timed out may
+        # already be queued, and retrying it would run the task twice.
     },
     redis_socket_keepalive=True,
     redis_socket_connect_timeout=5,

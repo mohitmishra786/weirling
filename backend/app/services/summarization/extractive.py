@@ -91,12 +91,21 @@ def keyword_topics(title: str, full_text: str, k: int = 3) -> list[str]:
     return topics[:k]
 
 
+_REAL_TAG = re.compile(r"</?[a-zA-Z][^>]*>", re.S)
+
+
 def plain_text(text: str | None) -> str:
     """Feed text without tags or entities: summaries are shown as text, so
-    markup would appear literally ("<p>Article URL: <a href=…")."""
+    markup would appear literally ("<p>Article URL: <a href=…").
+
+    With real tags present, escaped brackets are literal text (`Vec&lt;String&gt;`
+    in a code sample stays "Vec<String>"); only a feed with no real tags is
+    treated as double-escaped markup."""
     import html
 
-    return " ".join(html.unescape(_TAG.sub(" ", text or "")).split())
+    raw = text or ""
+    stripped = _REAL_TAG.sub(" ", raw) if _REAL_TAG.search(raw) else _TAG.sub(" ", raw)
+    return " ".join(html.unescape(stripped).split())
 
 
 def extractive_summary(title: str, full_text: str) -> SummarizationResult:

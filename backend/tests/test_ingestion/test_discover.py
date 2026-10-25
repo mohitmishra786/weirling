@@ -282,3 +282,12 @@ def test_well_known_order_folder_root_then_bare_segment():
     assert page.index("https://docs.example.com/index.xml") < page.index(
         "https://docs.example.com/guide/index.xml"
     )
+
+
+def test_a_malformed_link_does_not_stop_discovery():
+    from app.services.ingestion.discover import anchor_candidates
+
+    html = "<a href='http://['>bad</a><a href='/feed.xml'>rss</a>"
+    assert [c.url for c in anchor_candidates("https://x.example/", html)] == [
+        "https://x.example/feed.xml"
+    ]

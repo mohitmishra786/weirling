@@ -279,7 +279,7 @@ export default function ReaderPage() {
 
           {/* AI summary deck — the editorial "standfirst"; side panel on laptops */}
           {summary && (
-            <p className="deck mt-5 border-l-2 border-prism-600 pl-4 font-serif text-base leading-relaxed text-stone-600 sm:text-lg lg:hidden dark:text-stone-300">
+            <p className="deck mt-5 border-l-2 border-prism-600 pl-4 [overflow-wrap:anywhere] font-serif text-base leading-relaxed text-stone-600 sm:text-lg lg:hidden dark:text-stone-300">
               {summary}
             </p>
           )}
@@ -333,7 +333,7 @@ export default function ReaderPage() {
         <div className="sticky top-24 space-y-5 pt-10">
           {summary && (
             <section className="card p-4">
-              <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{summary}</p>
+              <p className="text-sm leading-relaxed text-[var(--text-secondary)] [overflow-wrap:anywhere]">{summary}</p>
             </section>
           )}
           <section className="card space-y-3 p-4 text-sm">

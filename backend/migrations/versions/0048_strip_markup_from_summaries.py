@@ -22,6 +22,11 @@ depends_on = None
 _COLUMNS = ("summary_headline", "summary_brief", "summary_detailed")
 
 
+# A tag, or one cut off at the end of the text: summaries were cut at 800 /
+# 1600 characters before stripping, which can land inside a tag.
+_TAG = "</?[a-zA-Z][^>]*(>|$)"
+
+
 def upgrade() -> None:
     for column in _COLUMNS:
         # Tags out, the common entities decoded, whitespace collapsed.
@@ -30,10 +35,10 @@ def upgrade() -> None:
             UPDATE content_items
             SET {column} = btrim(regexp_replace(
                 replace(replace(replace(replace(replace(
-                    regexp_replace({column}, '<[^>]*>', ' ', 'g'),
+                    regexp_replace({column}, '{_TAG}', ' ', 'g'),
                     '&quot;', '"'), '&#39;', ''''), '&lt;', '<'), '&gt;', '>'), '&amp;', '&'),
                 '\\s+', ' ', 'g'))
-            WHERE {column} ~ '<[a-zA-Z/][^>]*>'
+            WHERE {column} ~ '{_TAG}'
               AND coalesce(summary_source, '') <> 'llm'
             """
         )

@@ -235,7 +235,7 @@ def _items_from_feed(feed, source_url: str, raw_xml: str | None = None) -> list[
         text = _extract_text(entry)
         # Hacker News / Lobsters entries hold only link metadata, not the
         # article: keep a clean pointer to the discussion instead of markup.
-        text = aggregator_stub(text) or text
+        text = aggregator_stub(text, source_url) or text
         word_count = _count_words(text) if text else None
         guid = getattr(entry, "id", None) or getattr(entry, "guid", None)
         items.append(

@@ -22,7 +22,7 @@ CONCURRENCY = 4
 
 # Below this, there is nothing for a model to summarize (an aggregator's
 # link stub, a one-line excerpt); the extract is as good and costs nothing.
-MIN_WORDS_FOR_LLM = 40
+MIN_WORDS_FOR_LLM = 25
 
 
 def needs_llm_summary(item: ContentItem) -> bool:

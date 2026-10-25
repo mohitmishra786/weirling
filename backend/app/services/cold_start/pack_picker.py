@@ -23,6 +23,9 @@ MAX_PACKS = 4
 # The onboarding picker waits on this; past it the taxonomy answers.
 DEADLINE_SECONDS = 5.0
 _CACHE_TTL = 7 * 24 * 3600
+# A fallback answer (slow or failing model) is cached briefly, so the picker
+# and suggestion refreshes don't each wait out the deadline again.
+_FALLBACK_TTL = 600
 _FEEDS_SHOWN = 6
 
 _SYSTEM = (
@@ -42,7 +45,8 @@ def _catalog(packs: list[StarterPack]) -> str:
 
 
 def _cache_key(topics: list[str]) -> str:
-    joined = "\n".join(sorted(t.strip().lower() for t in topics if t.strip()))
+    # Order is part of the key: the prompt lists topics by priority.
+    joined = "\n".join(t.strip().lower() for t in topics if t.strip())
     return "packs:v1:" + hashlib.sha256(joined.encode()).hexdigest()[:32]
 
 
@@ -92,4 +96,7 @@ async def suggest_packs(topics: list[str], *, deadline: float = DEADLINE_SECONDS
     if picked:
         await cache_set(key, picked, ttl_seconds=_CACHE_TTL)
         return picked
-    return packs_for_topics(wanted)[:MAX_PACKS]
+    fallback = packs_for_topics(wanted)[:MAX_PACKS]
+    if fallback:
+        await cache_set(key, fallback, ttl_seconds=_FALLBACK_TTL)
+    return fallback

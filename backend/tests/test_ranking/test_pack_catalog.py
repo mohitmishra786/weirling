@@ -51,7 +51,8 @@ def summarizer(monkeypatch):
             "app.services.summarization.summarizer.get_llm_summarizer", lambda: fake
         )
         monkeypatch.setattr(pack_picker, "cache_get", _none)
-        monkeypatch.setattr(pack_picker, "cache_set", _none)
+        monkeypatch.setattr(pack_picker, "cache_set", _record_set)
+        cached.clear()
         monkeypatch.setattr(
             "app.config.get_settings",
             lambda: type("S", (), {"llm_configured": True})(),
@@ -63,6 +64,13 @@ def summarizer(monkeypatch):
 
 async def _none(*_args, **_kwargs):
     return None
+
+
+cached: list[tuple[str, list, int]] = []
+
+
+async def _record_set(key, value, ttl_seconds):
+    cached.append((key, value, ttl_seconds))
 
 
 @pytest.mark.asyncio
@@ -93,3 +101,11 @@ async def test_a_slow_model_does_not_hold_up_onboarding(summarizer, monkeypatch)
     monkeypatch.setattr(pack_picker, "_ask_llm", slow)
     picked = await pack_picker.suggest_packs(["PostgreSQL"], deadline=0.05)
     assert picked[0] == "databases-data"
+
+
+@pytest.mark.asyncio
+async def test_fallback_is_cached_briefly_and_order_is_part_of_the_key(summarizer):
+    summarizer(None)
+    await pack_picker.suggest_packs(["PostgreSQL", "Rust"])
+    assert cached and cached[0][2] == pack_picker._FALLBACK_TTL
+    assert pack_picker._cache_key(["a", "b"]) != pack_picker._cache_key(["b", "a"])

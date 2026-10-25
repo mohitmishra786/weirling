@@ -40,7 +40,8 @@ def get_redis() -> aioredis.Redis:
             socket_connect_timeout=5,
             socket_timeout=5,
             health_check_interval=30,
-            retry_on_timeout=True,
+            # No retry_on_timeout: rate-limit and quota counters use INCR, and
+            # a retried INCR whose first reply was lost would count twice.
         )
         _redis_loop = loop
     return _redis_client

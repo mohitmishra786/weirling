@@ -118,8 +118,11 @@ def anchor_candidates(page_url: str, html: str) -> list[FeedCandidate]:
         href = str(tag.get("href") or "").strip()
         if not href or href.startswith(("#", "mailto:", "javascript:")):
             continue
-        absolute = urljoin(page_url, href)
-        parsed = urlparse(absolute)
+        try:
+            absolute = urljoin(page_url, href)
+            parsed = urlparse(absolute)
+        except ValueError:  # e.g. href="http://[": skip it, keep looking
+            continue
         if parsed.scheme not in ("http", "https"):
             continue
         path = parsed.path.lower().rstrip("/")

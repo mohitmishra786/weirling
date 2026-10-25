@@ -13,7 +13,8 @@ from app.services.ingestion.metadata import _language
 from app.services.summarization.groq_client import language_instruction
 
 TEXTS = {
-    "en": "The planner chooses an index when the statistics say that it is cheaper for the query.",
+    "en": "The planner chooses an index when the statistics say that it is cheaper for the query. "
+    "It compares the estimated cost of a sequential scan with an index scan and picks the cheaper plan.",
     "fr": "Le planificateur choisit un index quand les statistiques disent que la requête est moins chère pour le serveur et que les données sont dans le cache.",
     "de": "Der Planer wählt einen Index, wenn die Statistik sagt, dass die Abfrage mit dem Index billiger ist und die Daten auf der Platte nicht im Speicher sind.",
 }

@@ -17,14 +17,19 @@ HN = (
 )
 
 
+HNRSS = "https://hnrss.org/frontpage"
+
+
 def test_hn_entry_becomes_a_clean_discussion_link():
-    stub = aggregator_stub(HN)
+    stub = aggregator_stub(HN, HNRSS)
     assert stub == (
         '<p>Discussion: <a href="https://news.ycombinator.com/item?id=50232035">'
         "16 points, 3 comments on Hacker News</a></p>"
     )
-    assert aggregator_stub("<p>A normal article about Comments URL handling.</p>") is None
-    assert aggregator_stub(None) is None
+    assert aggregator_stub("<p>A normal article about Comments URL handling.</p>", HNRSS) is None
+    assert aggregator_stub(None, HNRSS) is None
+    # A blog quoting the format keeps its own text.
+    assert aggregator_stub(HN, "https://someblog.example/feed.xml") is None
 
 
 def test_extractive_summary_never_shows_markup():
@@ -32,10 +37,14 @@ def test_extractive_summary_never_shows_markup():
     for text in (result.brief, result.detailed, result.headline):
         assert "<" not in text and "href" not in text
     assert plain_text("<p>Tom &amp; Jerry&#39;s</p>") == "Tom & Jerry's"
+    # Escaped brackets beside real tags are literal text, not markup.
+    assert plain_text("<p>Use <code>Vec&lt;String&gt;</code> here</p>") == "Use Vec<String> here"
+    # Double-escaped markup with no real tags is still removed.
+    assert plain_text("&lt;p&gt;Hello&lt;/p&gt;") == "Hello"
 
 
 def test_a_stub_is_not_sent_to_the_model():
-    stub = SimpleNamespace(full_text=aggregator_stub(HN), summary_source="extractive")
-    article = SimpleNamespace(full_text="<p>" + "word " * 60 + "</p>", summary_source="extractive")
+    stub = SimpleNamespace(full_text=aggregator_stub(HN, HNRSS), summary_source="extractive")
+    article = SimpleNamespace(full_text="<p>" + "word " * 30 + "</p>", summary_source="extractive")
     assert not needs_llm_summary(stub)
     assert needs_llm_summary(article)
