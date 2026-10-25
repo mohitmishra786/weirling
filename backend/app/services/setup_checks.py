@@ -77,6 +77,30 @@ def _send_smtp(*, host: str, port: int, username: str, password: str, to: str) -
     return True, f"Sent a test email to {to}."
 
 
+async def check_resend(*, to: str) -> tuple[bool, str]:
+    s = get_settings()
+    if not s.email_configured:
+        return (
+            False,
+            "Set RESEND_API_KEY and FROM_EMAIL (an address on a domain verified in Resend).",
+        )
+    from app.utils.email import send_email_sync
+
+    ok = await asyncio.to_thread(
+        send_email_sync,
+        to,
+        "Weirling test email",
+        "<p>This is a test from your Weirling setup screen. Email delivery works.</p>",
+        "This is a test from your Weirling setup screen. Email delivery works.",
+    )
+    if ok:
+        return True, f"Sent a test email to {to} through Resend."
+    return (
+        False,
+        "Resend didn't accept the email. The server log says why (often an unverified sender domain).",
+    )
+
+
 async def check_smtp(
     *, host: str, port: int, username: str, password: str, to: str
 ) -> tuple[bool, str]:

@@ -207,6 +207,12 @@ class Settings(BaseSettings):
     # allows aliases.
     from_email: str = ""
     from_name: str = "Weirling"
+    # How email leaves the server: "smtp", "resend" (HTTPS API, for hosts that
+    # block SMTP ports, e.g. Railway Hobby) or "auto" (resend when
+    # RESEND_API_KEY is set, else smtp). With resend, FROM_EMAIL must be on a
+    # domain verified in Resend.
+    email_provider: str = "auto"
+    resend_api_key: str = ""
     # Where replies to any email go (e.g. support@); empty: back to the sender.
     reply_to_email: str = ""
     # Shown to users for help, e.g. managing a subscription; empty falls back
@@ -481,6 +487,14 @@ class Settings(BaseSettings):
         return self
 
     @model_validator(mode="after")
+    def _check_email_provider(self) -> Settings:
+        provider = self.email_provider.strip().lower()
+        if provider not in ("auto", "smtp", "resend"):
+            raise ValueError(f"EMAIL_PROVIDER must be 'auto', 'smtp' or 'resend', got {provider!r}")
+        self.email_provider = provider
+        return self
+
+    @model_validator(mode="after")
     def _check_db_pool(self) -> Settings:
         # A typo must not silently fall back to pooling in workers, which
         # brings back the cross-event-loop connection leak (database.py).
@@ -527,6 +541,19 @@ class Settings(BaseSettings):
     @property
     def sender_email(self) -> str:
         return self.from_email or self.smtp_user
+
+    @property
+    def email_transport(self) -> str:
+        """ "resend" or "smtp", after resolving EMAIL_PROVIDER=auto."""
+        if self.email_provider == "auto":
+            return "resend" if self.resend_api_key else "smtp"
+        return self.email_provider
+
+    @property
+    def email_configured(self) -> bool:
+        if self.email_transport == "resend":
+            return bool(self.resend_api_key and self.sender_email)
+        return bool(self.smtp_host and self.smtp_password)
 
     @property
     def llm_configured(self) -> bool:

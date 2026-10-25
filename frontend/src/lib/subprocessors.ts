@@ -25,7 +25,7 @@ export const SUBPROCESSORS: Subprocessor[] = [
     termsNotes: "Same content-policy considerations as Groq. Disabled by default.",
   },
   {
-    service: "Spacemail by Spaceship (SMTP)",
+    service: "Resend",
     usedFor: "Digest and account email delivery (hosted)",
     dataSent: "Recipient email + email content",
     location: "United States",
