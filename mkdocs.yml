@@ -39,6 +39,7 @@ nav:
       - Upgrading: UPGRADING.md
       - Ranking sidecar: sidecar.md
   - Hosted service: HOSTING.md
+  - Deploy to Vercel + Railway: deploy/railway-vercel.md
   - How it works:
       - Architecture: ARCHITECTURE.md
       - How ranking works: signals.md

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from pydantic import model_validator
+from pydantic import AliasChoices, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Hosted per-plan quotas (#172); Settings.hosted_plan_quotas is merged over this.
@@ -51,6 +51,8 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
+        # Fields with an alias (SMTP_*) can still be set by name in code/tests.
+        populate_by_name=True,
     )
 
     # Observability — error tracking. Opt-in: no DSN => Sentry stays disabled.
@@ -195,11 +197,17 @@ class Settings(BaseSettings):
     ranking_interleaving: bool = False
     ranker_version: str = "2"
 
-    # Email delivery — Zoho SMTP
-    zoho_smtp_host: str = "smtppro.zoho.in"
-    zoho_smtp_port: int = 587
-    zoho_email: str = "admin@mohitmishra7.com"
-    zoho_password: str = ""
+    # Email delivery: any SMTP server with STARTTLS (port 587), e.g. Spacemail
+    # (mail.spacemail.com), Zoho, Fastmail. SMTP_* names are preferred; the
+    # older ZOHO_* names still work.
+    zoho_smtp_host: str = Field(
+        "smtppro.zoho.in", validation_alias=AliasChoices("SMTP_HOST", "ZOHO_SMTP_HOST")
+    )
+    zoho_smtp_port: int = Field(587, validation_alias=AliasChoices("SMTP_PORT", "ZOHO_SMTP_PORT"))
+    zoho_email: str = Field(
+        "admin@mohitmishra7.com", validation_alias=AliasChoices("SMTP_USER", "ZOHO_EMAIL")
+    )
+    zoho_password: str = Field("", validation_alias=AliasChoices("SMTP_PASSWORD", "ZOHO_PASSWORD"))
     from_email: str = "admin@mohitmishra7.com"
     # Externally-reachable base URL of this API — used to build one-click
     # unsubscribe links in digest emails (must be publicly routable in prod).
@@ -439,6 +447,27 @@ class Settings(BaseSettings):
         if mode not in ("selfhost", "hosted"):
             raise ValueError(f"DEPLOYMENT_MODE must be 'selfhost' or 'hosted', got {mode!r}")
         self.deployment_mode = mode
+        return self
+
+    @model_validator(mode="after")
+    def _normalize_database_urls(self) -> Settings:
+        """Accept a plain postgres:// URL (what Railway, Render, Heroku and
+        most managed Postgres hand out) and derive what the app needs: the
+        asyncpg URL, and the psycopg2 URL unless DATABASE_SYNC_URL is set."""
+        import re
+
+        plain = re.compile(r"^postgres(?:ql)?://")
+        url = self.database_url
+        if plain.match(url):
+            self.database_url = plain.sub("postgresql+asyncpg://", url, count=1)
+        if "database_sync_url" not in self.model_fields_set:
+            self.database_sync_url = re.sub(
+                r"^postgresql\+asyncpg://", "postgresql+psycopg2://", self.database_url, count=1
+            )
+        elif plain.match(self.database_sync_url):
+            self.database_sync_url = plain.sub(
+                "postgresql+psycopg2://", self.database_sync_url, count=1
+            )
         return self
 
     @model_validator(mode="after")
