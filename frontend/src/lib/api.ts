@@ -218,6 +218,16 @@ export interface SetupConfig {
 }
 
 // Auth
+export type IngestionReport = {
+  sources: number;
+  fetch_success_rate: number;
+  extraction_success_rate: number;
+  extraction_by_method: Record<string, number>;
+  ingest_to_scored_p50_seconds: number | null;
+  ingest_to_scored_samples?: number;
+  storage?: { items: number; full_text_chars: number };
+};
+
 export const api = {
   auth: {
     register: (
@@ -517,6 +527,8 @@ export const api = {
         embedding_quality_note?: string;
         embedding_upgrade_hint?: string | null;
       }>('/metrics/llm-status'),
+    /** Ingestion health: instance owner (session) or metrics token. */
+    ingestion: () => request<IngestionReport>('/metrics/ingestion'),
     /** Problems for the instance owner's banner (#234); empty for everyone else. */
     instanceHealth: () =>
       request<{ owner: boolean; problems: { key: string; message: string; hint: string }[] }>(

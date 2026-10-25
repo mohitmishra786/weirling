@@ -14,13 +14,15 @@ const NAV = [
   { href: "/search", label: "Search" },
   { href: "/interests", label: "Interests" },
   { href: "/preferences", label: "Preferences" },
-  { href: "/admin/ingestion", label: "Ingestion" },
 ];
+// Instance pages, shown to the instance owner only.
+const OWNER_NAV = [{ href: "/admin/ingestion", label: "Ingestion" }];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
+  const [owner, setOwner] = useState(false);
 
   useEffect(() => {
     // Session lives in httpOnly cookies (#103): ask the API instead of
@@ -28,8 +30,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     let cancelled = false;
     hasSession().then((signedIn) => {
       if (cancelled) return;
-      if (signedIn) setMounted(true);
-      else router.replace("/login");
+      if (!signedIn) {
+        router.replace("/login");
+        return;
+      }
+      setMounted(true);
+      api.metrics
+        .instanceHealth()
+        .then((h) => !cancelled && setOwner(h.owner))
+        .catch(() => {});
     });
     return () => {
       cancelled = true;
@@ -52,7 +61,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             aria-label="Main"
             className="mx-auto flex items-center gap-0.5 overflow-x-auto rounded-full border border-white/15 bg-white/[0.06] p-1"
           >
-            {NAV.map((item) => {
+            {[...NAV, ...(owner ? OWNER_NAV : [])].map((item) => {
               const active = pathname === item.href;
               return (
                 <Link
