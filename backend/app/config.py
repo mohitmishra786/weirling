@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from pydantic import AliasChoices, Field, model_validator
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Hosted per-plan quotas (#172); Settings.hosted_plan_quotas is merged over this.
@@ -51,8 +51,6 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
-        # Fields with an alias (SMTP_*) can still be set by name in code/tests.
-        populate_by_name=True,
     )
 
     # Observability — error tracking. Opt-in: no DSN => Sentry stays disabled.
@@ -197,22 +195,23 @@ class Settings(BaseSettings):
     ranking_interleaving: bool = False
     ranker_version: str = "2"
 
-    # Email delivery: any SMTP server with STARTTLS (port 587), e.g. Spacemail
-    # (mail.spacemail.com), Zoho, Fastmail. SMTP_* names are preferred; the
-    # older ZOHO_* names still work.
-    zoho_smtp_host: str = Field(
-        default="smtppro.zoho.in", validation_alias=AliasChoices("SMTP_HOST", "ZOHO_SMTP_HOST")
-    )
-    zoho_smtp_port: int = Field(
-        default=587, validation_alias=AliasChoices("SMTP_PORT", "ZOHO_SMTP_PORT")
-    )
-    zoho_email: str = Field(
-        default="admin@mohitmishra7.com", validation_alias=AliasChoices("SMTP_USER", "ZOHO_EMAIL")
-    )
-    zoho_password: str = Field(
-        default="", validation_alias=AliasChoices("SMTP_PASSWORD", "ZOHO_PASSWORD")
-    )
-    from_email: str = "admin@mohitmishra7.com"
+    # Email delivery over SMTP: STARTTLS on 587 (the usual) or implicit TLS on
+    # 465. Any provider works; the hosted service uses Spacemail
+    # (mail.spacemail.com). Email is skipped while SMTP_PASSWORD is empty.
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    # The From address; empty sends from SMTP_USER. Most providers only let a
+    # mailbox send as itself, so keep it the same as SMTP_USER unless yours
+    # allows aliases.
+    from_email: str = ""
+    from_name: str = "Weirling"
+    # Where replies to any email go (e.g. support@); empty: back to the sender.
+    reply_to_email: str = ""
+    # Shown to users for help, e.g. managing a subscription; empty falls back
+    # to the grievance contact.
+    support_email: str = ""
     # Externally-reachable base URL of this API — used to build one-click
     # unsubscribe links in digest emails (must be publicly routable in prod).
     public_api_url: str = "http://localhost:8000"
@@ -517,6 +516,10 @@ class Settings(BaseSettings):
         if own:
             return own
         return self.llm_model_fast if task in ("summary", "topics") else self.llm_model_primary
+
+    @property
+    def sender_email(self) -> str:
+        return self.from_email or self.smtp_user
 
     @property
     def llm_configured(self) -> bool:

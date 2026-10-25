@@ -12,6 +12,7 @@ from email.mime.text import MIMEText
 
 import httpx
 
+from app.config import get_settings
 from app.utils.logging import get_logger, mask_email
 
 logger = get_logger(__name__)
@@ -51,21 +52,23 @@ async def check_llm(*, base_url: str, api_key: str, model: str) -> tuple[bool, s
 
 
 def _send_smtp(*, host: str, port: int, username: str, password: str, to: str) -> tuple[bool, str]:
+    from app.utils.email import IMPLICIT_TLS_PORT, smtp_send, stamp
+
+    s = get_settings()
     msg = MIMEText("This is a test from your Weirling setup screen. Email delivery works.", "plain")
     msg["Subject"] = "Weirling test email"
-    msg["From"] = f"Weirling <{username}>"
+    # The From the app will really use, so a provider that refuses it fails here.
+    stamp(msg, s.from_email or username, s.from_name)
     msg["To"] = to
     try:
-        with smtplib.SMTP(host, port, timeout=20) as server:
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
-            server.login(username, password)
-            server.sendmail(username, to, msg.as_string())
+        smtp_send(host=host, port=port, username=username, password=password, msg=msg, timeout=20)
     except smtplib.SMTPAuthenticationError:
         return False, "The SMTP server rejected the username or password."
     except (smtplib.SMTPNotSupportedError, smtplib.SMTPHeloError):
-        return False, "The SMTP server doesn't support STARTTLS on that port (try 587)."
+        other = 587 if port == IMPLICIT_TLS_PORT else IMPLICIT_TLS_PORT
+        return False, f"The SMTP server didn't accept TLS on port {port} (try {other})."
+    except smtplib.SMTPSenderRefused:
+        return False, "The SMTP server won't send as the From address (check FROM_EMAIL)."
     except smtplib.SMTPException:
         return False, "The SMTP server refused the message."
     except OSError:

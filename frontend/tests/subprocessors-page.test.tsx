@@ -44,7 +44,7 @@ describe("Subprocessors page (#182)", () => {
     render(<SubprocessorsPage />);
 
     for (const service of services) {
-      // Look for the main service name (e.g. "Groq", "OpenAI", "Zoho SMTP / Resend")
+      // Look for the main service name (e.g. "Groq", "OpenAI", "Spacemail by Spaceship (SMTP)")
       const baseName = service.split("(")[0].trim();
       const matches = screen.getAllByText((content) => content.includes(baseName));
       expect(

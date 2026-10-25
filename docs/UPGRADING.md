@@ -75,6 +75,22 @@ unchanged; there is nothing to migrate.
   dashboards, alerts, backups and scripts keep working.
 - The crawler now identifies as `Weirling/1.0 (+https://weirling.com/bot)`.
 
+!!! warning "Rename the email settings in `.env`"
+    The SMTP settings no longer carry a provider's name, and the old names
+    are **not** read any more: rename them, or email stops.
+
+    | Before | Now |
+    |---|---|
+    | `ZOHO_SMTP_HOST` | `SMTP_HOST` (no default any more: set it) |
+    | `ZOHO_SMTP_PORT` | `SMTP_PORT` |
+    | `ZOHO_EMAIL` | `SMTP_USER` |
+    | `ZOHO_PASSWORD` | `SMTP_PASSWORD` |
+
+    Values saved on the setup screen are renamed for you (migration 0047).
+    `FROM_EMAIL` is now really used as the sender (it was ignored before);
+    leave it empty to send as `SMTP_USER`. New, optional: `FROM_NAME`,
+    `REPLY_TO_EMAIL`, `SUPPORT_EMAIL`, and port 465 (TLS) next to 587.
+
 ## v0.1.0 → v0.2.0
 
 The first upgrade across many changes (migrations 0022 to 0037). Read all of

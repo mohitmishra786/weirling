@@ -39,10 +39,18 @@ month (about 2 GB of memory in use), including the $5 plan fee.
 1. In Spaceship, Spacemail, **Connect domain**: pick `weirling.com`. Because
    the domain's DNS is at Spaceship, Spacemail adds its MX, SPF and DKIM
    records for you.
-2. Create the mailbox **hello@weirling.com** (digests are sent from it, and
-   replies come to it). Note its password. Optionally add `privacy@` (the
-   grievance contact the privacy page shows) and `support@`, and forward
-   them to the inbox you read.
+2. Create four mailboxes, one per job:
+
+    | Mailbox | Job |
+    |---|---|
+    | `hello@` | Sends every email the app sends (`SMTP_USER`). Also the public contact. |
+    | `support@` | Replies to any app email land here (`REPLY_TO_EMAIL`), and the app shows it for help (`SUPPORT_EMAIL`). |
+    | `privacy@` | Data and takedown requests (`GRIEVANCE_CONTACT_EMAIL`), shown on /contact. Keep it separate: these have legal deadlines and need a clean record. |
+    | `mohit@` | You. |
+
+    Don't forward them into one inbox: add all of them to one mail app
+    (Apple Mail, Thunderbird, or the Spacemail app) so you see everything in
+    one place and each reply goes out from the right address.
 3. Add a DMARC record (Spaceship, Domains, weirling.com, DNS):
 
     | Type | Host | Value |
@@ -108,6 +116,8 @@ SMTP_PORT=587
 SMTP_USER=hello@weirling.com
 SMTP_PASSWORD=...                 # the mailbox password
 FROM_EMAIL=hello@weirling.com
+REPLY_TO_EMAIL=support@weirling.com       # replies to any email land in support@
+SUPPORT_EMAIL=support@weirling.com
 GRIEVANCE_CONTACT_EMAIL=privacy@weirling.com
 NEWSLETTER_INBOX_DOMAIN=inbox.weirling.com
 

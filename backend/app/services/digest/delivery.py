@@ -182,7 +182,7 @@ async def deliver_digest(digest: Digest, user: User, session: AsyncSession) -> b
 
     # RFC 8058 one-click unsubscribe + mailto fallback.
     extra_headers = {
-        "List-Unsubscribe": f"<{unsub_url}>, <mailto:{settings.from_email}?subject=unsubscribe>",
+        "List-Unsubscribe": f"<{unsub_url}>, <mailto:{settings.sender_email}?subject=unsubscribe>",
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
     }
 
