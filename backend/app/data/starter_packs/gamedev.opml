@@ -2,19 +2,20 @@
 <opml version="2.0">
   <head>
     <title>Game Development: Weirling starter pack</title>
+    <!-- Scope: Making games: engines, tools and the craft. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Game Development" title="Game Development">
-        <outline text="Gamasutra (Game Developer)" title="Gamasutra (Game Developer)" type="rss" xmlUrl="https://www.gamedeveloper.com/rss/" htmlUrl="https://www.gamedeveloper.com/rss/"/>
-        <outline text="Unity Blog" title="Unity Blog" type="rss" xmlUrl="https://blog.unity.com/feed" htmlUrl="https://blog.unity.com/feed"/>
-        <outline text="Unreal Engine News" title="Unreal Engine News" type="rss" xmlUrl="https://www.unrealengine.com/en-US/rss" htmlUrl="https://www.unrealengine.com/en-US/rss"/>
-        <outline text="Godot News" title="Godot News" type="rss" xmlUrl="https://godotengine.org/rss.xml" htmlUrl="https://godotengine.org/rss.xml"/>
-        <outline text="80 Level" title="80 Level" type="rss" xmlUrl="https://80.lv/rss/" htmlUrl="https://80.lv/rss/"/>
-        <outline text="Lostgarden" title="Lostgarden" type="rss" xmlUrl="https://lostgarden.home.blog/feed/" htmlUrl="https://lostgarden.home.blog/feed/"/>
-        <outline text="Rock Paper Shotgun" title="Rock Paper Shotgun" type="rss" xmlUrl="https://www.rockpapershotgun.com/feed" htmlUrl="https://www.rockpapershotgun.com/feed"/>
-        <outline text="Gaming Debugged" title="Gaming Debugged" type="rss" xmlUrl="https://www.gamingdebugged.com/feed/" htmlUrl="https://www.gamingdebugged.com/feed/"/>
-        <outline text="Kiwi Walks Devlog" title="Kiwi Walks Devlog" type="rss" xmlUrl="https://www.gamedeveloper.com/rss/" htmlUrl="https://www.gamedeveloper.com/rss/"/>
-        <outline text="IndieGames.com" title="IndieGames.com" type="rss" xmlUrl="https://www.indiegames.com/rss" htmlUrl="https://www.indiegames.com/rss"/>
+      <outline text="Godot News" title="Godot News" type="rss" xmlUrl="https://godotengine.org/rss.xml" htmlUrl="https://godotengine.org/blog/"/>
+      <outline text="Unity Blog" title="Unity Blog" type="rss" xmlUrl="https://blog.unity.com/feed" htmlUrl="https://blog.unity.com/"/>
+      <outline text="Unreal Engine News" title="Unreal Engine News" type="rss" xmlUrl="https://www.unrealengine.com/en-US/rss" htmlUrl="https://www.unrealengine.com/en-US/feed"/>
+      <outline text="Bevy News" title="Bevy News" type="rss" xmlUrl="https://bevyengine.org/atom.xml" htmlUrl="https://bevyengine.org/news/"/>
+      <outline text="Game Developer" title="Game Developer" type="rss" xmlUrl="https://www.gamedeveloper.com/rss.xml" htmlUrl="https://www.gamedeveloper.com/"/>
+      <outline text="GameFromScratch" title="GameFromScratch" type="rss" xmlUrl="https://gamefromscratch.com/feed/" htmlUrl="https://gamefromscratch.com/"/>
+      <outline text="Red Blob Games" title="Red Blob Games" type="rss" xmlUrl="https://www.redblobgames.com/blog/posts.xml" htmlUrl="https://www.redblobgames.com/"/>
+      <outline text="Raph Koster" title="Raph Koster" type="rss" xmlUrl="https://www.raphkoster.com/feed/" htmlUrl="https://www.raphkoster.com/"/>
+      <outline text="DEV: #gamedev" title="DEV: #gamedev" type="rss" xmlUrl="https://dev.to/feed/tag/gamedev" htmlUrl="https://dev.to/t/gamedev"/>
+      <outline text="IndieGames.com" title="IndieGames.com" type="rss" xmlUrl="https://www.indiegames.com/rss" htmlUrl="https://www.indiegames.com/"/>
     </outline>
   </body>
 </opml>

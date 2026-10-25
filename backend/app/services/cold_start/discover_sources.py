@@ -76,14 +76,17 @@ async def refresh_suggestions(user: User, session: AsyncSession) -> int:
     )
     top_topics = [row[0].lower() for row in nodes.fetchall()]
 
+    from app.services.cold_start.pack_picker import suggest_packs
     from app.services.cold_start.starter_packs import list_starter_packs
 
-    for pack in list_starter_packs():
-        pack_words = set(pack.id.replace("-", " ").lower().split())
-        if top_topics and not any(
-            word in pack_words for topic in top_topics for word in topic.split()
-        ):
-            continue
+    # The LLM's pick for the top interests (taxonomy without a model). The
+    # old pack-id word match let "design" in "system design" pull in UI design.
+    by_id = {pack.id: pack for pack in list_starter_packs()}
+    if top_topics:
+        chosen = [by_id[i] for i in await suggest_packs(top_topics) if i in by_id]
+    else:
+        chosen = list(by_id.values())
+    for pack in chosen:
         for feed in pack.feeds:
             if feed["url"] not in known_urls and len(candidates) < 30:
                 candidates.append(

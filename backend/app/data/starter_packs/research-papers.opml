@@ -2,19 +2,21 @@
 <opml version="2.0">
   <head>
     <title>Research Papers: Weirling starter pack</title>
+    <!-- Scope: New papers outside computer science: journals and preprints. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Research Papers" title="Research Papers">
-        <outline text="arXiv stat.ML" title="arXiv stat.ML" type="rss" xmlUrl="https://rss.arxiv.org/rss/stat.ML" htmlUrl="https://arxiv.org/list/stat.ML/recent"/>
-        <outline text="arXiv econ.GN" title="arXiv econ.GN" type="rss" xmlUrl="https://rss.arxiv.org/rss/econ.GN" htmlUrl="https://arxiv.org/list/econ.GN/recent"/>
-        <outline text="arXiv q-bio.QM" title="arXiv q-bio.QM" type="rss" xmlUrl="https://rss.arxiv.org/rss/q-bio.QM" htmlUrl="https://arxiv.org/list/q-bio.QM/recent"/>
-        <outline text="arXiv q-fin.GN" title="arXiv q-fin.GN" type="rss" xmlUrl="https://rss.arxiv.org/rss/q-fin.GN" htmlUrl="https://arxiv.org/list/q-fin.GN/recent"/>
-        <outline text="arXiv physics.soc-ph" title="arXiv physics.soc-ph" type="rss" xmlUrl="https://rss.arxiv.org/rss/physics.soc-ph" htmlUrl="https://arxiv.org/list/physics.soc-ph/recent"/>
-        <outline text="arXiv math.ST" title="arXiv math.ST" type="rss" xmlUrl="https://rss.arxiv.org/rss/math.ST" htmlUrl="https://arxiv.org/list/math.ST/recent"/>
-        <outline text="PLOS ONE" title="PLOS ONE" type="rss" xmlUrl="https://journals.plos.org/plosone/feed/atom" htmlUrl="https://journals.plos.org/plosone/"/>
-        <outline text="Nature" title="Nature" type="rss" xmlUrl="https://www.nature.com/nature.rss" htmlUrl="https://www.nature.com/nature"/>
-        <outline text="eLife" title="eLife" type="rss" xmlUrl="https://elifesciences.org/rss/recent.xml" htmlUrl="https://elifesciences.org/"/>
-        <outline text="PNAS" title="PNAS" type="rss" xmlUrl="https://www.pnas.org/action/showFeed?type=etoc&amp;feed=rss&amp;jc=PNAS" htmlUrl="https://www.pnas.org/"/>
+      <outline text="Nature (journal)" title="Nature (journal)" type="rss" xmlUrl="https://www.nature.com/nature.rss" htmlUrl="https://www.nature.com/nature/"/>
+      <outline text="Science (journal)" title="Science (journal)" type="rss" xmlUrl="https://www.science.org/action/showFeed?type=etoc&amp;feed=rss&amp;jc=science" htmlUrl="https://www.science.org/journal/science"/>
+      <outline text="PNAS" title="PNAS" type="rss" xmlUrl="https://www.pnas.org/action/showFeed?type=etoc&amp;feed=rss&amp;jc=PNAS" htmlUrl="https://www.pnas.org/"/>
+      <outline text="PLOS ONE" title="PLOS ONE" type="rss" xmlUrl="https://journals.plos.org/plosone/feed/atom" htmlUrl="https://journals.plos.org/plosone/"/>
+      <outline text="Cell" title="Cell" type="rss" xmlUrl="https://www.cell.com/cell/current.rss" htmlUrl="https://www.cell.com/cell/home"/>
+      <outline text="arXiv: Statistics Theory (math.ST)" title="arXiv: Statistics Theory (math.ST)" type="rss" xmlUrl="https://rss.arxiv.org/rss/math.ST" htmlUrl="https://arxiv.org/list/math.ST/recent"/>
+      <outline text="arXiv: Machine Learning, statistics (stat.ML)" title="arXiv: Machine Learning, statistics (stat.ML)" type="rss" xmlUrl="https://rss.arxiv.org/rss/stat.ML" htmlUrl="https://arxiv.org/list/stat.ML/recent"/>
+      <outline text="arXiv: General Economics (econ.GN)" title="arXiv: General Economics (econ.GN)" type="rss" xmlUrl="https://rss.arxiv.org/rss/econ.GN" htmlUrl="https://arxiv.org/list/econ.GN/recent"/>
+      <outline text="arXiv: General Finance (q-fin.GN)" title="arXiv: General Finance (q-fin.GN)" type="rss" xmlUrl="https://rss.arxiv.org/rss/q-fin.GN" htmlUrl="https://arxiv.org/list/q-fin.GN/recent"/>
+      <outline text="arXiv: Quantitative Methods, biology (q-bio.QM)" title="arXiv: Quantitative Methods, biology (q-bio.QM)" type="rss" xmlUrl="https://rss.arxiv.org/rss/q-bio.QM" htmlUrl="https://arxiv.org/list/q-bio.QM/recent"/>
+      <outline text="arXiv: Physics and Society (physics.soc-ph)" title="arXiv: Physics and Society (physics.soc-ph)" type="rss" xmlUrl="https://rss.arxiv.org/rss/physics.soc-ph" htmlUrl="https://arxiv.org/list/physics.soc-ph/recent"/>
     </outline>
   </body>
 </opml>

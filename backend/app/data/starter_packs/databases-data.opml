@@ -2,19 +2,21 @@
 <opml version="2.0">
   <head>
     <title>Databases &amp; Data Engineering: Weirling starter pack</title>
+    <!-- Scope: Database internals, SQL and data pipelines. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Databases &amp; Data Engineering" title="Databases &amp; Data Engineering">
-        <outline text="EnterpriseDB Blog" title="EnterpriseDB Blog" type="rss" xmlUrl="https://www.enterprisedb.com/rss.xml" htmlUrl="https://www.enterprisedb.com/rss.xml"/>
-        <outline text="Planet PostgreSQL" title="Planet PostgreSQL" type="rss" xmlUrl="https://planet.postgresql.org/rss20.xml" htmlUrl="https://planet.postgresql.org/rss20.xml"/>
-        <outline text="Timescale Blog" title="Timescale Blog" type="rss" xmlUrl="https://www.timescale.com/blog/feed.xml" htmlUrl="https://www.timescale.com/blog/feed.xml"/>
-        <outline text="Databricks Blog" title="Databricks Blog" type="rss" xmlUrl="https://www.databricks.com/blog/feed.xml" htmlUrl="https://www.databricks.com/blog/feed.xml"/>
-        <outline text="Supabase Blog" title="Supabase Blog" type="rss" xmlUrl="https://supabase.com/blog/rss.xml" htmlUrl="https://supabase.com/blog/rss.xml"/>
-        <outline text="SingleStore Blog" title="SingleStore Blog" type="rss" xmlUrl="https://www.singlestore.com/blog/feed/" htmlUrl="https://www.singlestore.com/blog/feed/"/>
-        <outline text="Redis Blog" title="Redis Blog" type="rss" xmlUrl="https://redis.com/blog/feed/" htmlUrl="https://redis.com/blog/feed/"/>
-        <outline text="dbt Blog" title="dbt Blog" type="rss" xmlUrl="https://www.getdbt.com/blog/rss.xml" htmlUrl="https://www.getdbt.com/blog/rss.xml"/>
-        <outline text="Stonebraker Blog" title="Stonebraker Blog" type="rss" xmlUrl="https://blog.developer.atlassian.com/feed/" htmlUrl="https://blog.developer.atlassian.com/feed/"/>
-        <outline text="Planet PostgreSQL (dup ok)" title="Planet PostgreSQL (dup ok)" type="rss" xmlUrl="https://planet.postgresql.org/rss20.xml" htmlUrl="https://planet.postgresql.org/rss20.xml"/>
+      <outline text="Planet PostgreSQL" title="Planet PostgreSQL" type="rss" xmlUrl="https://planet.postgresql.org/rss20.xml" htmlUrl="https://planet.postgresql.org/"/>
+      <outline text="Phil Eaton" title="Phil Eaton" type="rss" xmlUrl="https://notes.eatonphil.com/rss.xml" htmlUrl="https://notes.eatonphil.com/"/>
+      <outline text="DuckDB Blog" title="DuckDB Blog" type="rss" xmlUrl="https://duckdb.org/feed.xml" htmlUrl="https://duckdb.org/news/"/>
+      <outline text="CockroachDB Blog" title="CockroachDB Blog" type="rss" xmlUrl="https://www.cockroachlabs.com/rss.xml" htmlUrl="https://www.cockroachlabs.com/blog/"/>
+      <outline text="ClickHouse Blog" title="ClickHouse Blog" type="rss" xmlUrl="https://clickhouse.com/rss.xml" htmlUrl="https://clickhouse.com/blog"/>
+      <outline text="Supabase Blog" title="Supabase Blog" type="rss" xmlUrl="https://supabase.com/blog/rss.xml" htmlUrl="https://supabase.com/blog"/>
+      <outline text="EnterpriseDB Blog" title="EnterpriseDB Blog" type="rss" xmlUrl="https://www.enterprisedb.com/rss.xml" htmlUrl="https://www.enterprisedb.com/blog"/>
+      <outline text="Redis Blog" title="Redis Blog" type="rss" xmlUrl="https://redis.com/blog/feed/" htmlUrl="https://redis.io/blog/"/>
+      <outline text="SingleStore Blog" title="SingleStore Blog" type="rss" xmlUrl="https://www.singlestore.com/blog/feed/" htmlUrl="https://www.singlestore.com/blog/"/>
+      <outline text="Databricks Blog" title="Databricks Blog" type="rss" xmlUrl="https://www.databricks.com/blog/feed.xml" htmlUrl="https://www.databricks.com/blog"/>
+      <outline text="dbt Blog" title="dbt Blog" type="rss" xmlUrl="https://www.getdbt.com/blog/rss.xml" htmlUrl="https://www.getdbt.com/blog"/>
     </outline>
   </body>
 </opml>

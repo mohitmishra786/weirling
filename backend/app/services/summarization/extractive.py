@@ -91,7 +91,16 @@ def keyword_topics(title: str, full_text: str, k: int = 3) -> list[str]:
     return topics[:k]
 
 
+def plain_text(text: str | None) -> str:
+    """Feed text without tags or entities: summaries are shown as text, so
+    markup would appear literally ("<p>Article URL: <a href=…")."""
+    import html
+
+    return " ".join(html.unescape(_TAG.sub(" ", text or "")).split())
+
+
 def extractive_summary(title: str, full_text: str) -> SummarizationResult:
+    full_text = plain_text(full_text)
     sentences = _sentences(full_text) or ([title.strip()] if title.strip() else ["Untitled"])
     title_tokens = _tokens(title)
     ranked = sorted(

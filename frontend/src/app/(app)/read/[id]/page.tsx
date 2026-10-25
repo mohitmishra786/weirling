@@ -201,8 +201,38 @@ export default function ReaderPage() {
     return <NoTextFallback item={item} />;
   }
 
+  const minutesLeft = item.reading_time_minutes
+    ? Math.max(0, Math.ceil(item.reading_time_minutes * (1 - progressPct / 100)))
+    : null;
+
+  const controls = (
+    <div className="flex flex-wrap items-center gap-2 text-xs">
+      <span className="text-stone-500 dark:text-stone-400">Text</span>
+      <button onClick={() => adjustFont(fontStep - 1)} className="btn-secondary min-h-9 min-w-9 px-2 py-1" aria-label="Smaller text">
+        A−
+      </button>
+      <button onClick={() => adjustFont(fontStep + 1)} className="btn-secondary min-h-9 min-w-9 px-2 py-1" aria-label="Larger text">
+        A+
+      </button>
+      <button onClick={cycleTheme} className="btn-secondary min-h-9 px-2.5 py-1 capitalize" aria-label="Change reading surface">
+        {/* "light" is the app's own (dark) surface since #159 */}
+        {theme === "light" ? "Default" : theme}
+      </button>
+    </div>
+  );
+
+  const summary = item.summary_detailed ? (
+    <>
+      <SummaryLabel source={item.summary_source} fromTranscript={Boolean(item.transcript_url)} />
+      {item.summary_detailed}
+    </>
+  ) : null;
+
   return (
-    <article className="mx-auto max-w-reading pb-32 pt-8">
+    // Laptop and up: the article at a readable measure plus a sticky side
+    // panel (summary, controls, progress, source). Phones and tablets: one
+    // column, with the summary under the title.
+    <div className="mx-auto grid max-w-6xl gap-x-12 pb-32 pt-6 sm:pt-8 lg:grid-cols-[minmax(0,1fr)_18rem] xl:grid-cols-[minmax(0,1fr)_20rem]">
       {/* Sticky reading-progress bar — prism gradient reflects genuine progress */}
       <div className="fixed left-0 right-0 top-0 z-50 h-1 bg-transparent">
         <div
@@ -211,107 +241,127 @@ export default function ReaderPage() {
         />
       </div>
 
-      <button
-        onClick={() => router.back()}
-        className="mb-4 text-sm text-stone-500 transition-colors hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
-      >
-        ← Back
-      </button>
-
-      {/* Typography / theme controls (UX-05) */}
-      <div className="mb-6 flex flex-wrap items-center gap-2 text-xs">
-        <span className="text-stone-500 dark:text-stone-400">Reading surface:</span>
-        <button onClick={() => adjustFont(fontStep - 1)} className="btn-secondary px-2 py-1" aria-label="Smaller text">
-          A−
-        </button>
-        <button onClick={() => adjustFont(fontStep + 1)} className="btn-secondary px-2 py-1" aria-label="Larger text">
-          A+
-        </button>
-        <button onClick={cycleTheme} className="btn-secondary px-2.5 py-1 capitalize">
-          {/* "light" is the app's own (dark) surface since #159 */}
-          {theme === "light" ? "Default" : theme}
-        </button>
-        <span className="ml-auto hidden text-stone-500 sm:inline dark:text-stone-400">
-          j/k next·prev · o original · s save · u helpful · d not helpful
-        </span>
-      </div>
-
-      {/* Article header */}
-      <header className="mb-8 border-b border-stone-200 pb-6 dark:border-white/10">
-        <h1 className={`font-serif text-3xl font-bold leading-tight tracking-tight md:text-4xl ${fontSizes[fontStep] === fontSizes[0] ? "md:text-3xl" : ""}`}>
-          {item.title}
-        </h1>
-
-        <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-stone-500 dark:text-stone-400">
-          {item.author && (
-            <span className="font-medium text-stone-700 dark:text-stone-300">{item.author}</span>
-          )}
-          {item.reading_time_minutes && (
-            <>
-              {item.author && <span className="text-stone-300">·</span>}
-              <span>{item.reading_time_minutes} min read</span>
-            </>
-          )}
-          {item.published_at && (
-            <>
-              <span className="text-stone-300">·</span>
-              <span>{new Date(item.published_at).toLocaleDateString()}</span>
-            </>
-          )}
+      <article className="mx-auto w-full min-w-0 max-w-reading lg:mx-0 lg:max-w-[46rem] lg:justify-self-end">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <button
+            onClick={() => router.back()}
+            className="min-h-9 text-sm text-stone-500 transition-colors hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100"
+          >
+            ← Back
+          </button>
+          {/* Typography / theme controls (UX-05); in the side panel on laptops */}
+          <div className="lg:hidden">{controls}</div>
         </div>
 
-        {/* AI summary deck — the editorial "standfirst" */}
-        {item.summary_detailed && (
-          <p className="deck mt-5 border-l-2 border-prism-600 pl-4 font-serif text-lg italic leading-relaxed text-stone-600 dark:text-stone-300">
-            <SummaryLabel source={item.summary_source} fromTranscript={Boolean(item.transcript_url)} />
-            {item.summary_detailed}
-          </p>
-        )}
-      </header>
+        {/* Article header */}
+        <header className="mb-8 border-b border-stone-200 pb-6 dark:border-white/10">
+          <h1 className={`break-words font-serif text-[1.75rem] font-bold leading-tight tracking-tight sm:text-3xl md:text-4xl ${fontSizes[fontStep] === fontSizes[0] ? "md:text-3xl" : ""}`}>
+            {item.title}
+          </h1>
 
-      {/* Article body — rendered HTML in a scoped, typographically-styled container */}
-      <div
-        className={`prose-reader ${surface} ${fontSizes[fontStep]} ${theme === "dark" ? "prose-dark" : ""} rounded-lg transition-colors`}
-        style={theme === "sepia" ? { boxShadow: "0 0 0 8px rgba(244,236,216,0.6)" } : undefined}
-        dangerouslySetInnerHTML={{ __html: articleHtml }}
-      />
+          <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-stone-500 dark:text-stone-400">
+            {item.author && (
+              <span className="font-medium text-stone-700 dark:text-stone-300">{item.author}</span>
+            )}
+            {item.reading_time_minutes && (
+              <>
+                {item.author && <span className="text-stone-300">·</span>}
+                <span>{item.reading_time_minutes} min read</span>
+              </>
+            )}
+            {item.published_at && (
+              <>
+                <span className="text-stone-300">·</span>
+                <span>{new Date(item.published_at).toLocaleDateString()}</span>
+              </>
+            )}
+          </div>
 
-      {/* Reached-end sentinel — intersecting floors completion at 0.95 */}
-      <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
-      {snapshot.reachedEnd && !toastClosed && item.topic_clusters?.[0] && (
-        <GotItToast
-          topic={item.topic_clusters[0]}
-          activeTimeMs={snapshot.activeTimeMs}
-          onClose={() => setToastClosed(true)}
-        />
-      )}
-
-      {/* Footer */}
-      <footer className="mt-12 border-t border-stone-200 pt-6 dark:border-white/10">
-        <a
-          href={item.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm font-medium text-prism-600 hover:text-prism-700 dark:text-prism-300 dark:hover:text-prism-200"
-        >
-          View original at {safeHostname(item.url)} →
-        </a>
-        <div className="mt-6">
-          <FeedbackBar
-            contentItemId={item.id}
-            topics={item.topic_clusters}
-          />
-          {(savedQuick || ratedQuick !== null) && (
-            <p className="mt-2 text-xs text-emerald-600" role="status">
-              {savedQuick && ratedQuick === null && "Saved"}
-              {ratedQuick === 1 && "Rated helpful: more like this"}
-              {ratedQuick === -1 && "Rated not helpful: less like this"}
-              {savedQuick && ratedQuick !== null && " · Saved"}
+          {/* AI summary deck — the editorial "standfirst"; side panel on laptops */}
+          {summary && (
+            <p className="deck mt-5 border-l-2 border-prism-600 pl-4 font-serif text-base leading-relaxed text-stone-600 sm:text-lg lg:hidden dark:text-stone-300">
+              {summary}
             </p>
           )}
+        </header>
+
+        {/* Article body — rendered HTML in a scoped, typographically-styled container */}
+        <div
+          className={`prose-reader ${surface} ${fontSizes[fontStep]} ${theme === "dark" ? "prose-dark" : ""} rounded-lg transition-colors`}
+          style={theme === "sepia" ? { boxShadow: "0 0 0 8px rgba(244,236,216,0.6)" } : undefined}
+          dangerouslySetInnerHTML={{ __html: articleHtml }}
+        />
+
+        {/* Reached-end sentinel — intersecting floors completion at 0.95 */}
+        <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
+        {snapshot.reachedEnd && !toastClosed && item.topic_clusters?.[0] && (
+          <GotItToast
+            topic={item.topic_clusters[0]}
+            activeTimeMs={snapshot.activeTimeMs}
+            onClose={() => setToastClosed(true)}
+          />
+        )}
+
+        {/* Footer */}
+        <footer className="mt-12 border-t border-stone-200 pt-6 dark:border-white/10">
+          <a
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="break-all text-sm font-medium text-prism-600 hover:text-prism-700 dark:text-prism-300 dark:hover:text-prism-200"
+          >
+            View original at {safeHostname(item.url)} →
+          </a>
+          <div className="mt-6">
+            <FeedbackBar
+              contentItemId={item.id}
+              topics={item.topic_clusters}
+            />
+            {(savedQuick || ratedQuick !== null) && (
+              <p className="mt-2 text-xs text-emerald-600" role="status">
+                {savedQuick && ratedQuick === null && "Saved"}
+                {ratedQuick === 1 && "Rated helpful: more like this"}
+                {ratedQuick === -1 && "Rated not helpful: less like this"}
+                {savedQuick && ratedQuick !== null && " · Saved"}
+              </p>
+            )}
+          </div>
+        </footer>
+      </article>
+
+      <aside className="hidden lg:block" aria-label="About this article">
+        <div className="sticky top-24 space-y-5 pt-10">
+          {summary && (
+            <section className="card p-4">
+              <p className="text-sm leading-relaxed text-[var(--text-secondary)]">{summary}</p>
+            </section>
+          )}
+          <section className="card space-y-3 p-4 text-sm">
+            <div>
+              <div className="mb-1.5 flex justify-between text-xs text-stone-500 dark:text-stone-400">
+                <span>{progressPct}% read</span>
+                {minutesLeft !== null && <span>{minutesLeft ? `${minutesLeft} min left` : "Done"}</span>}
+              </div>
+              <div className="h-1.5 overflow-hidden rounded-full bg-stone-200 dark:bg-white/10" aria-hidden>
+                <div className="reading-progress h-full" style={{ width: `${progressPct}%` }} />
+              </div>
+            </div>
+            {controls}
+            <a
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block truncate font-medium text-prism-600 hover:text-prism-700 dark:text-prism-300 dark:hover:text-prism-200"
+            >
+              View original at {safeHostname(item.url)} →
+            </a>
+          </section>
+          <p className="px-1 text-xs leading-relaxed text-stone-500 dark:text-stone-400">
+            Keys: j/k next and previous · o original · s save · u helpful · d not helpful
+          </p>
         </div>
-      </footer>
-    </article>
+      </aside>
+    </div>
   );
 }
 

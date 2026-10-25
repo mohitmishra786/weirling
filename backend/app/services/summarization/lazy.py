@@ -20,8 +20,17 @@ logger = get_logger(__name__)
 CONCURRENCY = 4
 
 
+# Below this, there is nothing for a model to summarize (an aggregator's
+# link stub, a one-line excerpt); the extract is as good and costs nothing.
+MIN_WORDS_FOR_LLM = 40
+
+
 def needs_llm_summary(item: ContentItem) -> bool:
-    return bool(item.full_text) and item.summary_source != "llm"
+    if not item.full_text or item.summary_source == "llm":
+        return False
+    from app.services.summarization.extractive import plain_text
+
+    return len(plain_text(item.full_text).split()) >= MIN_WORDS_FOR_LLM
 
 
 async def ensure_llm_summaries(

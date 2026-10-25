@@ -133,6 +133,10 @@ class LLMClient:
         self._api_key_override = api_key
         self._transport = transport
         self._sleep = sleep
+        self._clock = clock
+        # Set when the provider asks for a longer pause than we wait (a daily
+        # cap); calls skip it until then so a fallback answers straight away.
+        self._cooldown_until = 0.0
         self._bucket = TokenBucket(
             tpm if tpm is not None else settings.llm_tpm_limit,
             rpm if rpm is not None else settings.llm_rpm_limit,
@@ -156,6 +160,10 @@ class LLMClient:
     @property
     def circuit_open(self) -> bool:
         return self._circuit_open
+
+    @property
+    def cooling_down(self) -> bool:
+        return self._clock() < self._cooldown_until
 
     def reset_circuit(self) -> None:
         self._circuit_open = False
@@ -184,7 +192,8 @@ class LLMClient:
         else:
             delay = 0.0
         if delay > get_settings().llm_max_retry_wait_seconds:
-            logger.warning("LLM asked to retry after %.0fs; not waiting", delay)
+            logger.warning("LLM asked to retry after %.0fs; pausing it that long", delay)
+            self._cooldown_until = self._clock() + delay
             return False
         if delay <= 0:
             delay = min(20.0, float(2**attempt)) + random.random()
@@ -221,6 +230,8 @@ class LLMClient:
             return None
         if self._circuit_open:
             logger.error("LLM circuit open: %s", self._circuit_reason)
+            return None
+        if self.cooling_down:
             return None
 
         estimate = max(1, sum(len(m.get("content", "")) for m in messages) // 4 + max_tokens)
@@ -303,7 +314,7 @@ class LLMClient:
             json_mode=True,
         )
         parsed = _parse_json_object(raw) if raw else None
-        if parsed is not None or raw is None or self._circuit_open or not self.api_key:
+        if parsed is not None or raw is None or self._circuit_open or self.cooling_down:
             return parsed
 
         repair = await self.complete(

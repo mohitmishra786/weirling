@@ -180,7 +180,7 @@ def create_app() -> FastAPI:
             "db": getattr(app.state, "db_ok", False),
             "redis": redis_ok,
             "llm": settings.llm_configured,
-            "llm_model": settings.llm_model_primary if settings.llm_configured else None,
+            "llm_model": settings.llm_model_label if settings.llm_configured else None,
             # Kept so older health checks that look at `groq` still see a bool.
             "groq": settings.llm_configured,
         }

@@ -1,7 +1,9 @@
 """Ranked feed discovery for a page URL.
 
 Order, highest rank first: HTML `<link rel="alternate">`, a platform recipe,
-a well-known path that actually looks like a feed, an RSSHub route when
+a feed-looking `<a href>` in the page, a well-known path that actually looks
+like a feed (under the page's own folder first, so a blog at
+example.github.io/blog/ is found, then the site root), an RSSHub route when
 `RSSHUB_BASE_URL` is set, then the page itself as a scrape candidate.
 """
 
@@ -36,7 +38,20 @@ _WELL_KNOWN = (
     "/?feed=rss2",
 )
 
-_RANK = {"link": 100, "platform": 80, "well_known": 60, "rsshub": 40, "scrape": 10}
+# Tried under a sub-folder before the full list runs at the site root.
+_WELL_KNOWN_SUBPATH = ("feed.xml", "atom.xml", "index.xml", "rss.xml", "feed/")
+_FEED_SUFFIXES = (".xml", ".rss", ".atom", ".rdf")
+_FEED_WORDS = {"feed", "feeds", "rss", "atom"}
+_MAX_ANCHORS = 4
+
+_RANK = {
+    "link": 100,
+    "platform": 80,
+    "anchor": 70,
+    "well_known": 60,
+    "rsshub": 40,
+    "scrape": 10,
+}
 
 
 @dataclass(frozen=True)
@@ -90,6 +105,40 @@ def link_candidates(page_url: str, html: str) -> list[FeedCandidate]:
     return found
 
 
+def anchor_candidates(page_url: str, html: str) -> list[FeedCandidate]:
+    """`<a href>`s that look like feed links ("RSS" icons in a sidebar or
+    footer). Many static-site themes link the feed only this way. Each one is
+    confirmed by fetching it before it is used."""
+    if not html:
+        return []
+    soup = BeautifulSoup(html, "lxml")
+    found: list[FeedCandidate] = []
+    seen: set[str] = set()
+    for tag in soup.find_all("a", href=True):
+        href = str(tag.get("href") or "").strip()
+        if not href or href.startswith(("#", "mailto:", "javascript:")):
+            continue
+        absolute = urljoin(page_url, href)
+        parsed = urlparse(absolute)
+        if parsed.scheme not in ("http", "https"):
+            continue
+        path = parsed.path.lower().rstrip("/")
+        last = path.rsplit("/", 1)[-1]
+        stem = last.rsplit(".", 1)[0]
+        looks = last.endswith(_FEED_SUFFIXES) and (
+            stem in _FEED_WORDS or stem in {"index", "posts", "all"} or "feed" in stem
+        )
+        if not looks and last not in _FEED_WORDS:
+            continue
+        if absolute in seen:
+            continue
+        seen.add(absolute)
+        found.append(FeedCandidate(absolute, "anchor", _RANK["anchor"]))
+        if len(found) >= _MAX_ANCHORS:
+            break
+    return found
+
+
 def _hostname(url: str) -> str:
     """Parsed hostname, without a leading www. CodeQL treats this as a real host."""
     return (urlparse(url).hostname or "").lower().removeprefix("www.")
@@ -110,7 +159,13 @@ def platform_candidates(page_url: str, html: str) -> list[FeedCandidate]:
         found.append(FeedCandidate(url, "platform", _RANK["platform"]))
 
     if _is_host(page_url, "substack.com"):
-        add(f"https://{parsed.netloc}/feed")
+        if host == "substack.com":
+            # substack.com/@handle is a profile; its posts live on the subdomain.
+            handle = next((p[1:] for p in parts if p.startswith("@") and len(p) > 1), "")
+            if handle:
+                add(f"https://{handle}.substack.com/feed")
+        else:
+            add(f"https://{parsed.netloc}/feed")
     if _is_host(page_url, "blogspot.com") or _is_host(page_url, "blogger.com"):
         add(urljoin(_origin(page_url) + "/", "feeds/posts/default"))
     if _is_host(page_url, "medium.com"):
@@ -198,8 +253,37 @@ async def _confirmed(candidates: list[FeedCandidate], getter: FetchText) -> list
     return [candidate for candidate, body in checked if body and _looks_like_feed(body)]
 
 
-async def _first_well_known(origin: str, getter: FetchText) -> FeedCandidate | None:
-    targets = [urljoin(origin + "/", path.lstrip("/")) for path in _WELL_KNOWN]
+def _well_known_targets(page_url: str) -> list[str]:
+    """Where to look for a feed, in order.
+
+    A site published under a folder (user.github.io/Blog/) keeps its feed
+    there, and the host root may belong to someone else's site, so the first
+    folder is tried before the root. Only a path ending in "/", or the parent
+    of a page, counts as a folder: /guide is a page, and its site feed is at
+    the root. A single segment without the slash (/Blog) is tried last.
+    """
+    origin = _origin(page_url)
+    parts = _segments(page_url)
+    path = urlparse(page_url).path
+    folders = parts if path.endswith("/") else parts[:-1]
+    first: list[str] = []
+    if folders:
+        first.append(f"{origin}/{folders[0]}/")
+    last: list[str] = []
+    if not folders and len(parts) == 1 and "." not in parts[0]:
+        last.append(f"{origin}/{parts[0]}/")
+    targets = [urljoin(base, name) for base in first for name in _WELL_KNOWN_SUBPATH]
+    targets += [urljoin(origin + "/", name.lstrip("/")) for name in _WELL_KNOWN]
+    targets += [urljoin(base, name) for base in last for name in _WELL_KNOWN_SUBPATH]
+    unique: list[str] = []
+    for target in targets:
+        if target not in unique:
+            unique.append(target)
+    return unique
+
+
+async def _first_well_known(page_url: str, getter: FetchText) -> FeedCandidate | None:
+    targets = _well_known_targets(page_url)
     gate = asyncio.Semaphore(2)
 
     async def _one(index: int, target: str) -> tuple[int, str, str | None]:
@@ -217,9 +301,13 @@ async def _first_well_known(origin: str, getter: FetchText) -> FeedCandidate | N
 
 
 async def _fetch_text(url: str) -> str | None:
+    from app.config import get_settings
+
     try:
         validate_public_url(url)
-        resp = await safe_fetch(url, timeout=10, max_bytes=1_000_000)
+        # Some feeds are several MB (danluu.com: 6.6 MB); a smaller cap would
+        # fail to confirm them.
+        resp = await safe_fetch(url, timeout=10, max_bytes=get_settings().feed_max_bytes)
     except (UnsafeURLError, Exception) as e:
         logger.debug("discovery fetch failed for %s: %s", sanitize_log(url), e)
         return None
@@ -242,9 +330,11 @@ async def discover_feed_candidates(
     found: list[FeedCandidate] = []
     proposed = [*link_candidates(page_url, html), *platform_candidates(page_url, html)]
     found.extend(await _confirmed(proposed, getter))
+    if not found:
+        found.extend((await _confirmed(anchor_candidates(page_url, html), getter))[:1])
 
     if not found:
-        hit = await _first_well_known(_origin(page_url), getter)
+        hit = await _first_well_known(page_url, getter)
         if hit is not None:
             found.append(hit)
         found.extend(await _confirmed(rsshub_candidates(page_url), getter))

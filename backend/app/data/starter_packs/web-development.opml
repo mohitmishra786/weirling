@@ -2,19 +2,21 @@
 <opml version="2.0">
   <head>
     <title>Web Development: Weirling starter pack</title>
+    <!-- Scope: Browsers, CSS, JavaScript and the frontend. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Web Development" title="Web Development">
-        <outline text="CSS-Tricks" title="CSS-Tricks" type="rss" xmlUrl="https://css-tricks.com/feed/" htmlUrl="https://css-tricks.com/feed/"/>
-        <outline text="Smashing Magazine" title="Smashing Magazine" type="rss" xmlUrl="https://www.smashingmagazine.com/feed/" htmlUrl="https://www.smashingmagazine.com/feed/"/>
-        <outline text="web.dev" title="web.dev" type="rss" xmlUrl="https://web.dev/feed.xml" htmlUrl="https://web.dev/feed.xml"/>
-        <outline text="Josh W. Comeau" title="Josh W. Comeau" type="rss" xmlUrl="https://www.joshwcomeau.com/rss.xml" htmlUrl="https://www.joshwcomeau.com/rss.xml"/>
-        <outline text="Kent C. Dodds" title="Kent C. Dodds" type="rss" xmlUrl="https://kentcdodds.com/rss.xml" htmlUrl="https://kentcdodds.com/rss.xml"/>
-        <outline text="V8 Dev Blog" title="V8 Dev Blog" type="rss" xmlUrl="https://v8.dev/blog.atom" htmlUrl="https://v8.dev/blog.atom"/>
-        <outline text="Mozilla Hacks" title="Mozilla Hacks" type="rss" xmlUrl="https://hacks.mozilla.org/feed/" htmlUrl="https://hacks.mozilla.org/feed/"/>
-        <outline text="Addy Osmani" title="Addy Osmani" type="rss" xmlUrl="https://addyosmani.com/feed.xml" htmlUrl="https://addyosmani.com/feed.xml"/>
-        <outline text="freeCodeCamp News" title="freeCodeCamp News" type="rss" xmlUrl="https://www.freecodecamp.org/news/rss/" htmlUrl="https://www.freecodecamp.org/news/rss/"/>
-        <outline text="Next.js Blog" title="Next.js Blog" type="rss" xmlUrl="https://nextjs.org/blog/rss.xml" htmlUrl="https://nextjs.org/blog/rss.xml"/>
+      <outline text="web.dev" title="web.dev" type="rss" xmlUrl="https://web.dev/feed.xml" htmlUrl="https://web.dev/blog"/>
+      <outline text="Mozilla Hacks" title="Mozilla Hacks" type="rss" xmlUrl="https://hacks.mozilla.org/feed/" htmlUrl="https://hacks.mozilla.org/"/>
+      <outline text="Smashing Magazine" title="Smashing Magazine" type="rss" xmlUrl="https://www.smashingmagazine.com/feed/" htmlUrl="https://www.smashingmagazine.com/"/>
+      <outline text="CSS-Tricks" title="CSS-Tricks" type="rss" xmlUrl="https://css-tricks.com/feed/" htmlUrl="https://css-tricks.com/"/>
+      <outline text="Josh W. Comeau" title="Josh W. Comeau" type="rss" xmlUrl="https://www.joshwcomeau.com/rss.xml" htmlUrl="https://www.joshwcomeau.com/"/>
+      <outline text="Jake Archibald" title="Jake Archibald" type="rss" xmlUrl="https://jakearchibald.com/posts.rss" htmlUrl="https://jakearchibald.com/"/>
+      <outline text="Addy Osmani" title="Addy Osmani" type="rss" xmlUrl="https://addyosmani.com/feed.xml" htmlUrl="https://addyosmani.com/blog/"/>
+      <outline text="Kent C. Dodds" title="Kent C. Dodds" type="rss" xmlUrl="https://kentcdodds.com/rss.xml" htmlUrl="https://kentcdodds.com/blog"/>
+      <outline text="React Blog" title="React Blog" type="rss" xmlUrl="https://react.dev/rss.xml" htmlUrl="https://react.dev/blog"/>
+      <outline text="Svelte Blog" title="Svelte Blog" type="rss" xmlUrl="https://svelte.dev/blog/rss.xml" htmlUrl="https://svelte.dev/blog"/>
+      <outline text="freeCodeCamp News" title="freeCodeCamp News" type="rss" xmlUrl="https://www.freecodecamp.org/news/rss/" htmlUrl="https://www.freecodecamp.org/news/"/>
     </outline>
   </body>
 </opml>

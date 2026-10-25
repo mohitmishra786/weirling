@@ -27,9 +27,10 @@ def test_every_taxonomy_pack_is_a_real_starter_pack():
 
 def test_topics_map_to_their_packs():
     assert set(packs_for_topics(["Rust", "PostgreSQL"])[:2]) == {
-        "systems-programming",
+        "programming-languages",
         "databases-data",
     }
+    assert packs_for_topics(["Distributed systems", "System design"])[0] == "backend-distributed"
     assert packs_for_topics(["Kubernetes", "Observability", "Rust"])[0] == "devops-cloud"
     assert packs_for_topics(["zxqv"]) == []
 
@@ -72,5 +73,5 @@ async def test_pack_list_marks_suggestions_and_subscriptions(client):
         await client.get("/api/v1/sources/starter-packs?topics=Rust,PostgreSQL", headers=headers)
     ).json()
     suggested = {p["id"] for p in packs if p["suggested"]}
-    assert {"systems-programming", "databases-data"} <= suggested
+    assert {"programming-languages", "databases-data"} <= suggested
     assert all(p["subscribed"] == 0 for p in packs)

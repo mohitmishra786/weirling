@@ -96,11 +96,11 @@ async def list_packs(
     as suggested so the picker can pre-select them (#152); `subscribed` says
     how many of a pack's feeds the user already follows.
     """
+    from app.services.cold_start.pack_picker import suggest_packs
     from app.services.cold_start.starter_packs import list_starter_packs
-    from app.services.cold_start.taxonomy import packs_for_topics
 
     wanted = [t for t in (part.strip() for part in topics.split(",")) if t]
-    suggested = packs_for_topics(wanted)[:4] if wanted else []
+    suggested = await suggest_packs(wanted) if wanted else []
     followed = {
         row[0]
         for row in (
@@ -111,6 +111,7 @@ async def list_packs(
         {
             "id": pack.id,
             "title": pack.title,
+            "description": pack.description,
             "feed_count": len(pack.feeds),
             "feeds": [{"name": f["name"], "url": f["url"]} for f in pack.feeds],
             "suggested": pack.id in suggested,

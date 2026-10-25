@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   GraduationCap,
@@ -26,6 +26,8 @@ import {
   Landmark,
   FileSpreadsheet,
   BookOpen,
+  Network,
+  Search,
 } from "lucide-react";
 import { api } from "../../lib/api";
 import type { StarterPack } from "../../lib/types";
@@ -33,6 +35,7 @@ import type { StarterPack } from "../../lib/types";
 const ICONS: Record<string, LucideIcon> = {
   "academic-computing": GraduationCap,
   "ai-machine-learning": Bot,
+  "backend-distributed": Network,
   "biotech-health": Dna,
   "climate-energy": Sprout,
   "crypto-web3": Link,
@@ -73,6 +76,27 @@ export function packSummary(packs: StarterPack[], selected: string[]): string {
   return `${chosen.length} pack${chosen.length === 1 ? "" : "s"} · ${feeds} sources`;
 }
 
+/** Packs matching `query` (title, scope, or any feed's name), with the feeds
+ *  that matched so the card can say why it is shown. Empty query: all packs,
+ *  the ones suggested for the reader first. */
+export function searchPacks(
+  packs: StarterPack[],
+  query: string,
+): { pack: StarterPack; matchedFeeds: string[] }[] {
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const ordered = [...packs].sort((a, b) => Number(b.suggested) - Number(a.suggested));
+  if (words.length === 0) return ordered.map((pack) => ({ pack, matchedFeeds: [] }));
+  const hit = (text: string) => words.every((w) => text.toLowerCase().includes(w));
+  const out: { pack: StarterPack; matchedFeeds: string[] }[] = [];
+  for (const pack of ordered) {
+    const matchedFeeds = pack.feeds.map((f) => f.name).filter(hit);
+    if (hit(`${pack.title} ${pack.description ?? ""} ${pack.id}`) || matchedFeeds.length) {
+      out.push({ pack, matchedFeeds });
+    }
+  }
+  return out;
+}
+
 // Grid of starter packs with multi-select (#152). Controlled: the parent owns
 // the selection so the onboarding wizard can subscribe when the user moves on.
 export function StarterPackPicker({
@@ -87,7 +111,9 @@ export function StarterPackPicker({
   footer?: React.ReactNode;
 }) {
   const [packs, setPacks] = useState<StarterPack[] | null>(null);
+  const [query, setQuery] = useState("");
   const topicKey = topics.join(",");
+  const shown = useMemo(() => searchPacks(packs ?? [], query), [packs, query]);
 
   useEffect(() => {
     let cancelled = false;
@@ -116,8 +142,27 @@ export function StarterPackPicker({
 
   return (
     <div>
+      <label className="relative mb-3 block">
+        <span className="sr-only">Search starter packs</span>
+        <Search
+          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400"
+          aria-hidden="true"
+        />
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search packs or sources, e.g. kubernetes, Dan Luu"
+          className="w-full pl-9"
+        />
+      </label>
+      {shown.length === 0 && (
+        <p className="py-6 text-center text-sm text-stone-500 dark:text-stone-400" role="status">
+          No pack matches “{query}”. You can add any site or feed on the Sources page.
+        </p>
+      )}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {packs.map((p) => {
+        {shown.map(({ pack: p, matchedFeeds }) => {
           const on = selected.includes(p.id);
           const following = p.subscribed > 0 && p.subscribed >= p.feed_count;
           return (
@@ -142,10 +187,18 @@ export function StarterPackPicker({
                   <span className="badge-accent ml-auto shrink-0">For you</span>
                 )}
               </div>
+              {p.description && (
+                <p className="mt-1 text-xs text-[var(--text-secondary)]">{p.description}</p>
+              )}
               <p className="mt-1 text-xs text-stone-400">
                 {following
                   ? "Already following"
-                  : `${p.feed_count} sources · ${p.feeds.slice(0, 3).map((f) => f.name).join(", ")}`}
+                  : `${p.feed_count} sources · ${(matchedFeeds.length
+                      ? matchedFeeds
+                      : p.feeds.map((f) => f.name)
+                    )
+                      .slice(0, 3)
+                      .join(", ")}`}
               </p>
             </button>
           );

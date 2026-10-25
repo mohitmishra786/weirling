@@ -2,19 +2,21 @@
 <opml version="2.0">
   <head>
     <title>Robotics &amp; Automation: Weirling starter pack</title>
+    <!-- Scope: Robots, autonomy and industrial automation. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Robotics &amp; Automation" title="Robotics &amp; Automation">
-        <outline text="IEEE Spectrum Robotics" title="IEEE Spectrum Robotics" type="rss" xmlUrl="https://spectrum.ieee.org/feeds/topic/robotics.rss" htmlUrl="https://spectrum.ieee.org/feeds/topic/robotics.rss"/>
-        <outline text="The Robot Report" title="The Robot Report" type="rss" xmlUrl="https://www.therobotreport.com/feed/" htmlUrl="https://www.therobotreport.com/feed/"/>
-        <outline text="IEEE Spectrum Robotics" title="IEEE Spectrum Robotics" type="rss" xmlUrl="https://spectrum.ieee.org/feeds/topic/robotics.rss" htmlUrl="https://spectrum.ieee.org/feeds/topic/robotics.rss"/>
-        <outline text="Boston Dynamics" title="Boston Dynamics" type="rss" xmlUrl="https://www.bostondynamics.com/rss" htmlUrl="https://www.bostondynamics.com/rss"/>
-        <outline text="Robohub" title="Robohub" type="rss" xmlUrl="https://robohub.org/feed/" htmlUrl="https://robohub.org/feed/"/>
-        <outline text="Alex Eames (Raspberry Pi robotics)" title="Alex Eames (Raspberry Pi robotics)" type="rss" xmlUrl="https://raspi.tv/feed" htmlUrl="https://raspi.tv/feed"/>
-        <outline text="Automatic Addison" title="Automatic Addison" type="rss" xmlUrl="https://automaticaddison.com/feed/" htmlUrl="https://automaticaddison.com/feed/"/>
-        <outline text="Robotics Business Review" title="Robotics Business Review" type="rss" xmlUrl="https://www.roboticsbusinessreview.com/feed/" htmlUrl="https://www.roboticsbusinessreview.com/feed/"/>
-        <outline text="Fetch Robotics" title="Fetch Robotics" type="rss" xmlUrl="https://fetchrobotics.com/blog/rss/" htmlUrl="https://fetchrobotics.com/blog/rss/"/>
-        <outline text="Arduino Robotics (blog)" title="Arduino Robotics (blog)" type="rss" xmlUrl="https://www.aranacorp.com/en/feed/" htmlUrl="https://www.aranacorp.com/en/feed/"/>
+      <outline text="IEEE Spectrum: Robotics" title="IEEE Spectrum: Robotics" type="rss" xmlUrl="https://spectrum.ieee.org/feeds/topic/robotics.rss" htmlUrl="https://spectrum.ieee.org/topic/robotics/"/>
+      <outline text="The Robot Report" title="The Robot Report" type="rss" xmlUrl="https://www.therobotreport.com/feed/" htmlUrl="https://www.therobotreport.com/"/>
+      <outline text="Robohub" title="Robohub" type="rss" xmlUrl="https://robohub.org/feed/" htmlUrl="https://robohub.org/"/>
+      <outline text="Robotics Business Review" title="Robotics Business Review" type="rss" xmlUrl="https://www.roboticsbusinessreview.com/feed/" htmlUrl="https://www.roboticsbusinessreview.com/"/>
+      <outline text="ROS Discourse" title="ROS Discourse" type="rss" xmlUrl="https://discourse.ros.org/latest.rss" htmlUrl="https://discourse.ros.org/"/>
+      <outline text="TechCrunch: Robotics" title="TechCrunch: Robotics" type="rss" xmlUrl="https://techcrunch.com/category/robotics/feed/" htmlUrl="https://techcrunch.com/category/robotics/"/>
+      <outline text="MIT News: Robotics" title="MIT News: Robotics" type="rss" xmlUrl="https://news.mit.edu/topic/mitrobotics-rss.xml" htmlUrl="https://news.mit.edu/topic/robotics"/>
+      <outline text="Weekly Robotics" title="Weekly Robotics" type="rss" xmlUrl="https://www.weeklyrobotics.com/feed.xml" htmlUrl="https://www.weeklyrobotics.com/"/>
+      <outline text="Automatic Addison" title="Automatic Addison" type="rss" xmlUrl="https://automaticaddison.com/feed/" htmlUrl="https://automaticaddison.com/"/>
+      <outline text="Open Robotics" title="Open Robotics" type="rss" xmlUrl="https://www.openrobotics.org/blog?format=rss" htmlUrl="https://www.openrobotics.org/blog"/>
+      <outline text="Robotiq Blog" title="Robotiq Blog" type="rss" xmlUrl="https://blog.robotiq.com/rss.xml" htmlUrl="https://blog.robotiq.com/"/>
     </outline>
   </body>
 </opml>

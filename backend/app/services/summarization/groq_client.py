@@ -4,6 +4,7 @@ import json
 
 from app.config import get_settings
 from app.services.llm.client import LLMClient
+from app.services.llm.providers import Provider, instance_chain
 from app.utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -129,11 +130,11 @@ def _parse_result(raw: str) -> SummarizationResult | None:
 
 
 class LLMSummarizer:
-    """Provider-agnostic summarizer. Talks to whatever OpenAI-compatible endpoint is configured."""
+    """Provider-agnostic summarizer: Claude, then the OpenAI-compatible endpoint (see `providers`)."""
 
     def __init__(
         self,
-        llm: LLMClient | None = None,
+        llm: Provider | None = None,
         *,
         summary_model: str | None = None,
         use_fallback: bool = True,
@@ -145,9 +146,9 @@ class LLMSummarizer:
         self._summary_model = summary_model
         self._use_fallback = use_fallback
 
-    def _llm(self) -> LLMClient:
+    def _llm(self) -> Provider:
         if self._llm_client is None:
-            self._llm_client = LLMClient()
+            self._llm_client = instance_chain()
         return self._llm_client
 
     async def summarize(
@@ -231,15 +232,33 @@ class LLMSummarizer:
             return []
         return [str(topic) for topic in topics if isinstance(topic, str) and topic.strip()]
 
+    async def complete_json(
+        self, *, task: str, system: str, user: str, max_tokens: int = 512
+    ) -> dict | None:
+        """One JSON call on the model for `task` (summary, topics, synthesis, interests)."""
+        return await self._llm().complete_json(
+            model=get_settings().model_for(task), system=system, user=user, max_tokens=max_tokens
+        )
+
     async def expand_interests(self, interest_text: str) -> list[str]:
         """CS-01: expand a free-text interest description into 8-15 specific
-        subtopics the user can confirm or edit before onboarding continues."""
+        subtopics the user can confirm or edit before onboarding continues.
+
+        Labels are short (they become chips and interest-map nodes), and the
+        taxonomy's names are offered first so starter packs and the graph
+        line up with what the reader typed."""
+        from app.services.cold_start.taxonomy import known_labels
+
         prompt = (
             "A reader described their interests as:\n\n"
             f"{interest_text[:2000]}\n\n"
             "Expand this into 8 to 15 specific subtopics they would want in a "
-            "personalized daily digest (concrete areas, technologies, or "
-            "themes, not generic labels). "
+            "personalized daily digest: concrete areas, technologies or themes. "
+            "Each label is 1 to 4 words, with no parentheses, examples or "
+            "trailing qualifiers (\"Consensus algorithms\", not \"Consensus "
+            "algorithms (Raft, Paxos) in production\"). Use a name from this list "
+            "when one fits; write your own when none does:\n"
+            f"{', '.join(known_labels())}\n\n"
             'Return a JSON object {"topics": ["..."]}.'
         )
         data = await self._llm().complete_json(

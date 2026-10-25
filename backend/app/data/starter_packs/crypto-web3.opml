@@ -2,19 +2,20 @@
 <opml version="2.0">
   <head>
     <title>Crypto &amp; Web3: Weirling starter pack</title>
+    <!-- Scope: Blockchains, protocols and crypto markets. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Crypto &amp; Web3" title="Crypto &amp; Web3">
-        <outline text="Ethereum Blog" title="Ethereum Blog" type="rss" xmlUrl="https://blog.ethereum.org/feed.xml" htmlUrl="https://blog.ethereum.org/feed.xml"/>
-        <outline text="Ethereum Foundation Blog" title="Ethereum Foundation Blog" type="rss" xmlUrl="https://blog.ethereum.org/feed.xml" htmlUrl="https://blog.ethereum.org/feed.xml"/>
-        <outline text="a16z Crypto" title="a16z Crypto" type="rss" xmlUrl="https://a16zcrypto.com/feed/" htmlUrl="https://a16zcrypto.com/feed/"/>
-        <outline text="CoinDesk" title="CoinDesk" type="rss" xmlUrl="https://www.coindesk.com/arc/outboundfeeds/rss/" htmlUrl="https://www.coindesk.com/arc/outboundfeeds/rss/"/>
-        <outline text="The Block" title="The Block" type="rss" xmlUrl="https://www.theblock.co/rss.xml" htmlUrl="https://www.theblock.co/rss.xml"/>
-        <outline text="Crypto Briefing" title="Crypto Briefing" type="rss" xmlUrl="https://cryptobriefing.com/feed/" htmlUrl="https://cryptobriefing.com/feed/"/>
-        <outline text="CryptoSlate" title="CryptoSlate" type="rss" xmlUrl="https://cryptoslate.com/feed/" htmlUrl="https://cryptoslate.com/feed/"/>
-        <outline text="Ethereum Cat Herders" title="Ethereum Cat Herders" type="rss" xmlUrl="https://medium.com/feed/ethereum-cat-herders" htmlUrl="https://medium.com/feed/ethereum-cat-herders"/>
-        <outline text="Decrypt" title="Decrypt" type="rss" xmlUrl="https://decrypt.co/feed" htmlUrl="https://decrypt.co/feed"/>
-        <outline text="Bankless" title="Bankless" type="rss" xmlUrl="https://bankless.com/feed" htmlUrl="https://bankless.com/feed"/>
+      <outline text="Ethereum Foundation Blog" title="Ethereum Foundation Blog" type="rss" xmlUrl="https://blog.ethereum.org/feed.xml" htmlUrl="https://blog.ethereum.org/"/>
+      <outline text="Vitalik Buterin" title="Vitalik Buterin" type="rss" xmlUrl="https://vitalik.eth.limo/feed.xml" htmlUrl="https://vitalik.eth.limo/"/>
+      <outline text="a16z crypto" title="a16z crypto" type="rss" xmlUrl="https://a16zcrypto.com/feed/" htmlUrl="https://a16zcrypto.com/"/>
+      <outline text="The Defiant" title="The Defiant" type="rss" xmlUrl="https://thedefiant.io/api/feed" htmlUrl="https://thedefiant.io/"/>
+      <outline text="Bankless" title="Bankless" type="rss" xmlUrl="https://bankless.com/feed" htmlUrl="https://bankless.com/"/>
+      <outline text="CoinDesk" title="CoinDesk" type="rss" xmlUrl="https://www.coindesk.com/arc/outboundfeeds/rss/" htmlUrl="https://www.coindesk.com/"/>
+      <outline text="The Block" title="The Block" type="rss" xmlUrl="https://www.theblock.co/rss.xml" htmlUrl="https://www.theblock.co/"/>
+      <outline text="Decrypt" title="Decrypt" type="rss" xmlUrl="https://decrypt.co/feed" htmlUrl="https://decrypt.co/"/>
+      <outline text="CryptoSlate" title="CryptoSlate" type="rss" xmlUrl="https://cryptoslate.com/feed/" htmlUrl="https://cryptoslate.com/"/>
+      <outline text="Crypto Briefing" title="Crypto Briefing" type="rss" xmlUrl="https://cryptobriefing.com/feed/" htmlUrl="https://cryptobriefing.com/"/>
     </outline>
   </body>
 </opml>

@@ -2,19 +2,21 @@
 <opml version="2.0">
   <head>
     <title>Space &amp; Astronomy: Weirling starter pack</title>
+    <!-- Scope: Spaceflight, astronomy and planetary science. Each feed belongs to one pack only. -->
   </head>
   <body>
     <outline text="Space &amp; Astronomy" title="Space &amp; Astronomy">
-        <outline text="NASA News" title="NASA News" type="rss" xmlUrl="https://www.nasa.gov/rss/dyn/breaking_news.rss" htmlUrl="https://www.nasa.gov/rss/dyn/breaking_news.rss"/>
-        <outline text="Spaceflight Now" title="Spaceflight Now" type="rss" xmlUrl="https://spaceflightnow.com/feed/" htmlUrl="https://spaceflightnow.com/feed/"/>
-        <outline text="Ars Technica Space" title="Ars Technica Space" type="rss" xmlUrl="https://feeds.arstechnica.com/arstechnica/science" htmlUrl="https://feeds.arstechnica.com/arstechnica/science"/>
-        <outline text="Space.com" title="Space.com" type="rss" xmlUrl="https://www.space.com/feeds/all" htmlUrl="https://www.space.com/feeds/all"/>
-        <outline text="ESA News" title="ESA News" type="rss" xmlUrl="https://www.esa.int/rssfeed/Our_Activities/Space_Science" htmlUrl="https://www.esa.int/rssfeed/Our_Activities/Space_Science"/>
-        <outline text="NASA Blogs" title="NASA Blogs" type="rss" xmlUrl="https://blogs.nasa.gov/feed/" htmlUrl="https://blogs.nasa.gov/feed/"/>
-        <outline text="Space News" title="Space News" type="rss" xmlUrl="https://spacenews.com/feed/" htmlUrl="https://spacenews.com/feed/"/>
-        <outline text="Universe Today" title="Universe Today" type="rss" xmlUrl="https://www.universetoday.com/feed/" htmlUrl="https://www.universetoday.com/feed/"/>
-        <outline text="Everyday Astronaut" title="Everyday Astronaut" type="rss" xmlUrl="https://everydayastronaut.com/feed/" htmlUrl="https://everydayastronaut.com/feed/"/>
-        <outline text="Rocket Lab News" title="Rocket Lab News" type="rss" xmlUrl="https://www.rocketlabusa.com/updates/rss/" htmlUrl="https://www.rocketlabusa.com/updates/rss/"/>
+      <outline text="NASA: Breaking News" title="NASA: Breaking News" type="rss" xmlUrl="https://www.nasa.gov/rss/dyn/breaking_news.rss" htmlUrl="https://www.nasa.gov/news/"/>
+      <outline text="ESA: Space Science" title="ESA: Space Science" type="rss" xmlUrl="https://www.esa.int/rssfeed/Our_Activities/Space_Science" htmlUrl="https://www.esa.int/Science_Exploration/Space_Science"/>
+      <outline text="SpaceNews" title="SpaceNews" type="rss" xmlUrl="https://spacenews.com/feed/" htmlUrl="https://spacenews.com/"/>
+      <outline text="Spaceflight Now" title="Spaceflight Now" type="rss" xmlUrl="https://spaceflightnow.com/feed/" htmlUrl="https://spaceflightnow.com/"/>
+      <outline text="Payload" title="Payload" type="rss" xmlUrl="https://payloadspace.com/feed/" htmlUrl="https://payloadspace.com/"/>
+      <outline text="The Planetary Society" title="The Planetary Society" type="rss" xmlUrl="https://www.planetary.org/rss/articles" htmlUrl="https://www.planetary.org/articles"/>
+      <outline text="Universe Today" title="Universe Today" type="rss" xmlUrl="https://www.universetoday.com/feed/" htmlUrl="https://www.universetoday.com/"/>
+      <outline text="Space.com" title="Space.com" type="rss" xmlUrl="https://www.space.com/feeds/all" htmlUrl="https://www.space.com/"/>
+      <outline text="Rocket Lab Updates" title="Rocket Lab Updates" type="rss" xmlUrl="https://www.rocketlabusa.com/updates/rss/" htmlUrl="https://www.rocketlabusa.com/updates/"/>
+      <outline text="ESO News" title="ESO News" type="rss" xmlUrl="https://www.eso.org/public/news/feed/" htmlUrl="https://www.eso.org/public/news/"/>
+      <outline text="ESA: Human and Robotic Exploration" title="ESA: Human and Robotic Exploration" type="rss" xmlUrl="https://www.esa.int/rssfeed/Our_Activities/Human_and_Robotic_Exploration" htmlUrl="https://www.esa.int/Science_Exploration/Human_and_Robotic_Exploration"/>
     </outline>
   </body>
 </opml>

@@ -7,6 +7,7 @@ feeds are dead, keeping the >= 90%-live acceptance honest.
 
 from __future__ import annotations
 
+import re
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from pathlib import Path
@@ -19,6 +20,8 @@ class StarterPack:
     id: str
     title: str
     feeds: list[dict]
+    # One line on what belongs in this pack, from the file's "Scope:" comment.
+    description: str = ""
 
 
 def _parse_opml(path: Path) -> StarterPack:
@@ -42,7 +45,9 @@ def _parse_opml(path: Path) -> StarterPack:
                     "feed_url": outline.get("xmlUrl") or url,
                 }
             )
-    return StarterPack(id=path.stem, title=title, feeds=feeds)
+    scope = re.search(r"<!--\s*Scope:\s*(.+?)\.?\s+Each feed", path.read_text())
+    description = scope.group(1).strip() if scope else ""
+    return StarterPack(id=path.stem, title=title, feeds=feeds, description=description)
 
 
 def list_starter_packs() -> list[StarterPack]:

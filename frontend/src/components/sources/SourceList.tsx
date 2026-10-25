@@ -61,13 +61,15 @@ export function SourceList({ sources, onUpdated, onDeleted }: SourceListProps) {
   }
 
   return (
-    <div className="grid gap-2.5 xl:grid-cols-2">
+    <div className="grid grid-cols-1 gap-2.5 xl:grid-cols-2">
       {sources.map((s) => (
         <div
           key={s.id}
-          className={`card p-4 ${s.is_active ? "" : "opacity-60"}`}
+          className={`card min-w-0 p-4 [overflow-wrap:anywhere] ${s.is_active ? "" : "opacity-60"}`}
         >
-          <div className="flex items-start justify-between gap-3">
+          {/* Phones: actions on their own row under the details, so a long
+              name or error can never push Remove off screen. */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <span className="truncate font-medium text-stone-900 dark:text-stone-100">
@@ -143,13 +145,13 @@ export function SourceList({ sources, onUpdated, onDeleted }: SourceListProps) {
             <div className="flex shrink-0 gap-1.5">
               <button
                 onClick={() => toggle(s)}
-                className="btn-ghost border border-stone-200 px-2.5 py-1 text-xs dark:border-white/10"
+                className="btn-ghost min-h-9 border border-stone-200 px-3 py-1 text-xs dark:border-white/10"
               >
                 {s.is_active ? "Pause" : "Resume"}
               </button>
               <button
                 onClick={() => del(s.id)}
-                className="border border-rose-200 px-2.5 py-1 text-xs text-rose-600 transition-colors hover:bg-rose-50 dark:border-rose-900 dark:text-rose-300"
+                className="min-h-9 rounded-full border border-rose-200 px-3 py-1 text-xs text-rose-600 transition-colors hover:bg-rose-50 dark:border-rose-900 dark:text-rose-300"
               >
                 Remove
               </button>
