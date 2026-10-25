@@ -34,6 +34,16 @@ export function InterestMap() {
   const [mergeInto, setMergeInto] = useState("");
   const [note, setNote] = useState("");
   const graphRef = useRef<ForceGraphHandle | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  // Below the two-column layout the edit panel sits under the graph: bring it
+  // into view after every tap (also on the topic already selected), or the
+  // tap looks like it did nothing. No animation for reduced motion.
+  const [revealTick, setRevealTick] = useState(0);
+  useEffect(() => {
+    if (!selected || window.matchMedia?.("(min-width: 1024px)").matches) return;
+    const still = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    panelRef.current?.scrollIntoView?.({ behavior: still ? "auto" : "smooth", block: "nearest" });
+  }, [selected, revealTick]);
   const [now] = useState(() => Date.now());
 
   const load = useCallback(() => {
@@ -82,6 +92,7 @@ export function InterestMap() {
       : undefined;
   const choose = (label: string) => {
     setSelected(label);
+    setRevealTick((n) => n + 1);
     setRename(label);
     setMergeInto("");
   };
@@ -97,8 +108,10 @@ export function InterestMap() {
   const current = graph.nodes.find((n) => n.label === selected) ?? null;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr_18rem]">
-      <div>
+    // minmax(0, 1fr): the graph column may shrink below its canvas's width,
+    // so the side panel always stays on screen.
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
+      <div className="min-w-0">
         <ForceGraph
           ref={graphRef}
           nodes={nodes}
@@ -111,8 +124,11 @@ export function InterestMap() {
         />
         <p className="mt-2 text-xs text-[var(--text-tertiary)]">
           Bigger = stronger interest. <span className="text-prism-300">Orange</span> = core interest.{" "}
-          <span className="text-amber-300">Ring</span> = reinforced in the last week. Grey = muted. Hover a topic to see
-          what it connects to; drag one onto another to merge them.
+          <span className="text-amber-300">Ring</span> = reinforced in the last week. Grey = muted.{" "}
+          <span className="[@media(pointer:coarse)]:hidden">
+            Hover a topic to see what it connects to; drag one onto another to merge them.
+          </span>
+          <span className="hidden [@media(pointer:coarse)]:inline">Tap a topic to see its links and edit it.</span>
         </p>
         <div className="mt-2 flex gap-2">
           <button
@@ -135,14 +151,14 @@ export function InterestMap() {
         </div>
       </div>
 
-      <aside className="text-sm">
+      <aside className="min-w-0 text-sm">
         {note && (
           <p role="status" className="mb-3 text-[var(--text-secondary)]">
             {note}
           </p>
         )}
         {current && (
-          <div className="card mb-4 p-3" aria-label={`Edit ${current.label}`} role="group">
+          <div ref={panelRef} className="card mb-4 p-3" aria-label={`Edit ${current.label}`} role="group">
             <p className="font-medium">{current.label}</p>
             <p className="text-xs text-[var(--text-tertiary)]">
               Weight {Math.round(current.weight * 100)}% · reinforced {current.reinforcement_count ?? 0} times
@@ -219,7 +235,7 @@ export function InterestMap() {
           </div>
         )}
         <h2 className="eyebrow mb-1.5">All topics</h2>
-        <ul className="max-h-[30rem] space-y-0.5 overflow-auto">
+        <ul className="max-h-[22rem] space-y-0.5 overflow-auto lg:max-h-[30rem]">
           {graph.nodes.map((n) => (
             <li key={n.label}>
               <button

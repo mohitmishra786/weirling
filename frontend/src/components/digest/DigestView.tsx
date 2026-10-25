@@ -51,7 +51,7 @@ function FeedbackPrompts({ digestId }: { digestId: string }) {
   if (unanswered.length === 0) return null;
 
   return (
-    <div className="mb-8 rounded-xl border border-prism-200 bg-prism-50 p-5 dark:border-prism-800 dark:bg-prism-900/30">
+    <div className="rounded-xl border border-prism-200 bg-prism-50 p-5 dark:border-prism-800 dark:bg-prism-900/30">
       <p className="mb-3 text-sm font-semibold text-prism-800 dark:text-prism-200">
         Help us calibrate your feed
       </p>
@@ -152,30 +152,38 @@ export function DigestView({ digest, userCreatedAt }: DigestViewProps) {
         </p>
       </header>
 
-      <EmergingTopics />
-      <VsNewestCard />
+      {/* Articles first on every screen; the extras sit beside them on wide
+          screens and after them on phones, so a reader never scrolls past
+          questions to reach today's reading. */}
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem] xl:gap-10">
+        <div className="min-w-0">
+          {isNewUser && showFirstDigest && (
+            <FirstDigestBanner onDismiss={() => setShowFirstDigest(false)} />
+          )}
 
-      {quietDay && (
-        <div
-          role="status"
-          className="mb-6 rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-stone-300"
-        >
-          Your sources were quiet today, so this edition catches you up on unread
-          items from the last two weeks.
+          {quietDay && (
+            <div
+              role="status"
+              className="mb-6 rounded-lg border border-stone-200 bg-stone-50 px-4 py-3 text-sm text-stone-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-stone-300"
+            >
+              Your sources were quiet today, so this edition catches you up on unread
+              items from the last two weeks.
+            </div>
+          )}
+
+          {SECTION_ORDER.map((section) => (
+            <DigestSection key={section} name={section} items={grouped[section] || []} />
+          ))}
+
+          {digest.ask_top5 && <Top5Question digestId={digest.id} />}
         </div>
-      )}
 
-      {isNewUser && showFirstDigest && (
-        <FirstDigestBanner onDismiss={() => setShowFirstDigest(false)} />
-      )}
-
-      <FeedbackPrompts digestId={digest.id} />
-
-      {SECTION_ORDER.map((section) => (
-        <DigestSection key={section} name={section} items={grouped[section] || []} />
-      ))}
-
-      {digest.ask_top5 && <Top5Question digestId={digest.id} />}
+        <aside className="min-w-0 space-y-6 lg:sticky lg:top-24 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto">
+          <EmergingTopics />
+          <VsNewestCard />
+          <FeedbackPrompts digestId={digest.id} />
+        </aside>
+      </div>
     </div>
   );
 }

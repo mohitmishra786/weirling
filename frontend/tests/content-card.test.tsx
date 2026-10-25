@@ -54,6 +54,28 @@ describe("ContentCard", () => {
     expect(screen.getByRole("link", { name: "Topic match: compilers" })).toHaveAttribute("href", "/interests");
   });
 
+  it("Escape from inside the panel closes it and returns focus to the button", async () => {
+    render(<ContentCard content={makeItem()} signalBreakdown={breakdown} />);
+    const toggle = screen.getByRole("button", { name: /why this/i });
+    await userEvent.click(toggle);
+    screen.getByRole("link", { name: "Topic match: compilers" }).focus();
+    await userEvent.keyboard("{Escape}");
+    expect(screen.queryByRole("region", { name: "Why this is ranked here" })).not.toBeInTheDocument();
+    expect(toggle).toHaveFocus();
+  });
+
+  it("closes the why panel on a click elsewhere", async () => {
+    render(
+      <div>
+        <p>outside</p>
+        <ContentCard content={makeItem()} signalBreakdown={breakdown} />
+      </div>,
+    );
+    await userEvent.click(screen.getByRole("button", { name: /why this/i }));
+    await userEvent.click(screen.getByText("outside"));
+    expect(screen.queryByRole("region", { name: "Why this is ranked here" })).not.toBeInTheDocument();
+  });
+
   it("opens and closes the why panel from the keyboard", async () => {
     render(<ContentCard content={makeItem()} signalBreakdown={breakdown} />);
     screen.getByRole("button", { name: /why this/i }).focus();

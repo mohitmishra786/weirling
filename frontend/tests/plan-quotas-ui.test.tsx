@@ -31,7 +31,7 @@ describe("plan quotas (#172)", () => {
     });
     render(<PlanSection />);
     expect(await screen.findByText("42 of 500")).toBeInTheDocument();
-    expect(screen.getByText("200 of 200")).toHaveStyle({ color: "#dc2626" });
+    expect(screen.getByText("200 of 200")).toHaveClass("text-red-400");
     expect(screen.getByText("3 (no limit)")).toBeInTheDocument();
     expect(screen.getByText(/reset at midnight UTC/)).toBeInTheDocument();
   });

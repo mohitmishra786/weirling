@@ -85,6 +85,20 @@ describe("Interest map (#179)", () => {
     expect(api.preferences.interestGraph.mock.calls.length).toBeGreaterThan(3); // reloads after edits
   });
 
+  it("on a phone, every tap on a topic (even the selected one) brings its panel into view", async () => {
+    const scroll = vi.fn();
+    Element.prototype.scrollIntoView = scroll;
+    window.matchMedia = ((q: string) => ({ matches: q.includes("reduce") })) as unknown as typeof window.matchMedia;
+    render(<InterestMap />);
+    const list = await screen.findByRole("list");
+    const compilers = within(list).getByRole("button", { name: /^compilers/ });
+    await userEvent.click(compilers);
+    await userEvent.click(compilers);
+    expect(scroll).toHaveBeenCalledTimes(2);
+    // Reduced motion: jump, don't animate.
+    expect(scroll).toHaveBeenLastCalledWith({ behavior: "auto", block: "nearest" });
+  });
+
   it("highlights recent and muted topics", () => {
     expect(isRecent(graph.nodes[0])).toBe(true);
     expect(isRecent(graph.nodes[1])).toBe(false);

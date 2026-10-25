@@ -51,15 +51,15 @@ export function LlmKeySection() {
   };
 
   return (
-    <section style={{ marginTop: 40, borderTop: "1px solid var(--border)", paddingTop: 24 }}>
-      <h2 style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: 8 }}>Your own AI key</h2>
-      <p style={{ color: "var(--text-tertiary)", fontSize: 14, marginBottom: 16 }}>
+    <section className="card p-5 sm:p-6">
+      <h2 className="mb-1 text-xl italic">Your own AI key</h2>
+      <p className="mb-4 text-sm text-[var(--text-tertiary)]">
         Optional. AI summaries for your digest and the articles you open then run on your provider account, with no
         daily limit from your plan. The key is stored encrypted and is never shown again; only you are billed for it.
       </p>
       {state.configured ? (
-        <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-          <span style={{ fontSize: 14 }}>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-sm">
             Key ending in <code>{state.last4 || "····"}</code> at {state.base_url}
             {state.model ? ` (${state.model})` : ""}
           </span>
@@ -68,8 +68,8 @@ export function LlmKeySection() {
           </button>
         </div>
       ) : (
-        <div style={{ display: "grid", gap: 10 }}>
-          <label style={{ fontSize: 14 }}>
+        <div className="grid gap-2.5">
+          <label className="text-sm">
             Provider
             <select className="input mt-1 block" value={baseUrl} onChange={(e) => setBaseUrl(e.target.value)}>
               {(state.allowed_base_urls ?? []).map((u) => (
@@ -79,7 +79,7 @@ export function LlmKeySection() {
               ))}
             </select>
           </label>
-          <label style={{ fontSize: 14 }}>
+          <label className="text-sm">
             API key
             <input
               className="input mt-1 block"
@@ -89,7 +89,7 @@ export function LlmKeySection() {
               onChange={(e) => setApiKey(e.target.value)}
             />
           </label>
-          <label style={{ fontSize: 14 }}>
+          <label className="text-sm">
             Model (optional)
             <input
               className="input mt-1 block"
@@ -106,7 +106,7 @@ export function LlmKeySection() {
         </div>
       )}
       {error && (
-        <p role="alert" style={{ color: "#f87171", fontSize: 14, marginTop: 12 }}>
+        <p role="alert" className="mt-3 text-sm text-red-400">
           {error}
         </p>
       )}

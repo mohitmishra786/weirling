@@ -56,18 +56,18 @@ function PlanPicker({
 }) {
   if (!plans.length) return null;
   return (
-    <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 16 }}>
+    <div className="mb-4 flex flex-wrap gap-4">
       {plans.map((p) => (
         <div
           key={p.plan}
           data-testid={`plan-${p.plan}`}
-          style={{ flex: "1 1 220px", border: "1px solid var(--border)", borderRadius: 8, padding: 16 }}
+          className="min-w-[13rem] flex-1 rounded-lg border border-[var(--border)] bg-[var(--bg-sunken)] p-4"
         >
-          <h3 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: 8 }}>
+          <h3 className="mb-2 text-base font-semibold">
             {p.name}
-            {current === p.plan && <span style={{ fontWeight: 400, color: "var(--text-tertiary)" }}> (your plan)</span>}
+            {current === p.plan && <span className="font-normal text-[var(--text-tertiary)]"> (your plan)</span>}
           </h3>
-          <ul style={{ fontSize: 14, margin: "0 0 12px", paddingLeft: 18 }}>
+          <ul className="mb-3 list-disc pl-5 text-sm">
             <li>{n(p.quotas.sources)} feeds</li>
             <li>{n(p.quotas.llm_summaries_per_day)} AI summaries a day</li>
             <li>{n(p.quotas.newsletter_mb_per_day)} MB of newsletters a day</li>
@@ -78,16 +78,16 @@ function PlanPicker({
           </ul>
           {current !== p.plan && (
             <div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <div className="flex flex-wrap gap-2">
                 {p.intervals.map((i) => (
                   <button key={i} className="btn-secondary disabled:cursor-not-allowed disabled:opacity-50" onClick={() => onBuy(p.plan, i)}>
                     {p.name} {i === "month" ? "monthly" : "yearly"}
                   </button>
                 ))}
               </div>
-              <p style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 8 }}>
+              <p className="mt-2 text-xs text-[var(--text-tertiary)]">
                 By subscribing, you agree to the{" "}
-                <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline" }}>
+                <a href="/terms" target="_blank" rel="noopener noreferrer" className="underline">
                   Terms of Service
                 </a>
                 .
@@ -104,15 +104,15 @@ function PlanPicker({
 function Quotas({ quotas }: { quotas: PlanQuota[] }) {
   if (!quotas.length) return null;
   return (
-    <div style={{ marginBottom: 16 }}>
-      <table style={{ fontSize: 14, borderCollapse: "collapse" }}>
+    <div className="mb-4">
+      <table className="border-collapse text-sm">
         <tbody>
           {quotas.map((q) => {
             const full = q.limit > 0 && q.used >= q.limit;
             return (
               <tr key={q.quota}>
-                <td style={{ padding: "2px 16px 2px 0", color: "var(--text-tertiary)" }}>{QUOTA_LABEL[q.quota]}</td>
-                <td style={{ padding: "2px 0", color: full ? "#dc2626" : undefined }}>
+                <td className="py-0.5 pr-4 text-[var(--text-tertiary)]">{QUOTA_LABEL[q.quota]}</td>
+                <td className={`py-0.5 ${full ? "text-red-400" : ""}`}>
                   {q.limit > 0 ? `${q.used} of ${q.limit}` : `${q.used} (no limit)`}
                 </td>
               </tr>
@@ -120,7 +120,7 @@ function Quotas({ quotas }: { quotas: PlanQuota[] }) {
           })}
         </tbody>
       </table>
-      <p style={{ color: "var(--text-tertiary)", fontSize: 13, marginTop: 8 }}>
+      <p className="mt-2 text-xs text-[var(--text-tertiary)]">
         Daily allowances reset at midnight UTC. When AI summaries run out, digests use the shorter
         extract until the next day; scheduled digests are never skipped.
       </p>
@@ -151,13 +151,13 @@ export function PlanSection() {
     (state.plan === "reader" || state.plan === "pro" || state.plan === "team") && state.status !== "cancelled";
 
   return (
-    <section id="plan" style={{ marginTop: 40, borderTop: "1px solid var(--border)", paddingTop: 24 }}>
-      <h2 style={{ fontSize: "1.1rem", fontWeight: 600, marginBottom: 8 }}>Plan</h2>
-      <p style={{ color: "var(--text-tertiary)", fontSize: 14, marginBottom: 16 }}>{describe(state)}</p>
+    <section id="plan" className="card p-5 sm:p-6">
+      <h2 className="mb-1 text-xl italic">Plan</h2>
+      <p className="mb-4 text-sm text-[var(--text-tertiary)]">{describe(state)}</p>
       <Quotas quotas={state.quotas ?? []} />
       {state.billing_enabled && state.academic_discount && !paying && (
-        <p style={{ fontSize: 14, marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }} role="status">
-          <GraduationCap style={{ width: 16, height: 16, flexShrink: 0 }} aria-hidden="true" />
+        <p className="mb-3 flex items-center gap-1.5 text-sm" role="status">
+          <GraduationCap className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span>Academic discount: your university email qualifies, and the discount is applied at checkout.</span>
         </p>
       )}
@@ -169,14 +169,14 @@ export function PlanSection() {
         />
       )}
       {state.billing_enabled && paying && (state.plans?.length ?? 0) > 1 && (
-        <p style={{ fontSize: 14, marginBottom: 12 }}>
+        <p className="mb-3 text-sm">
           {state.manage_via === "email"
             ? "To switch plans, email us using the link below."
             : "To switch plans, use Manage billing."}
         </p>
       )}
       {state.billing_enabled && (
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+        <div className="flex flex-wrap items-center gap-3">
           {state.can_manage &&
             (state.manage_via === "email" ? (
               state.support_email ? (
@@ -187,7 +187,7 @@ export function PlanSection() {
                   Email to change or cancel
                 </a>
               ) : (
-                <p style={{ fontSize: 14 }}>To change or cancel, contact the operator of this service.</p>
+                <p className="text-sm">To change or cancel, contact the operator of this service.</p>
               )
             ) : (
               <button className="btn-secondary disabled:cursor-not-allowed disabled:opacity-50" onClick={() => go(api.billing.portal())}>
@@ -196,7 +196,7 @@ export function PlanSection() {
             ))}
         </div>
       )}
-      {error && <p style={{ color: "#f87171", fontSize: 14, marginTop: 12 }}>{error}</p>}
+      {error && <p className="mt-3 text-sm text-red-400">{error}</p>}
     </section>
   );
 }

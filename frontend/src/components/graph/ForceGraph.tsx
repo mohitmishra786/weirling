@@ -44,6 +44,12 @@ function escapeXml(s: string) {
   return s.replace(/[<>&"']/g, (c) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;", "'": "&apos;" })[c]!);
 }
 
+/** Canvas height for a given width: the prop is the most it may be, and
+ *  phones get a shorter graph so the page around it stays reachable. */
+function heightFor(width: number, max: number) {
+  return width > 0 ? Math.min(max, Math.max(300, Math.round(width * 0.8))) : max;
+}
+
 function reducedMotion() {
   return typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 }
@@ -80,6 +86,9 @@ export const ForceGraph = forwardRef<ForceGraphHandle, {
   props.current = { nodes, selected, onSelect, onDropOnto };
   const frame = useRef(0);
   const draw = useRef<() => void>(() => {});
+  // Zoom buttons for touch screens, which have no wheel.
+  const zoomBy = useRef<(factor: number) => void>(() => {});
+  const fitView = useRef<() => void>(() => {});
 
   // Rebuild the simulation when the graph itself changes (not on selection).
   useEffect(() => {
@@ -90,7 +99,7 @@ export const ForceGraph = forwardRef<ForceGraphHandle, {
     view.current.userMoved = false;
     hover.current = -1;
     const w = wrapRef.current?.clientWidth ?? 0;
-    if (w > 0) simRef.current.aspect = Math.max(0.5, Math.min(3, w / height));
+    if (w > 0) simRef.current.aspect = Math.max(0.5, Math.min(3, w / heightFor(w, height)));
     if (reducedMotion()) settle(simRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, height]);
@@ -138,18 +147,20 @@ export const ForceGraph = forwardRef<ForceGraphHandle, {
     if (!ctx) return; // jsdom and very old browsers: the lists still work
 
     let width = 0;
+    let h = height;
     const applyFit = (sim: Sim) => {
-      const f = fit(sim, width, height);
+      const f = fit(sim, width, h);
       Object.assign(view.current, f, { fitK: f.k || 1 });
     };
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     const resize = () => {
       width = wrap.clientWidth;
-      if (simRef.current && width > 0) simRef.current.aspect = Math.max(0.5, Math.min(3, width / height));
+      h = heightFor(width, height);
+      if (simRef.current && width > 0) simRef.current.aspect = Math.max(0.5, Math.min(3, width / h));
       canvas.width = Math.round(width * dpr);
-      canvas.height = Math.round(height * dpr);
+      canvas.height = Math.round(h * dpr);
       canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
+      canvas.style.height = `${h}px`;
       if (!view.current.userMoved && simRef.current) applyFit(simRef.current);
       draw.current();
     };
@@ -164,7 +175,7 @@ export const ForceGraph = forwardRef<ForceGraphHandle, {
       const isLit = (i: number) => lit < 0 || i === lit || Boolean(near?.has(i));
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, width, height);
+      ctx.clearRect(0, 0, width, h);
       ctx.setTransform(dpr * k, 0, 0, dpr * k, dpr * x, dpr * y);
 
       // Links: faint, the hovered topic's links in the accent.
@@ -210,7 +221,9 @@ export const ForceGraph = forwardRef<ForceGraphHandle, {
       // Like Obsidian: at the fitted zoom only the strongest topics are
       // named; the rest fade in as you zoom in, or when you hover nearby.
       const radii = sim.nodes.map((p) => p.r).sort((a, b) => b - a);
-      const named = radii[Math.min(radii.length - 1, LABELS_AT_REST - 1)] ?? 0;
+      // About one name per 90 px of width: 12 on a laptop, 4 on a phone.
+      const atRest = Math.max(4, Math.min(LABELS_AT_REST, Math.round(width / 90)));
+      const named = radii[Math.min(radii.length - 1, atRest - 1)] ?? 0;
       const zoomFade = Math.max(0, Math.min(1, (k / view.current.fitK - 1.15) / 0.5));
       // Place labels by priority (hovered topic, its neighbours, then the
       // biggest topics) and skip any that would overlap one already placed:
@@ -218,7 +231,10 @@ export const ForceGraph = forwardRef<ForceGraphHandle, {
       const order = sim.nodes
         .map((p, i) => ({ p, i, rank: i === lit ? 3 : lit >= 0 && isLit(i) ? 2 : 0 }))
         .sort((a, b) => b.rank - a.rank || b.p.r - a.p.r);
-      const placed: { x: number; y: number; w: number; h: number }[] = [];
+      // Circles count as taken space too, so a name never covers a topic.
+      const placed: { x: number; y: number; w: number; h: number; owner?: number }[] = sim.nodes.map(
+        (p, i) => ({ x: p.x - p.r, y: p.y - p.r, w: p.r * 2, h: p.r * 2, owner: i }),
+      );
       const lineH = 15 / k;
       for (const { p, i } of order) {
         const n = meta[i];
@@ -230,7 +246,9 @@ export const ForceGraph = forwardRef<ForceGraphHandle, {
         const text = clip(n.label, i === lit);
         const w = ctx.measureText(text).width;
         const box = { x: p.x - w / 2 - 3 / k, y: p.y + p.r + 3 / k, w: w + 6 / k, h: lineH };
-        const hits = placed.some((b) => box.x < b.x + b.w && b.x < box.x + box.w && box.y < b.y + b.h && b.y < box.y + box.h);
+        const hits = placed.some(
+          (b) => b.owner !== i && box.x < b.x + b.w && b.x < box.x + box.w && box.y < b.y + b.h && b.y < box.y + box.h,
+        );
         if (hits && i !== lit) continue;
         placed.push(box);
         ctx.globalAlpha = alpha;
@@ -348,6 +366,18 @@ export const ForceGraph = forwardRef<ForceGraphHandle, {
       applyFit(simRef.current);
       draw.current();
     };
+    fitView.current = onDouble;
+    zoomBy.current = (factor: number) => {
+      const v = view.current;
+      const k = Math.max(0.25, Math.min(4, v.k * factor));
+      const cx = width / 2;
+      const cy = h / 2;
+      v.x = cx - ((cx - v.x) * k) / v.k;
+      v.y = cy - ((cy - v.y) * k) / v.k;
+      v.k = k;
+      v.userMoved = true;
+      draw.current();
+    };
 
     canvas.addEventListener("pointerdown", onDown);
     canvas.addEventListener("pointermove", onMove);
@@ -381,16 +411,36 @@ export const ForceGraph = forwardRef<ForceGraphHandle, {
 
   return (
     <div ref={wrapRef} className="relative overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-sunken)]">
+      {/* Touch: vertical swipes still scroll the page (a full-width graph
+          must not trap the reader); a mouse gets the whole canvas. */}
       <canvas
         ref={canvasRef}
         role="img"
         aria-label={label}
-        className="block touch-none select-none"
-        style={{ height, cursor: "grab" }}
+        className="block w-full touch-pan-y select-none [@media(pointer:fine)]:touch-none"
+        style={{ height: Math.min(height, 420), cursor: "grab" }}
       />
-      <div className="pointer-events-none absolute bottom-2 left-3 right-3 flex justify-between text-[11px] text-[var(--text-tertiary)]">
-        <span className="truncate pr-4 text-[var(--text-secondary)]">{hint ?? ""}</span>
-        <span className="shrink-0">Scroll to zoom · drag to move · double-click to fit</span>
+      <div className="absolute right-2 top-2 flex flex-col overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--bg-elevated)]/90 backdrop-blur">
+        {[
+          { label: "Zoom in", text: "+", run: () => zoomBy.current(1.35) },
+          { label: "Zoom out", text: "−", run: () => zoomBy.current(1 / 1.35) },
+          { label: "Fit the graph", text: "⤢", run: () => fitView.current() },
+        ].map((b) => (
+          <button
+            key={b.label}
+            type="button"
+            aria-label={b.label}
+            title={b.label}
+            onClick={b.run}
+            className="h-11 w-11 border-b border-[var(--border)] text-lg leading-none text-[var(--text-secondary)] last:border-b-0 hover:bg-[var(--bg-sunken)] hover:text-[var(--text)]"
+          >
+            {b.text}
+          </button>
+        ))}
+      </div>
+      <div className="pointer-events-none absolute bottom-2 left-3 right-3 flex justify-between gap-3 text-[11px] text-[var(--text-tertiary)]">
+        <span className="truncate text-[var(--text-secondary)]">{hint ?? ""}</span>
+        <span className="hidden shrink-0 sm:inline">Scroll to zoom · drag to move · double-click to fit</span>
       </div>
     </div>
   );

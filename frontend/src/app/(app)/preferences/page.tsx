@@ -250,123 +250,211 @@ export default function PreferencesPage() {
         <h1 className="mt-1 text-3xl italic">Preferences</h1>
       </header>
 
-      <Section title="Digest">
-        <div className="grid max-w-xl gap-5">
-          <Field
-            label="Frequency"
-            htmlFor="frequency-input"
-            hint="Lighter reader? Weekly bundles the best of your week; “email off” stops digest emails while keeping your in-app digest."
-          >
-            <select
-              id="frequency-input"
-              className="input"
-              value={user.digest_frequency}
-              onChange={(e) => setUser({ ...user, digest_frequency: e.target.value })}
-            >
-              <option value="daily">Daily</option>
-              <option value="twice_daily">Twice daily</option>
-              <option value="weekly">Weekly (we’ll keep it short)</option>
-              <option value="in_app_only">Email off (read in-app only)</option>
-            </select>
-          </Field>
-          <Field
-            label={
-              <span className="flex justify-between">
-                <span>Max items per digest</span>
-                <span className="font-mono text-[var(--text-secondary)]">{user.digest_max_items}</span>
-              </span>
-            }
-            htmlFor="max-items-input"
-            hint={
-              user.digest_length_locked
-                ? "Locked to your choice."
-                : "Auto: adapts to how much you actually open. Moving the slider locks it."
-            }
-          >
-            <input
-              id="max-items-input"
-              type="range"
-              className="w-full"
-              min={5}
-              max={30}
-              value={user.digest_max_items}
-              onChange={(e) => setUser({ ...user, digest_max_items: Number(e.target.value) })}
-            />
-          </Field>
-          <Field
-            label={
-              <span className="flex justify-between">
-                <span>Discovery</span>
-                <span className="font-mono text-[var(--text-secondary)]">{user.serendipity_percentage}%</span>
-              </span>
-            }
-            htmlFor="discovery-input"
-            hint="Share of each digest from outside your usual sources."
-          >
-            <input
-              id="discovery-input"
-              type="range"
-              className="w-full"
-              min={0}
-              max={50}
-              value={user.serendipity_percentage}
-              onChange={(e) => setUser({ ...user, serendipity_percentage: Number(e.target.value) })}
-            />
-          </Field>
-          <Field
-            label={
-              <>
-                Send time <span className="font-normal text-[var(--text-tertiary)]">(your time zone)</span>
-                <span className="ml-2 chip border border-[var(--border-strong)] text-[10px] text-[var(--text-secondary)]">
-                  {user.send_time_locked ? "Locked" : "Auto-learned"}
+      {/* Two columns on wide screens: settings you change often on the
+          left, mail, plan and keys on the right; the graph spans both. */}
+      <div className="grid gap-6 xl:grid-cols-2 xl:items-start">
+        <div className="min-w-0 space-y-6">
+          <Section title="Digest">
+            <div className="grid gap-5">
+              <Field
+                label="Frequency"
+                htmlFor="frequency-input"
+                hint="Lighter reader? Weekly bundles the best of your week; “email off” stops digest emails while keeping your in-app digest."
+              >
+                <select
+                  id="frequency-input"
+                  className="input"
+                  value={user.digest_frequency}
+                  onChange={(e) => setUser({ ...user, digest_frequency: e.target.value })}
+                >
+                  <option value="daily">Daily</option>
+                  <option value="twice_daily">Twice daily</option>
+                  <option value="weekly">Weekly (we’ll keep it short)</option>
+                  <option value="in_app_only">Email off (read in-app only)</option>
+                </select>
+              </Field>
+              <Field
+                label={
+                  <span className="flex justify-between">
+                    <span>Max items per digest</span>
+                    <span className="font-mono text-[var(--text-secondary)]">{user.digest_max_items}</span>
+                  </span>
+                }
+                htmlFor="max-items-input"
+                hint={
+                  user.digest_length_locked
+                    ? "Locked to your choice."
+                    : "Auto: adapts to how much you actually open. Moving the slider locks it."
+                }
+              >
+                <input
+                  id="max-items-input"
+                  type="range"
+                  className="w-full"
+                  min={5}
+                  max={30}
+                  value={user.digest_max_items}
+                  onChange={(e) => setUser({ ...user, digest_max_items: Number(e.target.value) })}
+                />
+              </Field>
+              <Field
+                label={
+                  <span className="flex justify-between">
+                    <span>Discovery</span>
+                    <span className="font-mono text-[var(--text-secondary)]">{user.serendipity_percentage}%</span>
+                  </span>
+                }
+                htmlFor="discovery-input"
+                hint="Share of each digest from outside your usual sources."
+              >
+                <input
+                  id="discovery-input"
+                  type="range"
+                  className="w-full"
+                  min={0}
+                  max={50}
+                  value={user.serendipity_percentage}
+                  onChange={(e) => setUser({ ...user, serendipity_percentage: Number(e.target.value) })}
+                />
+              </Field>
+              <Field
+                label={
+                  <>
+                    Send time <span className="font-normal text-[var(--text-tertiary)]">(your time zone)</span>
+                    <span className="ml-2 chip border border-[var(--border-strong)] text-[10px] text-[var(--text-secondary)]">
+                      {user.send_time_locked ? "Locked" : "Auto-learned"}
+                    </span>
+                  </>
+                }
+                htmlFor="send-time-input"
+                hint={
+                  user.send_time_locked
+                    ? "Locked to the time you set."
+                    : "Auto: follows when you actually open digests. Changing it locks it."
+                }
+              >
+                <input
+                  id="send-time-input"
+                  type="time"
+                  className="input w-auto"
+                  value={user.digest_time_morning.slice(0, 5)}
+                  onChange={(e) => setUser({ ...user, digest_time_morning: `${e.target.value}:00` })}
+                />
+              </Field>
+              <Field label="Languages" htmlFor="languages-input" hint="Comma-separated codes, for example en, de. Empty = every language.">
+                {/* Raw text while editing: splitting/filtering per keystroke would
+                    eat the trailing comma and block typing the next language. */}
+                <input
+                  id="languages-input"
+                  type="text"
+                  className="input"
+                  value={languagesText}
+                  onChange={(e) => setLanguagesText(e.target.value)}
+                  placeholder="en, de, fr"
+                />
+              </Field>
+            </div>
+            <LlmStatus />
+            <div className="mt-5 flex items-center gap-3">
+              <button type="button" className="btn-primary disabled:cursor-wait disabled:opacity-70" onClick={save} disabled={saving}>
+                {saving ? "Saving…" : "Save preferences"}
+              </button>
+              {saved && (
+                <span role="status" className="flex items-center gap-1.5 text-sm text-emerald-400">
+                  <Check className="h-4 w-4" aria-hidden="true" /> Saved
                 </span>
+              )}
+            </div>
+            {saveError && (
+              <p role="alert" className="mt-2 text-sm text-red-400">
+                {saveError}
+              </p>
+            )}
+          </Section>
+
+          <Section title="Export saved articles">
+            <CitationExport />
+          </Section>
+
+          <Section
+            title="Your data"
+            hint={
+              <>
+                Download a portable copy of everything Weirling stores about you, or permanently delete your account.{" "}
+                <a href="/privacy" className="underline hover:text-[var(--text)]">
+                  What we collect and why
+                </a>
+                .
               </>
             }
-            htmlFor="send-time-input"
-            hint={
-              user.send_time_locked
-                ? "Locked to the time you set."
-                : "Auto: follows when you actually open digests. Changing it locks it."
-            }
           >
-            <input
-              id="send-time-input"
-              type="time"
-              className="input w-auto"
-              value={user.digest_time_morning.slice(0, 5)}
-              onChange={(e) => setUser({ ...user, digest_time_morning: `${e.target.value}:00` })}
-            />
-          </Field>
-          <Field label="Languages" htmlFor="languages-input" hint="Comma-separated codes, for example en, de. Empty = every language.">
-            {/* Raw text while editing: splitting/filtering per keystroke would
-                eat the trailing comma and block typing the next language. */}
-            <input
-              id="languages-input"
-              type="text"
-              className="input"
-              value={languagesText}
-              onChange={(e) => setLanguagesText(e.target.value)}
-              placeholder="en, de, fr"
-            />
-          </Field>
+            <label className="mb-4 flex items-start gap-2.5 text-sm">
+              <input
+                type="checkbox"
+                className="mt-0.5"
+                checked={!user.collaborative_opt_out}
+                onChange={async (e) => {
+                  const updated = await api.preferences.update({ collaborative_opt_out: !e.target.checked }).catch(() => null);
+                  if (updated) {
+                    setUser(updated);
+                    setInitial(updated);
+                  }
+                }}
+              />
+              <span>
+                Count my reading in anonymous &ldquo;popular with readers&rdquo; picks for new users. Only articles at least
+                20 readers finished are ever used, and never linked to you.
+              </span>
+            </label>
+            <div className="flex flex-wrap gap-3">
+              <button type="button" className="btn-secondary disabled:opacity-50" onClick={exportData} disabled={busy}>
+                Export my data
+              </button>
+              <button type="button" className="btn-secondary state-negative border disabled:opacity-50" onClick={deleteAccount} disabled={busy}>
+                Delete account
+              </button>
+            </div>
+            <p className="mt-4 text-xs text-[var(--text-tertiary)]">
+              Running this instance? <a href="/admin/setup" className="underline hover:text-[var(--text)]">Instance setup</a>,{" "}
+              <a href="/admin/metrics" className="underline hover:text-[var(--text)]">product metrics</a> and{" "}
+              <a href="/admin/ingestion" className="underline hover:text-[var(--text)]">ingestion</a> (owner only).
+            </p>
+          </Section>
         </div>
-        <LlmStatus />
-        <div className="mt-5 flex items-center gap-3">
-          <button type="button" className="btn-primary disabled:cursor-wait disabled:opacity-70" onClick={save} disabled={saving}>
-            {saving ? "Saving…" : "Save preferences"}
-          </button>
-          {saved && (
-            <span role="status" className="flex items-center gap-1.5 text-sm text-emerald-400">
-              <Check className="h-4 w-4" aria-hidden="true" /> Saved
-            </span>
-          )}
+        <div className="min-w-0 space-y-6">
+          <Section title="Newsletters">
+            <NewsletterAddressCard />
+          </Section>
+
+          <Section title="Weekly summary">
+            <label className="flex items-start gap-2.5 text-sm">
+              <input
+                type="checkbox"
+                className="mt-0.5"
+                checked={Boolean(user.weekly_email)}
+                onChange={async (e) => {
+                  const updated = await api.preferences.update({ weekly_email: e.target.checked }).catch(() => null);
+                  if (updated) {
+                    setUser(updated);
+                    setInitial(updated);
+                  }
+                }}
+              />
+              <span>
+                Email me once a week with what Weirling learned: topics rising and fading, and the source I finish most,
+                each with a one-click undo.
+              </span>
+            </label>
+          </Section>
+
+          <Section title="Digest alerts">
+            <PushAlerts />
+          </Section>
+
+          <PlanSection />
+          <LlmKeySection />
         </div>
-        {saveError && (
-          <p role="alert" className="mt-2 text-sm text-red-400">
-            {saveError}
-          </p>
-        )}
-      </Section>
+      </div>
 
       {graph && (
         <Section
@@ -437,86 +525,6 @@ export default function PreferencesPage() {
         </Section>
       )}
 
-      <Section title="Newsletters">
-        <NewsletterAddressCard />
-      </Section>
-
-      <Section title="Weekly summary">
-        <label className="flex items-start gap-2.5 text-sm">
-          <input
-            type="checkbox"
-            className="mt-0.5"
-            checked={Boolean(user.weekly_email)}
-            onChange={async (e) => {
-              const updated = await api.preferences.update({ weekly_email: e.target.checked }).catch(() => null);
-              if (updated) {
-                setUser(updated);
-                setInitial(updated);
-              }
-            }}
-          />
-          <span>
-            Email me once a week with what Weirling learned: topics rising and fading, and the source I finish most,
-            each with a one-click undo.
-          </span>
-        </label>
-      </Section>
-
-      <Section title="Digest alerts">
-        <PushAlerts />
-      </Section>
-
-      <Section title="Export saved articles">
-        <CitationExport />
-      </Section>
-
-      <PlanSection />
-      <LlmKeySection />
-
-      <Section
-        title="Your data"
-        hint={
-          <>
-            Download a portable copy of everything Weirling stores about you, or permanently delete your account.{" "}
-            <a href="/privacy" className="underline hover:text-[var(--text)]">
-              What we collect and why
-            </a>
-            .
-          </>
-        }
-      >
-        <label className="mb-4 flex items-start gap-2.5 text-sm">
-          <input
-            type="checkbox"
-            className="mt-0.5"
-            checked={!user.collaborative_opt_out}
-            onChange={async (e) => {
-              const updated = await api.preferences.update({ collaborative_opt_out: !e.target.checked }).catch(() => null);
-              if (updated) {
-                setUser(updated);
-                setInitial(updated);
-              }
-            }}
-          />
-          <span>
-            Count my reading in anonymous &ldquo;popular with readers&rdquo; picks for new users. Only articles at least
-            20 readers finished are ever used, and never linked to you.
-          </span>
-        </label>
-        <div className="flex flex-wrap gap-3">
-          <button type="button" className="btn-secondary disabled:opacity-50" onClick={exportData} disabled={busy}>
-            Export my data
-          </button>
-          <button type="button" className="btn-secondary state-negative border disabled:opacity-50" onClick={deleteAccount} disabled={busy}>
-            Delete account
-          </button>
-        </div>
-        <p className="mt-4 text-xs text-[var(--text-tertiary)]">
-          Running this instance? <a href="/admin/setup" className="underline hover:text-[var(--text)]">Instance setup</a>,{" "}
-          <a href="/admin/metrics" className="underline hover:text-[var(--text)]">product metrics</a> and{" "}
-          <a href="/admin/ingestion" className="underline hover:text-[var(--text)]">ingestion</a> (owner only).
-        </p>
-      </Section>
     </div>
   );
 }
