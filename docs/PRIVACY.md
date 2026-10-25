@@ -109,9 +109,10 @@ Weirling can send data to the third-party services below when configured. See
 
 - **Groq** (and optionally OpenAI): article text/titles are sent to generate
   summaries. Summaries are cached.
-- **Email provider (Spacemail by Spaceship, on the hosted service):** your
-  email address and the content of the emails we send you (digests, sign-in
-  and account messages). Self-hosters use their own SMTP provider.
+- **Email provider (Resend, on the hosted service):** your email address and
+  the content of the emails we send you (digests, sign-in and account
+  messages). Replies you send us go to our own mailboxes. Self-hosters use
+  their own provider.
 - **Postgres, Redis, Browserless:** run within the operator's own
   infrastructure.
 

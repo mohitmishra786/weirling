@@ -51,7 +51,8 @@ async def _config(session: AsyncSession) -> dict:
         "can_store_secrets": secretbox.configured(),
         "effective_registration_mode": effective_mode(),
         "llm_configured": s.llm_configured,
-        "email_configured": bool(s.smtp_host and s.smtp_password),
+        "email_configured": s.email_configured,
+        "email_provider": s.email_transport,
         "fields": instance_config.describe(stored),
     }
 
@@ -116,6 +117,12 @@ async def test_smtp(body: SMTPTest, owner: User = Depends(require_owner)) -> dic
     from app.services.setup_checks import check_smtp
 
     s = get_settings()
+    if s.email_transport == "resend" and not body.host:
+        # Email goes through Resend's API: test the real path.
+        from app.services.setup_checks import check_resend
+
+        ok, message = await check_resend(to=owner.email)
+        return {"ok": ok, "message": message}
     ok, message = await check_smtp(
         host=body.host or s.smtp_host,
         port=body.port or s.smtp_port,

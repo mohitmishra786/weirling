@@ -520,9 +520,17 @@ async def magic_link_request(
         '<p style="font-size:12px;color:#6b7280">If you didn\'t request this, ignore it.</p>'
         "</div>"
     )
+    import hashlib
+
     from app.utils.email import send_email
 
-    await send_email(to=email, subject="Your Weirling sign-in link", html_body=html)
+    # One email per link, even if the send is retried (keyed on the link, not the token).
+    await send_email(
+        to=email,
+        subject="Your Weirling sign-in link",
+        html_body=html,
+        idempotency_key="magic-link/" + hashlib.sha256(link.encode()).hexdigest(),
+    )
     return {"status": "sent"}
 
 

@@ -43,7 +43,7 @@ month (about 2 GB of memory in use), including the $5 plan fee.
 
     | Mailbox | Job |
     |---|---|
-    | `hello@` | Sends every email the app sends (`SMTP_USER`). Also the public contact. |
+    | `hello@` | The public contact address. |
     | `support@` | Replies to any app email land here (`REPLY_TO_EMAIL`), and the app shows it for help (`SUPPORT_EMAIL`). |
     | `privacy@` | Data and takedown requests (`GRIEVANCE_CONTACT_EMAIL`), shown on /contact. Keep it separate: these have legal deadlines and need a clean record. |
     | `mohit@` | You. |
@@ -60,6 +60,24 @@ month (about 2 GB of memory in use), including the $5 plan fee.
     Start with `p=none`; after two clean weeks, change it to `p=quarantine`.
 4. Send a test email from webmail to a Gmail address; in Gmail, "Show
    original" should say SPF, DKIM and DMARC: PASS.
+
+### 1.5 Sending app email: Resend
+
+Railway's Hobby plan blocks outgoing SMTP (ports 25, 465 and 587), so the
+app sends through Resend's HTTPS API instead; Spacemail keeps the human
+mailboxes.
+
+1. In Resend, **Domains, Add Domain**: `mail.weirling.com` (a subdomain keeps
+   bulk-digest reputation away from your main domain). Pick the region
+   nearest your Railway services; it can't change later.
+2. Add the records Resend shows (DKIM TXT, and MX plus SPF TXT for the
+   `send.mail` return path) at Spaceship, then **Verify**.
+3. **API Keys, Create**: permission **Sending access**, domain
+   `mail.weirling.com`. This is `RESEND_API_KEY`.
+
+With `RESEND_API_KEY` set, `EMAIL_PROVIDER=auto` uses Resend. On Railway Pro
+(SMTP allowed) you can use Spacemail's SMTP instead: set `SMTP_HOST`,
+`SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` and leave `RESEND_API_KEY` empty.
 
 Limits: Spacemail paid plans send up to 500 emails an hour per mailbox,
 plenty for the beta. Move digests to a transactional sender (Resend,
@@ -115,11 +133,8 @@ PUBLIC_API_URL=https://api.weirling.com
 COOKIE_DOMAIN=.weirling.com
 
 LLM_API_KEY=...                   # paid Groq key
-SMTP_HOST=mail.spacemail.com
-SMTP_PORT=587
-SMTP_USER=hello@weirling.com
-SMTP_PASSWORD=...                 # the mailbox password
-FROM_EMAIL=hello@weirling.com
+RESEND_API_KEY=...                # sending-only key, see 1.5
+FROM_EMAIL=hello@mail.weirling.com
 REPLY_TO_EMAIL=support@weirling.com       # replies to any email land in support@
 SUPPORT_EMAIL=support@weirling.com
 GRIEVANCE_CONTACT_EMAIL=privacy@weirling.com
@@ -230,5 +245,6 @@ sign-up. So, as soon as `https://weirling.com` loads:
 | `DATABASE_URL is empty` or `Could not parse SQLAlchemy URL` | the reference resolved to nothing: set `DATABASE_URL=${{Postgres.DATABASE_URL_PRIVATE}}` on the service itself (not as a shared variable) and check the value with the eye icon |
 | Healthcheck fails with "service unavailable" although the log says `Uvicorn running` | uvicorn listens on IPv6 only (`--host ::`); use `--host 0.0.0.0` |
 | api restarts during deploy | the migration failed: check the api logs right after `python -m app.migrate` |
+| Sign-up or "Resend the link" hangs about 30 s and no email arrives | SMTP is blocked by the host (Railway Hobby): use Resend (1.5) |
 | No digests arrive | worker-digest or beat isn't running, or SMTP is wrong: test it in /admin/setup |
 | "too many clients" from Postgres | lower `DB_POOL_SIZE` / `DB_MAX_OVERFLOW` (workers don't pool) |

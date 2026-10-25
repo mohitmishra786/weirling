@@ -337,6 +337,7 @@ Redis is persistent: the compose service runs with AOF (`--appendonly yes --appe
 | `SMTP_HOST` / `SMTP_PORT` | Empty / `587` | SMTP server. Port 587 uses STARTTLS, 465 uses TLS. |
 | `SMTP_USER` / `SMTP_PASSWORD` | Empty | Mailbox login (email skipped if unset). |
 | `FROM_EMAIL` / `FROM_NAME` | `SMTP_USER` / `Weirling` | Sender of every email. |
+| `EMAIL_PROVIDER` / `RESEND_API_KEY` | `auto` / Empty | `auto` sends through Resend's HTTPS API when the key is set (for hosts that block SMTP), else SMTP. |
 | `REPLY_TO_EMAIL` | Empty | Where replies go (e.g. `support@`); empty means back to the sender. |
 | `SUPPORT_EMAIL` | Empty | Help address shown in the app (falls back to `GRIEVANCE_CONTACT_EMAIL`). |
 | `EMAIL_PHYSICAL_ADDRESS` | Empty | Physical mailing address included in digest email footer (CAN-SPAM). |
@@ -434,7 +435,7 @@ reviewed by counsel before collecting user data. Licensed under
 | Cache & Queue | Redis 7 + Celery |
 | Embeddings | sentence-transformers (`all-MiniLM-L6-v2`, local, no API cost; or hash embeddings in `lite` profile) |
 | Summarization LLM | OpenAI-compatible HTTP (`LLM_BASE_URL` + `LLM_MODEL_*`). Default host is Groq with `openai/gpt-oss-120b` and `openai/gpt-oss-20b`. Optional; falls back to extractive summarization. |
-| Email delivery | Any SMTP provider (Spacemail on the hosted service) |
+| Email delivery | Any SMTP provider, or Resend over HTTPS (the hosted service uses Resend) |
 | Scraping | trafilatura + Playwright / Browserless (in `full` profile) |
 | ORM | SQLAlchemy 2.0 (async) |
 | Migrations | Alembic |

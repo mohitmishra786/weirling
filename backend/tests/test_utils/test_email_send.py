@@ -64,3 +64,89 @@ def test_not_configured_sends_nothing(smtp, monkeypatch):
     monkeypatch.setattr(get_settings(), "smtp_password", "")
     assert not email.send_email_sync("r@example.org", "Hi", "<p>hi</p>")
     smtp["plain"].send_message.assert_not_called()
+
+
+class _Resp:
+    def __init__(self, status, body=None, headers=None):
+        self.status_code = status
+        self._body = body or {}
+        self.headers = headers or {}
+        self.text = str(self._body)
+
+    def json(self):
+        return self._body
+
+
+@pytest.fixture
+def resend(monkeypatch):
+    s = get_settings()
+    for k, v in {
+        "email_provider": "auto",
+        "resend_api_key": "re_test",
+        "from_email": "hello@mail.example.com",
+        "from_name": "Weirling",
+        "reply_to_email": "support@example.com",
+    }.items():
+        monkeypatch.setattr(s, k, v)
+    monkeypatch.setattr(email.time, "sleep", lambda _s: None)
+    calls = []
+
+    def post(url, json, headers, timeout):
+        calls.append({"url": url, "json": json, "headers": headers})
+        return responses.pop(0)
+
+    responses: list = []
+    import httpx
+
+    monkeypatch.setattr(httpx, "post", post)
+    return calls, responses
+
+
+def test_resend_is_used_when_a_key_is_set(smtp, resend):
+    calls, responses = resend
+    responses.append(_Resp(200, {"id": "abc"}))
+    assert email.send_email_sync(
+        "r@example.org",
+        "Hi",
+        "<p>hi</p>",
+        "hi",
+        extra_headers={"List-Unsubscribe": "<https://x/u>"},
+        idempotency_key="verify/1",
+    )
+    sent = calls[0]
+    assert sent["url"] == "https://api.resend.com/emails"
+    assert sent["json"]["from"] == "Weirling <hello@mail.example.com>"
+    assert sent["json"]["to"] == ["r@example.org"]
+    assert sent["json"]["reply_to"] == "support@example.com"
+    assert sent["json"]["headers"] == {"List-Unsubscribe": "<https://x/u>"}
+    assert sent["headers"]["Idempotency-Key"] == "verify/1"
+    smtp["plain"].send_message.assert_not_called()
+
+
+def test_resend_retries_429_and_5xx_but_not_other_4xx(resend):
+    calls, responses = resend
+    responses.extend(
+        [_Resp(429, headers={"retry-after": "1"}), _Resp(502), _Resp(200, {"id": "x"})]
+    )
+    assert email.send_email_sync("r@example.org", "Hi", "<p>hi</p>")
+    assert len(calls) == 3
+
+    calls.clear()
+    responses.extend([_Resp(403, {"message": "domain not verified"})])
+    assert not email.send_email_sync("r@example.org", "Hi", "<p>hi</p>")
+    assert len(calls) == 1
+
+
+def test_email_provider_setting():
+    from pydantic import ValidationError
+
+    from app.config import Settings
+
+    assert Settings(_env_file=None, resend_api_key="re_x").email_transport == "resend"
+    assert Settings(_env_file=None, resend_api_key="").email_transport == "smtp"
+    assert (
+        Settings(_env_file=None, resend_api_key="re_x", email_provider="SMTP").email_transport
+        == "smtp"
+    )
+    with pytest.raises(ValidationError, match="EMAIL_PROVIDER"):
+        Settings(_env_file=None, email_provider="sendgrid")

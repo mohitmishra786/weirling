@@ -135,7 +135,14 @@ async def send_verification_email(user: User) -> bool:
         "account, ignore this email and nothing more will be sent.</p>"
         "</div>"
     )
-    return await send_email(to=user.email, subject="Confirm your Weirling email", html_body=html)
+    import hashlib
+
+    return await send_email(
+        to=user.email,
+        subject="Confirm your Weirling email",
+        html_body=html,
+        idempotency_key="verify/" + hashlib.sha256(link.encode()).hexdigest(),
+    )
 
 
 def email_domain(email: str) -> str:
