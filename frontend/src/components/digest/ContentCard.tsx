@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { ContentItem } from "../../lib/types";
 import { topicFromWhy, whySegments } from "../../lib/why";
@@ -32,6 +32,24 @@ export function ContentCard({
 }: ContentCardProps) {
   const router = useRouter();
   const [showWhy, setShowWhy] = useState(false);
+  const whyRef = useRef<HTMLDivElement | null>(null);
+  // The explanation is a popover: a click anywhere else or Escape closes it,
+  // so it never sits over the next item.
+  useEffect(() => {
+    if (!showWhy) return;
+    const onDown = (e: PointerEvent) => {
+      if (whyRef.current && !whyRef.current.contains(e.target as Node)) setShowWhy(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowWhy(false);
+    };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [showWhy]);
   const [summaryLevel, setSummaryLevel] = useState<"brief" | "detailed">("brief");
 
   const discoveredVia =
@@ -147,9 +165,9 @@ export function ContentCard({
       )}
 
       {/* Footer: why-this + feedback */}
-      <div className="mt-4 flex items-center justify-between border-t border-stone-100 pt-3 dark:border-stone-800">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-stone-100 pt-3 dark:border-stone-800">
         {whySummary || segments.length ? (
-          <div className="relative">
+          <div className="relative" ref={whyRef}>
             <button
               type="button"
               onClick={() => setShowWhy((v) => !v)}
@@ -165,7 +183,7 @@ export function ContentCard({
                 id={`why-${content.id}`}
                 role="region"
                 aria-label="Why this is ranked here"
-                className="absolute bottom-full left-0 z-20 mb-2 w-72 rounded-lg bg-stone-900 p-3 text-xs text-white shadow-xl"
+                className="absolute bottom-full left-0 z-20 mb-2 w-72 max-w-[calc(100vw-3rem)] rounded-lg bg-stone-900 p-3 text-xs text-white shadow-xl"
               >
                 <div className="mb-2 font-semibold">Why this is ranked here</div>
                 {whySummary && <p className="mb-2 text-stone-100">{whySummary}</p>}

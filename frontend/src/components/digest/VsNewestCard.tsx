@@ -21,7 +21,7 @@ export function VsNewestCard() {
   if (!result?.available) return null;
   const line = result.interleaving ? winLine(result.interleaving) : null;
   return (
-    <section aria-labelledby="vs-newest-heading" className="mb-6 rounded-lg border border-stone-200 px-4 py-3 dark:border-stone-700">
+    <section aria-labelledby="vs-newest-heading" className="rounded-lg border border-stone-200 px-4 py-3 dark:border-stone-700">
       <h2 id="vs-newest-heading" className="text-xs font-semibold uppercase tracking-wide text-stone-500 dark:text-stone-400">
         Your digest vs newest-first
       </h2>

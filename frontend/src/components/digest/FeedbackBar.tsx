@@ -66,7 +66,7 @@ export function FeedbackBar({ contentItemId, topics, onFeedback }: FeedbackBarPr
   };
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex flex-wrap items-center gap-1.5 [&>button]:whitespace-nowrap">
       <button
         onClick={() => rate(1)}
         title="Helpful"

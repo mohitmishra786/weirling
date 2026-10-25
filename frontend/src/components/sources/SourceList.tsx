@@ -61,7 +61,7 @@ export function SourceList({ sources, onUpdated, onDeleted }: SourceListProps) {
   }
 
   return (
-    <div className="space-y-2.5">
+    <div className="grid gap-2.5 xl:grid-cols-2">
       {sources.map((s) => (
         <div
           key={s.id}
