@@ -77,7 +77,9 @@ jobs:
           touch "/tmp/digests/${digest#sha256:}"
       - uses: actions/upload-artifact@v7
         with:
-          name: digests-${{ matrix.image.name }}-${{ matrix.platform.arch }}
+          # Arch first: a pattern like digests-backend-* would also match
+          # backend-lite and mix the two images into one tag (it did, in 0.3.0).
+          name: digests-${{ matrix.platform.arch }}-${{ matrix.image.name }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -99,7 +101,7 @@ jobs:
       - uses: actions/download-artifact@v7
         with:
           path: /tmp/digests
-          pattern: digests-${{ matrix.image.name }}-*
+          pattern: digests-*-${{ matrix.image.name }}
           merge-multiple: true
       - uses: docker/setup-buildx-action@v4
       - uses: docker/login-action@v4
@@ -121,6 +123,8 @@ jobs:
         env:
           REPO: ${{ matrix.image.repo }}
         run: |
+          # Exactly one image per architecture, or the tag would mix builds.
+          [ "$(ls | wc -l)" -eq 2 ] || { echo "expected 2 digests, got: $(ls)"; exit 1; }
           tags=$(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON")
           if [ -z "$tags" ]; then echo "No tags for this ref; nothing to publish"; exit 0; fi
           docker buildx imagetools create $tags $(printf "$REPO@sha256:%s " *)

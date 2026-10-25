@@ -151,7 +151,7 @@ set the start command (Settings, Deploy, Custom Start Command):
 
 | Service | Start command | Notes |
 |---|---|---|
-| **api** | `sh -c "python -m app.migrate && exec uvicorn app.main:app --host :: --port ${PORT:-8000}"` | Settings, Networking: **Generate domain** first to test, then **Custom domain** `api.weirling.com`. Healthcheck path `/health`. |
+| **api** | `sh -c "python -m app.migrate && exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"` | Settings, Networking: **Generate domain** first to test, then **Custom domain** `api.weirling.com`. Healthcheck path `/health`. |
 | **worker-ingest** | `celery -A app.workers.celery_app worker --loglevel=info --pool=solo -Q scrape,embed -n ingest@%h` | Fetching and embeddings. |
 | **worker-digest** | `celery -A app.workers.celery_app worker --loglevel=info --pool=solo -Q digest,celery -n digest@%h` | Kept separate so a slow feed never delays digests. |
 | **beat** | `celery -A app.workers.celery_app beat --loglevel=info` | The scheduler. Exactly one replica. |
@@ -228,6 +228,7 @@ sign-up. So, as soon as `https://weirling.com` loads:
 | Signed in, but every page sends you back to sign-in | `COOKIE_DOMAIN` isn't `.weirling.com`, or `FRONTEND_URL` doesn't match the site's address |
 | The browser console shows CORS errors | `FRONTEND_URL` / `CORS_EXTRA_ORIGINS` don't list the exact origin (with `https://`) |
 | `DATABASE_URL is empty` or `Could not parse SQLAlchemy URL` | the reference resolved to nothing: set `DATABASE_URL=${{Postgres.DATABASE_URL_PRIVATE}}` on the service itself (not as a shared variable) and check the value with the eye icon |
+| Healthcheck fails with "service unavailable" although the log says `Uvicorn running` | uvicorn listens on IPv6 only (`--host ::`); use `--host 0.0.0.0` |
 | api restarts during deploy | the migration failed: check the api logs right after `python -m app.migrate` |
 | No digests arrive | worker-digest or beat isn't running, or SMTP is wrong: test it in /admin/setup |
 | "too many clients" from Postgres | lower `DB_POOL_SIZE` / `DB_MAX_OVERFLOW` (workers don't pool) |
