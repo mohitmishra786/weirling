@@ -98,7 +98,7 @@ jobs:
           - { name: frontend, repo: ghcr.io/mohitmishra786/weirling/weirling-frontend, suffix: "" }
           - { name: aio, repo: ghcr.io/mohitmishra786/weirling/weirling-aio, suffix: "" }
     steps:
-      - uses: actions/download-artifact@v7
+      - uses: actions/download-artifact@v8
         with:
           path: /tmp/digests
           pattern: digests-*-${{ matrix.image.name }}
