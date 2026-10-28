@@ -17,7 +17,13 @@ logger = get_logger(__name__)
 
 
 async def _reset_demo_account_async() -> dict:
+    from app.config import get_settings
     from scripts.seed_demo import seed
+
+    if not get_settings().demo_mode:
+        # A queued or manual run on a normal instance must not create the
+        # demo persona.
+        return {"skipped": "DEMO_MODE is off"}
 
     password = secrets.token_urlsafe(12)
     async with AsyncSessionLocal() as session:

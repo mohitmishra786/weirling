@@ -156,6 +156,7 @@ async def test_nightly_reset_demo_task(db_session, monkeypatch):
 
     monkeypatch.setattr("app.database.AsyncSessionLocal", TestingSessionLocal)
     monkeypatch.setattr(demo_task, "AsyncSessionLocal", TestingSessionLocal)
+    monkeypatch.setattr(get_settings(), "demo_mode", True)
 
     summary = await demo_task._reset_demo_account_async()
     assert summary["email"] == "demo@weirling.local"
@@ -192,3 +193,29 @@ async def test_read_only_is_only_for_the_demo_account_on_a_demo_instance(
     monkeypatch.setattr(settings, "demo_mode", True)
     assert (await write(demo)).status_code == 403
     assert (await write(operator)).status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_demo_reset_does_nothing_without_demo_mode(db_session, monkeypatch):
+    """The nightly reset created the demo persona on every instance."""
+    import app.workers.tasks.demo as demo_task
+    from app.models.user import User
+    from app.workers.celery_app import celery_app
+    from app.workers.schedules import setup_beat_schedule
+    from tests.conftest import TestingSessionLocal
+
+    monkeypatch.setattr(demo_task, "AsyncSessionLocal", TestingSessionLocal)
+    monkeypatch.setattr(get_settings(), "demo_mode", False)
+    assert (await demo_task._reset_demo_account_async()) == {"skipped": "DEMO_MODE is off"}
+    found = (
+        await db_session.execute(select(User).where(User.email == "demo@weirling.local"))
+    ).scalar_one_or_none()
+    assert found is None
+
+    setup_beat_schedule(celery_app)
+    assert "reset-demo-account" not in celery_app.conf.beat_schedule
+    monkeypatch.setattr(get_settings(), "demo_mode", True)
+    setup_beat_schedule(celery_app)
+    assert "reset-demo-account" in celery_app.conf.beat_schedule
+    monkeypatch.setattr(get_settings(), "demo_mode", False)
+    setup_beat_schedule(celery_app)
