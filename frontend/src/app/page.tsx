@@ -369,6 +369,13 @@ function LandingSections() {
         </ol>
       </section>
 
+      <section className="mx-auto max-w-5xl px-6 pb-24" aria-labelledby="video-heading">
+        <h2 id="video-heading" className="font-playfair text-4xl italic sm:text-5xl">
+          See it in 40 seconds
+        </h2>
+        <DemoVideo />
+      </section>
+
       <section className="mx-auto max-w-5xl px-6 pb-24" aria-labelledby="example-heading">
         <h2 id="example-heading" className="font-playfair text-4xl italic sm:text-5xl">
           A real digest, with its reasons
@@ -378,22 +385,22 @@ function LandingSections() {
           panel showing which signals put each one there. It learns from what you open,
           finish, skip and rate. You can see and edit what it has learned.
         </p>
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
+        <div className="mt-10 grid gap-6 md:grid-cols-2 [&>*]:min-w-0">
           <Image
             src="/landing/example-digest.png"
             alt="A Weirling digest: ranked articles with AI summaries and scores"
             width={1280}
             height={800}
-            sizes="(min-width: 768px) 480px, 100vw"
-            className="rounded-2xl border border-white/10"
+            sizes="(min-width: 768px) 488px, 92vw"
+            className="h-auto w-full rounded-2xl border border-white/10"
           />
           <Image
             src="/landing/example-why.png"
             alt="The Why this? panel: the share of each reading signal behind an item's rank"
             width={1280}
             height={800}
-            sizes="(min-width: 768px) 480px, 100vw"
-            className="rounded-2xl border border-white/10"
+            sizes="(min-width: 768px) 488px, 92vw"
+            className="h-auto w-full rounded-2xl border border-white/10"
           />
         </div>
       </section>
@@ -467,16 +474,68 @@ function LandingSections() {
       <footer className="border-t border-white/10">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-6 py-8 text-sm text-white/60">
           <Logo />
-          <nav aria-label="Footer" className="flex flex-wrap gap-5">
-            <a href="/how-it-works" className="hover:text-white">How it works</a>
-            <a href="/vs/feedly" className="hover:text-white">Compare</a>
-            <a href="/privacy" className="hover:text-white">Privacy</a>
-            <a href="/terms" className="hover:text-white">Terms</a>
-            <a href="https://github.com/mohitmishra786/weirling" className="hover:text-white">GitHub</a>
+          <nav aria-label="Footer" className="flex flex-wrap gap-x-3 gap-y-1">
+            {[
+              ["/how-it-works", "How it works"],
+              ["/vs/feedly", "Compare"],
+              ["/privacy", "Privacy"],
+              ["/terms", "Terms"],
+              ["https://github.com/mohitmishra786/weirling", "GitHub"],
+            ].map(([href, label]) => (
+              <a key={href} href={href} className="inline-block px-2 py-2 hover:text-white">
+                {label}
+              </a>
+            ))}
           </nav>
         </div>
       </footer>
     </div>
+  );
+}
+
+// #213: the product in use, narrated, captions burned in (works muted). The
+// poster is a lazy image and the video loads only on click, so the section
+// costs nothing on page load.
+function DemoVideo() {
+  const [playing, setPlaying] = useState(false);
+  if (playing) {
+    return (
+      <video
+        className="mt-8 w-full rounded-2xl border border-white/10"
+        controls
+        autoPlay
+        playsInline
+        width={1920}
+        height={1080}
+        src="/landing/weirling-demo.mp4"
+      >
+        A 40-second tour of Weirling: the digest, the reasons behind each pick, and what it learns.
+      </video>
+    );
+  }
+  return (
+    <button
+      type="button"
+      onClick={() => setPlaying(true)}
+      className="group relative mt-8 block w-full overflow-hidden rounded-2xl border border-white/10"
+      aria-label="Play the 40-second Weirling tour"
+    >
+      <Image
+        src="/landing/weirling-demo.jpg"
+        alt=""
+        width={1280}
+        height={720}
+        sizes="(min-width: 1024px) 976px, 100vw"
+        className="w-full"
+      />
+      <span className="absolute inset-0 flex items-center justify-center">
+        <span className="flex h-20 w-20 items-center justify-center rounded-full bg-[#b45309] shadow-lg shadow-black/40 transition-transform group-hover:scale-105">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </span>
+      </span>
+    </button>
   );
 }
 

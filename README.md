@@ -19,6 +19,8 @@ Self-hostable reader for RSS, newsletters and creators. Learns from scroll depth
 
 ![Weirling's daily digest: ranked articles, each with its score and reason](docs/media/digest.png)
 
+[Watch a 40-second narrated tour](frontend/public/landing/weirling-demo.mp4) of the digest, why each item ranks and what it learns.
+
 ## What it does
 
 - **Brings your reading into one place:** RSS and Atom feeds, newsletters
